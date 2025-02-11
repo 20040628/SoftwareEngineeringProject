@@ -1,0 +1,81 @@
+# IDE - VSCode
+.vscode/
+*.code-workspace
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Maven
+backend/target/
+backend/!.mvn/wrapper/maven-wrapper.jar
+backend/!**/src/main/**/target/
+backend/!**/src/test/**/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Vue.js
+frontend/node_modules/
+frontend/.env.local
+frontend/.env.*.local
+frontend/dist/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.vite/
+frontend/coverage/
+frontend/.nuxt/
+frontend/.output/
+frontend/.nitro/
+
+# System Files
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Database
+*.sqlite
+*.db
+*.sql
+!backend/src/main/resources/data.sql
+!backend/src/main/resources/schema.sql
+
+# virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local env files
+.env
+.env.*
+!.env.example 

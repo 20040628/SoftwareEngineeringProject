@@ -1,10 +1,24 @@
 <script>
 import TestConnection from './components/TestConnection.vue'
+import UserRegister from './components/UserRegister.vue'
+import UserLogin from './components/UserLogin.vue'
 
 export default {
   name: 'App',
   components: {
-    TestConnection
+    TestConnection,
+    UserRegister,
+    UserLogin
+  },
+  data() {
+    return {
+      currentUser: null
+    }
+  },
+  methods: {
+    handleLoginSuccess(user) {
+      this.currentUser = user
+    }
   }
 }
 </script>
@@ -12,11 +26,26 @@ export default {
 <template>
   <div id="app">
     <header>
-      <h1>Vue + Spring Boot 测试</h1>
+      <h1>E-Scooter Rental System</h1>
+      <div v-if="currentUser" class="user-info">
+        Welcome, {{ currentUser.username }}!
+      </div>
     </header>
     
     <main>
-      <TestConnection />
+      <div v-if="!currentUser">
+        <div class="auth-container">
+          <UserLogin @login-success="handleLoginSuccess" />
+          <div class="divider">
+            <span>Or</span>
+          </div>
+          <UserRegister />
+        </div>
+      </div>
+      <div v-else>
+        <!-- Add your authenticated content here -->
+        <p>You are logged in!</p>
+      </div>
     </main>
   </div>
 </template>
@@ -34,9 +63,58 @@ export default {
 header {
   text-align: center;
   margin-bottom: 30px;
+  position: relative;
+}
+
+.user-info {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  font-size: 0.9em;
+  color: #666;
 }
 
 h1 {
   color: #34495e;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: #ddd;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.divider span {
+  background-color: white;
+  padding: 0 10px;
+  color: #666;
+  font-size: 0.9em;
 }
 </style>

@@ -1,5 +1,7 @@
-# SoftwareEngineeringProject
-Develop an application for hiring electric scooters in the City Centre
+# E-Scooter Rental System
+
+## Project Overview
+A web application for renting electric scooters in the City Centre.
 
 ## Project Structure
 
@@ -33,7 +35,7 @@ Develop an application for hiring electric scooters in the City Centre
 ## Database Setup
 
 1. Install MySQL 8.0+
-2. Create database (if not exists, system will create automatically):
+2. Create database:
 ```sql
 CREATE DATABASE IF NOT EXISTS vuesb;
 ```
@@ -65,24 +67,91 @@ Frontend service will run on http://localhost:5173
 
 ## API Documentation
 
-### User Related Interfaces
+### Authentication API
 
-- GET /api/users - Get All Users
-- GET /api/users/{id} - Get User by ID
-- POST /api/users - Create New User
+#### User Registration
 
-## Database
+- **URL**: `/api/auth/register`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "username": "string",     // 3-20 characters, letters, numbers and underscore only
+    "password": "string",     // Min 8 chars, must contain uppercase, lowercase and number
+    "email": "string",        // Valid email format
+    "mobile": "string",       // 10-13 digits
+    "birthday": "date"        // Format: YYYY-MM-DD, must be in the past
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "Registration successful",
+    "userId": "number",
+    "username": "string"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "username": "error message",
+    "password": "error message",
+    "email": "error message",
+    "mobile": "error message",
+    "birthday": "error message"
+  }
+  ```
 
-Project uses MySQL database. You can access the database using:
+#### User Login
 
-1. MySQL Command Line:
-```bash
-mysql -u root -p
-```
+- **URL**: `/api/auth/login`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "Login successful",
+    "userId": "number",
+    "username": "string",
+    "userType": "number",
+    "email": "string"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "error message"  // e.g., "User not found" or "Invalid password"
+  }
+  ```
 
-2. MySQL Workbench or other GUI tools with these credentials:
-- Host: localhost
-- Port: 3306
-- Database: vuesb
-- Username: root
-- Password: root
+## Validation Rules
+
+### Username
+- Length: 3-20 characters
+- Allowed characters: letters, numbers, underscore
+- Special characters not allowed
+
+### Password
+- Minimum length: 8 characters
+- Must contain:
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+
+### Email
+- Must be valid email format
+- Cannot be already registered
+
+### Mobile Number
+- Length: 10-13 digits
+- Numbers only
+
+### Birthday
+- Must be valid date format (YYYY-MM-DD)
+- Cannot be a future date

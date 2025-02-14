@@ -130,9 +130,49 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
+### Scooter API
+
+#### Add scooter
+
+- **URL**: `/api/scooters/add`
+
+- **Method**: `POST`
+
+- **Request Body**:
+
+  ```
+  {
+  location: string,
+  priceHour: bigdecimal,
+  priceDay: bigdecimal,
+  priceWeek: bigdecimal,
+  status: int
+  }
+  ```
+
+- **Success Response** (200 OK):
+
+  ```
+  {
+      message: "Add successful",
+      Scooter ID: int
+  }
+  ```
+
+  **Error Response** (400 Bad Request):
+
+  ```
+  {
+    "message": "error message"
+  }
+  ```
+
 ## Validation Rules
 
+b_user
+
 ### Username
+
 - Length: 3-20 characters
 - Allowed characters: letters, numbers, underscore
 - Special characters not allowed
@@ -155,3 +195,11 @@ Frontend service will run on http://localhost:5173
 ### Birthday
 - Must be valid date format (YYYY-MM-DD)
 - Cannot be a future date
+
+### b_scooter table
+
+####location
+
+####price per hour/day/week
+
+- Integers have a maximum of three digits, and decimal places have a maximum of two digits

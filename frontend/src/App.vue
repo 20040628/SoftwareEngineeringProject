@@ -2,13 +2,15 @@
 import TestConnection from './components/TestConnection.vue'
 import UserRegister from './components/UserRegister.vue'
 import UserLogin from './components/UserLogin.vue'
+import ScooterAdd from "@/components/ScooterAdd.vue";
 
 export default {
   name: 'App',
   components: {
     TestConnection,
     UserRegister,
-    UserLogin
+    UserLogin,
+    ScooterAdd
   },
   data() {
     return {
@@ -45,6 +47,10 @@ export default {
       <div v-else>
         <!-- Add your authenticated content here -->
         <p>You are logged in!</p>
+      </div>
+
+      <div>
+        <ScooterAdd />
       </div>
     </main>
   </div>

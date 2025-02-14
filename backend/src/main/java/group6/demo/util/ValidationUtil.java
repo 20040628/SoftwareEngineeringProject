@@ -1,5 +1,6 @@
 package group6.demo.util;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -38,5 +39,17 @@ public class ValidationUtil {
         if (birthday == null) return false;
         Date now = new Date();
         return birthday.before(now);
+    }
+
+    // scooter price validation: Integers have a maximum of three digits, decimals have a maximum of two digits
+    public static final Pattern PRICE_PATTERN = Pattern.compile("^(\\d{1,3})(\\.\\d{1,2})?$");
+    public static boolean isValidPrice(BigDecimal price) {
+        if (price == null) {
+            return false;
+        }
+        else{
+            String priceStr = price.toPlainString();
+            return PRICE_PATTERN.matcher(priceStr).matches();
+        }
     }
 } 

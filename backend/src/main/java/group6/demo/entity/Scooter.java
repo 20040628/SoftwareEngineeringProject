@@ -15,6 +15,7 @@ public class Scooter {
 
     private String location;
     private BigDecimal priceHour;
+    private BigDecimal priceFourHour;
     private BigDecimal priceDay;
     private BigDecimal priceWeek;
     private Integer status;

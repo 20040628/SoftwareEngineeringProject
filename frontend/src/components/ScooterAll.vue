@@ -7,6 +7,7 @@
         <th>ID</th>
         <th>Location</th>
         <th>Price per Hour</th>
+        <th>Price per Four Hours</th>
         <th>Price per Day</th>
         <th>Price per Week</th>
         <th></th>
@@ -17,6 +18,7 @@
         <td>{{ scooter.id }}</td>
         <td>{{ scooter.location }}</td>
         <td>{{ scooter.priceHour }}</td>
+        <td>{{ scooter.priceFourHour }}</td>
         <td>{{ scooter.priceDay }}</td>
         <td>{{ scooter.priceWeek }}</td>
         <td><button @click="book">Book</button></td>

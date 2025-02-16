@@ -18,6 +18,11 @@ public class ScooterAddDTO {
             message = "Price per hour must be a decimal with up to 3 digits and 2 decimal places")
     private BigDecimal priceHour;
 
+    @NotNull(message = "The price per four hours is required")
+    @Digits(integer = 3, fraction = 2,
+            message = "Price per four hours must be a decimal with up to 3 digits and 2 decimal places")
+    private BigDecimal priceFourHour;
+
     @NotNull(message = "The price per day is required")
     @Digits(integer = 3, fraction = 2,
             message = "Price per day must be a decimal with up to 3 digits and 2 decimal places")

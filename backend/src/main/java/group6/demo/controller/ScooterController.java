@@ -41,6 +41,7 @@ public class ScooterController {
             response.put("scooterId", scooter.getId());
             response.put("location", scooter.getLocation());
             response.put("price_hour", scooter.getPriceHour());
+            response.put("price_four_hour", scooter.getPriceFourHour());
             response.put("price_day", scooter.getPriceDay());
             response.put("price_week", scooter.getPriceWeek());
             response.put("status", scooter.getStatus());

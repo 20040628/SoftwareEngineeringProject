@@ -14,6 +14,12 @@
     </div>
 
     <div class="form-group">
+      <label>Price per four hours:</label>
+      <input v-model="form.priceFourHour" type="text" placeholder="Enter price per four hours">
+      <span v-if="errors.priceFourHour" class="error-message">{{ errors.priceFourHour }}</span>
+    </div>
+
+    <div class="form-group">
       <label>Price per day:</label>
       <input v-model="form.priceDay" type="text" placeholder="Enter price per day">
       <span v-if="errors.priceDay" class="error-message">{{ errors.priceDay }}</span>
@@ -50,6 +56,7 @@ export default {
       form: {
         location: '',
         priceHour: '',
+        priceFourHour: '',
         priceDay: '',
         priceWeek: '',
         status: 1
@@ -69,7 +76,7 @@ export default {
       this.errors = {}
 
       // Basic frontend validation
-      if (!this.form.location ||!this.form.priceHour ||!this.form.priceDay ||!this.form.priceWeek) {
+      if (!this.form.location ||!this.form.priceHour || !this.form.priceFourHour  ||!this.form.priceDay ||!this.form.priceWeek) {
         this.message = 'Please fill in all required fields'
         this.messageType = 'error'
         this.loading = false
@@ -77,6 +84,7 @@ export default {
       }
 
       this.form.priceHour = parseFloat(this.form.priceHour);
+      this.form.priceFourHour = parseFloat(this.form.priceFourHour);
       this.form.priceDay = parseFloat(this.form.priceDay);
       this.form.priceWeek = parseFloat(this.form.priceWeek);
 
@@ -93,6 +101,7 @@ export default {
         this.form = {
           location: '',
           priceHour: '',
+          priceFourHour: '',
           priceDay: '',
           priceWeek: ''
         }

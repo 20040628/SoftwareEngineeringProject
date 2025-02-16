@@ -27,6 +27,7 @@ CREATE TABLE `b_scooter` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `location` varchar(255) NOT NULL,
   `price_hour` decimal(5, 2) NOT NULL,
+  `price_four_hour` decimal(5, 2) NOT NULL,
   `price_day` decimal(5, 2) NOT NULL,
   `price_week` decimal(5, 2) NOT NULL, 
   `status` tinyint(1) NOT NULL DEFAULT 1,

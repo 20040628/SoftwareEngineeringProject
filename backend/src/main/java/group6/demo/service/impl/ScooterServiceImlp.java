@@ -24,6 +24,9 @@ public class ScooterServiceImlp implements ScooterService {
         if (!ValidationUtil.isValidPrice(scooterAddDTO.getPriceHour())) {
             throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
         }
+        if (!ValidationUtil.isValidPrice(scooterAddDTO.getPriceFourHour())) {
+            throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
+        }
         if (!ValidationUtil.isValidPrice(scooterAddDTO.getPriceDay())) {
             throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
         }
@@ -35,6 +38,7 @@ public class ScooterServiceImlp implements ScooterService {
         Scooter scooter = new Scooter();
         scooter.setLocation(scooterAddDTO.getLocation());
         scooter.setPriceHour(scooterAddDTO.getPriceHour());
+        scooter.setPriceFourHour(scooterAddDTO.getPriceFourHour());
         scooter.setPriceDay(scooterAddDTO.getPriceDay());
         scooter.setPriceWeek(scooterAddDTO.getPriceWeek());
         // Set default values(1:available;0:unavailable)

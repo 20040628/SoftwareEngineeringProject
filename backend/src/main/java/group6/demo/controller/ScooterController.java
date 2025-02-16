@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -51,5 +52,10 @@ public class ScooterController {
             // Handle other unexpected errors
             return ResponseEntity.badRequest().body("adding scooter failed: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/getAll")
+    public List<Scooter> getAllScooters() {
+        return scooterService.getAllScooters();
     }
 }

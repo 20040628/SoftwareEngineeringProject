@@ -8,6 +8,8 @@ import group6.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ScooterServiceImlp implements ScooterService {
     @Autowired
@@ -39,5 +41,10 @@ public class ScooterServiceImlp implements ScooterService {
         scooter.setStatus(1);
 
         return scooterRepository.save(scooter);
+    }
+
+    @Override
+    public List<Scooter> getAllScooters() {
+        return scooterRepository.findAll();
     }
 }

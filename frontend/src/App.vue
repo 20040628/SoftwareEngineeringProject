@@ -3,10 +3,12 @@ import TestConnection from './components/TestConnection.vue'
 import UserRegister from './components/UserRegister.vue'
 import UserLogin from './components/UserLogin.vue'
 import ScooterAdd from "@/components/ScooterAdd.vue";
+import ScooterAll from "@/components/ScooterAll.vue";
 
 export default {
   name: 'App',
   components: {
+    ScooterAll,
     TestConnection,
     UserRegister,
     UserLogin,
@@ -51,6 +53,9 @@ export default {
 
       <div>
         <ScooterAdd />
+      </div>
+      <div>
+        <ScooterAll/>
       </div>
     </main>
   </div>

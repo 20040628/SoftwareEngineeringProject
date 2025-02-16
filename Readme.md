@@ -167,6 +167,16 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
+####view all
+
+**URL**: `/api/scooters/getAll`
+
+**Method**: `Get`
+
+**Success Response** (200 OK):
+
+![73970673039](assets/1739706730395.png)
+
 ## Validation Rules
 
 b_user

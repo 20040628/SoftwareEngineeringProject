@@ -49,13 +49,13 @@ export default {
       <div v-else>
         <!-- Add your authenticated content here -->
         <p>You are logged in!</p>
+        <div v-if="currentUser.userType === 0">
+          <ScooterAdd />
+        </div>
       </div>
 
       <div>
-        <ScooterAdd />
-      </div>
-      <div>
-        <ScooterAll/>
+        <ScooterAll :current-user="currentUser"/>
       </div>
     </main>
   </div>

@@ -167,7 +167,7 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
-####view all
+#### view all
 
 **URL**: `/api/scooters/getAll`
 
@@ -176,6 +176,76 @@ Frontend service will run on http://localhost:5173
 **Success Response** (200 OK):
 
 ![73970673039](assets/1739706730395.png)
+
+### Booking API
+
+#### Create Booking
+
+- **URL**: `/api/bookings`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "userId": "number",       // User ID
+    "scooterId": "number",    // Scooter ID
+    "hireType": "string",     // One of: "HOUR", "FOUR_HOURS", "DAY", "WEEK"
+    "startTime": "string"     // Format: "YYYY-MM-DD HH:mm:ss"
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "Booking successful",
+    "orderId": "number",
+    "startTime": "datetime",
+    "endTime": "datetime",
+    "price": "number"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "error message"  // e.g., "User not found", "Scooter not found", 
+                               // "Invalid date format", "Booking time cannot be earlier than current time",
+                               // "Selected time period is already booked", "Invalid hire type"
+  }
+  ```
+
+#### Get Booking Timeline
+
+- **URL**: `/api/bookings/timeline/{scooterId}`
+- **Method**: `GET`
+- **Path Parameters**:
+  - `scooterId`: ID of the scooter
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "startTime": "datetime",
+      "endTime": "datetime",
+      "status": "string",     // "booked" or "available"
+      "hirePeriod": "string"  // Only present when status is "booked"
+    }
+  ]
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to get timeline: error message"
+  }
+  ```
+
+### Email Notifications
+
+The system automatically sends email confirmations for successful bookings. The email includes:
+- Booking confirmation message
+- Order ID
+- Location
+- Start and end times
+- Rental duration
+- Rental fee
+- Contact information
+
 
 ## Validation Rules
 
@@ -208,8 +278,8 @@ b_user
 
 ### b_scooter table
 
-####location
+#### location
 
-####price per hour/day/week
+#### price per hour/day/week
 
 - Integers have a maximum of three digits, and decimal places have a maximum of two digits

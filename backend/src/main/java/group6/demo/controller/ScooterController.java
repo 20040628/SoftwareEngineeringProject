@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/scooters")
@@ -58,5 +59,10 @@ public class ScooterController {
     @GetMapping("/getAll")
     public List<Scooter> getAllScooters() {
         return scooterService.getAllScooters();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Scooter> getScooterById(@PathVariable Long id) {
+        return scooterService.getScooterById(id);
     }
 }

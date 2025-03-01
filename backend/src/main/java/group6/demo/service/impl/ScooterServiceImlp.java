@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScooterServiceImlp implements ScooterService {
@@ -50,5 +51,10 @@ public class ScooterServiceImlp implements ScooterService {
     @Override
     public List<Scooter> getAllScooters() {
         return scooterRepository.findAll();
+    }
+
+    @Override
+    public Optional<Scooter> getScooterById(Long id) {
+        return scooterRepository.findById(id);
     }
 }

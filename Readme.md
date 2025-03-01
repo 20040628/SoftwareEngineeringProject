@@ -177,6 +177,27 @@ Frontend service will run on http://localhost:5173
 
 ![73970673039](assets/1739706730395.png)
 
+#### view one scooter
+
+**URL**:  `/api/scooters/{id}`
+
+**Method**: `Get`
+
+**Success Response** (200 OK):
+
+```
+{
+    id:
+    location:
+    priceHour:
+    priceDay:
+    priceWeek:
+    statue:
+}
+```
+
+
+
 ### Booking API
 
 #### Create Booking

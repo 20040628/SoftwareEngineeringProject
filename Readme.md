@@ -88,7 +88,8 @@ Frontend service will run on http://localhost:5173
   {
     "message": "Registration successful",
     "userId": "number",
-    "username": "string"
+    "username": "string",
+    "token": "string"
   }
   ```
 - **Error Response** (400 Bad Request):
@@ -120,14 +121,50 @@ Frontend service will run on http://localhost:5173
     "userId": "number",
     "username": "string",
     "userType": "number",
-    "email": "string"
+    "email": "string",
+    "token": "string"
   }
   ```
 - **Error Response** (400 Bad Request):
   ```json
   {
-    "message": "error message"  // e.g., "User not found" or "Invalid password"
+    "username": "error message",
+    "password": "error message"
   }
+  ```
+  或
+  ```json
+  "Login failed: error message"
+  ```
+
+#### Validate Token
+
+- **URL**: `/api/auth/validate`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "valid": true,
+    "userId": "number",
+    "username": "string",
+    "userType": "number"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  "Invalid or missing token"
+  ```
+  或
+  ```json
+  "Invalid token"
+  ```
+  或
+  ```json
+  "Token validation failed: error message"
   ```
 
 ### Scooter API
@@ -139,23 +176,28 @@ Frontend service will run on http://localhost:5173
 - **Method**: `POST`
 
 - **Request Body**:
-
-  ```
+  ```json
   {
-  location: string,
-  priceHour: bigdecimal,
-  priceDay: bigdecimal,
-  priceWeek: bigdecimal,
-  status: int
+    "location": "string",
+    "priceHour": "decimal",
+    "priceFourHour": "decimal",
+    "priceDay": "decimal",
+    "priceWeek": "decimal",
+    "status": "int"
   }
   ```
 
 - **Success Response** (200 OK):
-
-  ```
+  ```json
   {
-      message: "Add successful",
-      Scooter ID: int
+    "message": "Add successful",
+    "scooterId": "int"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+      "message": "error message"
   }
   ```
 
@@ -196,8 +238,6 @@ Frontend service will run on http://localhost:5173
 }
 ```
 
-
-
 ### Booking API
 
 #### Create Booking
@@ -218,9 +258,9 @@ Frontend service will run on http://localhost:5173
   {
     "message": "Booking successful",
     "orderId": "number",
-    "startTime": "datetime",
-    "endTime": "datetime",
-    "price": "number"
+    "startTime": "string",
+    "endTime": "string",
+    "price": "decimal"
   }
   ```
 - **Error Response** (400 Bad Request):
@@ -297,7 +337,7 @@ b_user
 - Must be valid date format (YYYY-MM-DD)
 - Cannot be a future date
 
-### b_scooter table
+b_scooter table
 
 #### location
 

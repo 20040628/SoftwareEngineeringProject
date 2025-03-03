@@ -1,162 +1,196 @@
 <template>
-  <div class="login-form">
-    <h2>User Login</h2>
-    <div class="form-group">
-      <label>Username:</label>
-      <input v-model="form.username" type="text" placeholder="Enter username">
-      <span v-if="errors.username" class="error-message">{{ errors.username }}</span>
-    </div>
-    
-    <div class="form-group">
-      <label>Password:</label>
-      <input v-model="form.password" type="password" placeholder="Enter password">
-      <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
-    </div>
-
-    <div class="form-group">
-      <button @click="login" :disabled="loading">
-        {{ loading ? 'Logging in...' : 'Login' }}
-      </button>
-    </div>
-
-    <div v-if="message" :class="['message', messageType]">
-      <p>{{ message }}</p>
-      <template v-if="loggedInUser">
-        <p>User ID: {{ loggedInUser.userId }}</p>
-        <p>Username: {{ loggedInUser.username }}</p>
-      </template>
+  <div class="login-container">
+    <div class="login-form">
+      <h2>用户登录</h2>
+      
+      <div v-if="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+      
+      <form @submit.prevent="login">
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <input 
+            type="text" 
+            id="username" 
+            v-model="loginForm.username" 
+            class="form-control" 
+            required
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input 
+            type="password" 
+            id="password" 
+            v-model="loginForm.password" 
+            class="form-control" 
+            required
+          />
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">登录</button>
+          <router-link to="/register" class="btn btn-link">注册新账号</router-link>
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import { ref, reactive } from 'vue'
 
 export default {
   name: 'UserLogin',
-  data() {
-    return {
-      form: {
-        username: '',
-        password: ''
-      },
-      loading: false,
-      message: '',
-      messageType: 'success',
-      loggedInUser: null,
-      errors: {}
-    }
-  },
-  methods: {
-    async login() {
-      this.loading = true
-      this.message = ''
-      this.loggedInUser = null
-      this.errors = {}
-      
-      // Basic frontend validation
-      if (!this.form.username || !this.form.password) {
-        this.message = 'Please fill in all required fields'
-        this.messageType = 'error'
-        this.loading = false
-        return
-      }
-      
+  setup() {
+    const store = useStore()
+    const router = useRouter()
+    
+    const errorMessage = ref('')
+    const loginForm = reactive({
+      username: '',
+      password: ''
+    })
+    
+    const login = async () => {
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/login', this.form)
+        errorMessage.value = ''
+        const response = await axios.post('http://localhost:8080/api/auth/login', loginForm)
         
-        this.message = response.data.message
-        this.messageType = 'success'
-        this.loggedInUser = {
-          userId: response.data.userId,
-          username: response.data.username,
-          userType: response.data.userType,
-          email: response.data.email
+        if (response.data && response.data.token) {
+          // 登录成功，保存令牌和用户信息到Vuex store
+          store.dispatch('login', {
+            token: response.data.token,
+            user: {
+              userId: response.data.userId,
+              username: response.data.username,
+              userType: response.data.userType
+            }
+          })
+          
+          // 根据用户类型导航到相应页面
+          if (response.data.userType === 'ADMIN') {
+            router.push('/admin/dashboard')
+          } else {
+            router.push('/scooters')
+          }
         }
-        
-        // Clear form
-        this.form = {
-          username: '',
-          password: ''
-        }
-        
-        // Emit login event
-        this.$emit('login-success', this.loggedInUser)
       } catch (error) {
-        if (error.response?.data && typeof error.response.data === 'object') {
-          // Handle validation errors
-          this.errors = error.response.data
-          this.message = 'Please correct the errors below'
+        if (error.response) {
+          errorMessage.value = error.response.data.message || '登录失败，请检查用户名和密码'
         } else {
-          // Handle other errors
-          this.message = error.response?.data || 'Login failed'
+          errorMessage.value = '无法连接到服务器，请稍后再试'
         }
-        this.messageType = 'error'
-      } finally {
-        this.loading = false
       }
+    }
+    
+    return {
+      loginForm,
+      errorMessage,
+      login
     }
   }
 }
 </script>
 
 <style scoped>
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background-color: #f5f5f5;
+}
+
 .login-form {
+  width: 100%;
   max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-weight: 500;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
 }
 
-input {
+.form-control {
   width: 100%;
-  padding: 8px;
+  padding: 10px 15px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 16px;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background: #4CAF50;
+.form-control:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.alert {
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.alert-danger {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #4a90e2;
   color: white;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-button:disabled {
-  background: #cccccc;
+.btn-primary:hover {
+  background-color: #3a7fcb;
 }
 
-.message {
-  margin-top: 15px;
-  padding: 10px;
-  border-radius: 4px;
+.btn-link {
+  color: #4a90e2;
+  text-decoration: none;
 }
 
-.success {
-  background: #E8F5E9;
-  color: #2E7D32;
-}
-
-.error {
-  background: #FFEBEE;
-  color: #C62828;
-}
-
-.error-message {
-  color: #C62828;
-  font-size: 0.8em;
-  margin-top: 5px;
-  display: block;
+.btn-link:hover {
+  text-decoration: underline;
 }
 </style> 

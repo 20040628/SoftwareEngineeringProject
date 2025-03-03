@@ -10,8 +10,8 @@
           <p>Daily Rate: ${{ scooter.priceDay }}</p>
           <p>Weekly Rate: ${{ scooter.priceWeek }}</p>
         </div>
-        <button @click="showBookingModal(scooter)" :disabled="!currentUser">
-          {{ currentUser ? 'Book Now' : 'Login to Book' }}
+        <button @click="showBookingModal(scooter)" :disabled="!isAuthenticated">
+          {{ isAuthenticated ? 'Book Now' : 'Login to Book' }}
         </button>
       </div>
     </div>
@@ -78,6 +78,8 @@
 
 <script>
 import axios from 'axios';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'ScooterAll',
@@ -85,6 +87,18 @@ export default {
     currentUser: {
       type: Object,
       default: null
+    }
+  },
+  setup() {
+    const store = useStore();
+    
+    // 从Vuex获取用户认证状态和用户信息
+    const isAuthenticated = computed(() => store.getters.isAuthenticated);
+    const currentUser = computed(() => store.getters.user);
+    
+    return {
+      isAuthenticated,
+      currentUser
     }
   },
   data() {

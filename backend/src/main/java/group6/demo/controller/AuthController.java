@@ -4,6 +4,7 @@ import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
 import group6.demo.entity.User;
 import group6.demo.service.UserService;
+import group6.demo.util.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginDTO loginDTO,
@@ -37,12 +41,16 @@ public class AuthController {
         try {
             User user = userService.loginUser(loginDTO);
             
+            // Generate JWT token
+            String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getUserType());
+            
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
             response.put("userId", user.getId());
             response.put("username", user.getUsername());
             response.put("userType", user.getUserType());
             response.put("email", user.getEmail());
+            response.put("token", token);
             
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
@@ -77,10 +85,14 @@ public class AuthController {
         try {
             User registeredUser = userService.registerUser(registrationDTO);
             
+            // Generate JWT token
+            String token = jwtUtil.generateToken(registeredUser.getUsername(), registeredUser.getId(), registeredUser.getUserType());
+            
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Registration successful");
             response.put("userId", registeredUser.getId());
             response.put("username", registeredUser.getUsername());
+            response.put("token", token);
             
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
@@ -89,6 +101,34 @@ public class AuthController {
         } catch (Exception e) {
             // Handle other unexpected errors
             return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+        }
+    }
+    
+    // Validate token endpoint
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Invalid or missing token");
+            }
+            
+            String token = authHeader.substring(7);
+            String username = jwtUtil.extractUsername(token);
+            Long userId = jwtUtil.extractUserId(token);
+            Integer userType = jwtUtil.extractUserType(token);
+            
+            if (username != null && !jwtUtil.isTokenExpired(token)) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("valid", true);
+                response.put("userId", userId);
+                response.put("username", username);
+                response.put("userType", userType);
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body("Invalid token");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Token validation failed: " + e.getMessage());
         }
     }
 } 

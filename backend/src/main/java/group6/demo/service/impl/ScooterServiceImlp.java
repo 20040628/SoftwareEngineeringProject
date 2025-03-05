@@ -35,6 +35,12 @@ public class ScooterServiceImlp implements ScooterService {
             throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
         }
 
+        if (!ValidationUtil.isValidLocation(scooterAddDTO.getLongitude())) {
+            throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 6 decimal places");
+        }
+        if (!ValidationUtil.isValidLocation(scooterAddDTO.getLatitude())) {
+            throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 6 decimal places");
+        }
         // Create new scooter entity
         Scooter scooter = new Scooter();
         scooter.setLocation(scooterAddDTO.getLocation());
@@ -42,6 +48,8 @@ public class ScooterServiceImlp implements ScooterService {
         scooter.setPriceFourHour(scooterAddDTO.getPriceFourHour());
         scooter.setPriceDay(scooterAddDTO.getPriceDay());
         scooter.setPriceWeek(scooterAddDTO.getPriceWeek());
+        scooter.setLongitude(scooterAddDTO.getLongitude());
+        scooter.setLatitude(scooterAddDTO.getLatitude());
         // Set default values(1:available;0:unavailable)
         scooter.setStatus(1);
 

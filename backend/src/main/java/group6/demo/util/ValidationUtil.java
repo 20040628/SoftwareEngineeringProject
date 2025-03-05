@@ -52,4 +52,16 @@ public class ValidationUtil {
             return PRICE_PATTERN.matcher(priceStr).matches();
         }
     }
+
+    // scooter longitude and latitude validation:decimal(9, 6)
+    public static final Pattern LOCATION_PATTERN = Pattern.compile("^(\\d{1,3})(\\.\\d{1,6})?$");
+    public static boolean isValidLocation(BigDecimal location) {
+        if (location == null) {
+            return false;
+        }
+        else {
+            String locationStr = location.toPlainString();
+            return LOCATION_PATTERN.matcher(locationStr).matches();
+        }
+    }
 } 

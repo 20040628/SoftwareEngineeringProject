@@ -31,6 +31,8 @@ CREATE TABLE `b_scooter` (
   `price_day` decimal(5, 2) NOT NULL,
   `price_week` decimal(5, 2) NOT NULL, 
   `status` tinyint(1) NOT NULL DEFAULT 1,
+  `longitude` decimal(9, 6) NOT NULL,
+  `latitude` decimal(9, 6) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

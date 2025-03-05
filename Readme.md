@@ -183,7 +183,9 @@ Frontend service will run on http://localhost:5173
     "priceFourHour": "decimal",
     "priceDay": "decimal",
     "priceWeek": "decimal",
-    "status": "int"
+    "status": "int"，
+    "longitude": "decimal",
+    "latitude": "decimal"
   }
   ```
 
@@ -235,6 +237,8 @@ Frontend service will run on http://localhost:5173
     priceDay:
     priceWeek:
     statue:
+    longitude:
+    latitude:
 }
 ```
 
@@ -337,9 +341,11 @@ b_user
 - Must be valid date format (YYYY-MM-DD)
 - Cannot be a future date
 
-b_scooter table
+### b_scooter table
 
-#### location
+#### longitude and latitude
+
+Integers have a maximum of three digits, and decimal places have a maximum of 6 digits
 
 #### price per hour/day/week
 

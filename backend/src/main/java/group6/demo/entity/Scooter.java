@@ -19,4 +19,6 @@ public class Scooter {
     private BigDecimal priceDay;
     private BigDecimal priceWeek;
     private Integer status;
+    private BigDecimal longitude;
+    private BigDecimal latitude;
 }

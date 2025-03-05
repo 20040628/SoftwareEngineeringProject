@@ -46,6 +46,8 @@ public class ScooterController {
             response.put("price_day", scooter.getPriceDay());
             response.put("price_week", scooter.getPriceWeek());
             response.put("status", scooter.getStatus());
+            response.put("longitude", scooter.getLongitude());
+            response.put("latitude", scooter.getLatitude());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             // Handle validation errors

@@ -109,6 +109,11 @@ public class BookingServiceImpl implements BookingService {
         order.setPrice(price);
 
         Order savedOrder = orderRepository.save(order);
+
+        // update the status of scooter
+        scooter.setStatus(0);
+        scooterRepository.save(scooter);
+
         sendConfirmationEmail(savedOrder);
         
         return savedOrder;

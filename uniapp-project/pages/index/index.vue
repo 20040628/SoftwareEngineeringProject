@@ -66,8 +66,8 @@ export default {
   data() {
     return {
       mapCenter: {
-        latitude: 39.9042,  
-        longitude: 116.4074
+        latitude: 30.7656,  
+        longitude: 103.9799
       },
       userLocation: null,
       searchKeyword: '',

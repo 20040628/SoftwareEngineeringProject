@@ -34,7 +34,9 @@
 				
 				<view class="form-group">
 				  <label>Birthday</label>
-				  <input v-model="form.birthday" type="date" class="input-field"/>
+				  <picker mode="date" :value="form.birthday" @change="getBirthday">
+				  	<view class="picker">{{ form.birthday || 'Please select a start date' }}</view>
+				  </picker>
 				  <span v-if="errors.birthday" class="error-message">{{ errors.birthday }}</span>
 				</view>
 				<!-- <view class="form-group">
@@ -89,6 +91,9 @@ export default {
     };
   },
   methods: {
+	getBirthday(event){
+		this.form.birthday = event.detail.value
+	},
     validate() {
       this.errors = {};
 
@@ -219,4 +224,12 @@ export default {
 	.error-message{
 		color:red;
 	}
+	.picker {
+		padding: 10rpx;
+		 border: 2rpx solid darkgrey;
+		border-radius: 10rpx;
+		text-align: center;
+		margin-bottom: 10rpx;
+	}
+	
 </style>

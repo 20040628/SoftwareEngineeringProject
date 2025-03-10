@@ -13,4 +13,7 @@ public interface ScooterService {
     List<Scooter> getAllScooters();
 
     Optional<Scooter> getScooterById(Long id);
+
+    Optional<Scooter> changeScooterStatus(Long id);
+
 }

@@ -65,4 +65,29 @@ public class ScooterServiceImlp implements ScooterService {
     public Optional<Scooter> getScooterById(Long id) {
         return scooterRepository.findById(id);
     }
+
+    /**
+     * 将指定ID的滑板车状态从可用更新为不可用
+     * @param id 滑板车的ID
+     * @return 更新后的滑板车对象，如果未找到则返回空的Optional
+     */
+    @Override
+    public Optional<Scooter> changeScooterStatus(Long id) {
+        // find scooter
+        Optional<Scooter> Scooter = scooterRepository.findById(id);
+
+        if (Scooter.isPresent()) {
+            Scooter scooter = Scooter.get();
+            // 检查滑板车当前状态是否为可用
+            if (scooter.getStatus() == 1) {
+                scooter.setStatus(0);
+                return Optional.of(scooterRepository.save(scooter));
+            }
+            else {
+                scooter.setStatus(1);
+                return Optional.of(scooterRepository.save(scooter));
+            }
+        }
+        return Scooter;
+    }
 }

@@ -40,11 +40,12 @@
 	  @scroll="adjustListHeight"
       :style="{ height: listHeight + 'px' }"
     >
+
       <view 
         v-for="scooter in scooters"
         :key="scooter.id"
         class="scooter-item"
-        @click="showScooterDetail(scooter)"
+		@click="showScooterDetail(scooter)"
       >
         <!-- <image :src="scooter.image" class="scooter-image"/> -->
         <view class="scooter-info">
@@ -57,6 +58,9 @@
             </view>
           </view>
         </view>
+		<button @click="changeScooterStatus(scooter.id)">
+		  <text>change status</text>
+		</button>
       </view>
     </scroll-view>
   </view>
@@ -130,6 +134,33 @@ export default {
 	  }
 	},
 	
+	async changeScooterStatus(id) {
+	  try {
+	    const res = await uni.request({
+	      url: `http://localhost:8080/api/scooters/changeStatus/${id}`,
+	      method: 'GET'
+	    });
+	    if (res.statusCode === 200) {
+	      // 更新本地数据中的滑板车状态
+	      const updatedScooter = res.data;
+	      const index = this.scooters.findIndex(scooter => scooter.id === id);
+	      if (index!== -1) {
+	        this.scooters[index] = {
+	         ...updatedScooter,
+	          iconPath: updatedScooter.status === 1 
+	           ? "/static/icons/available_scooter.png" 
+	            : "/static/icons/in_use_scooter.png"
+	        };
+	      }
+	      uni.showToast({ title: '状态更新成功', icon:'success' });
+	    } else {
+	      uni.showToast({ title: '状态更新失败', icon: 'none' });
+	    }
+	  } catch (err) {
+	    uni.showToast({ title: '网络错误', icon: 'none' });
+	  }
+	},
+	
 	// 跳转到详情页
 	showScooterDetail(scooter) {
 	  // 跳转到详情页，传递 scooter.id 作为参数
@@ -175,13 +206,15 @@ export default {
 		  const scooterId = e.detail.markerId
 		  const scooter = this.scooters.find(s => s.id === scooterId)
 		  this.showScooterDetail(scooter)
-		}
-
+		},
+	
 	// 	// 搜索处理
 	// handleSearch() {
 	// 	  // 实际开发中可调用后端搜索接口
 	// 	  console.log('搜索关键词:', this.searchKeyword)
 	// 	}
+	
+				
 	}
 }
 </script>

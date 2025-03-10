@@ -67,4 +67,9 @@ public class ScooterController {
     public Optional<Scooter> getScooterById(@PathVariable Long id) {
         return scooterService.getScooterById(id);
     }
+
+    @GetMapping("/changeStatus/{id}")
+    public Optional<Scooter> changeScooterStatus(@PathVariable Long id) {
+        return scooterService.changeScooterStatus(id);
+    }
 }

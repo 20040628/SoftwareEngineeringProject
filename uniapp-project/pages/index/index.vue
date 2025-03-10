@@ -40,11 +40,12 @@
 	  @scroll="adjustListHeight"
       :style="{ height: listHeight + 'px' }"
     >
+
       <view 
         v-for="scooter in scooters"
         :key="scooter.id"
         class="scooter-item"
-        @click="showScooterDetail(scooter)"
+		@click="showScooterDetail(scooter)"
       >
         <!-- <image :src="scooter.image" class="scooter-image"/> -->
         <view class="scooter-info">
@@ -66,7 +67,7 @@ export default {
   data() {
     return {
       mapCenter: {
-        latitude: 30.7656,  
+        latitude:  30.7656,  
         longitude: 103.9799
       },
       userLocation: null,
@@ -130,6 +131,7 @@ export default {
 	  }
 	},
 	
+	
 	// 跳转到详情页
 	showScooterDetail(scooter) {
 	  // 跳转到详情页，传递 scooter.id 作为参数
@@ -175,13 +177,15 @@ export default {
 		  const scooterId = e.detail.markerId
 		  const scooter = this.scooters.find(s => s.id === scooterId)
 		  this.showScooterDetail(scooter)
-		}
-
+		},
+	
 	// 	// 搜索处理
 	// handleSearch() {
 	// 	  // 实际开发中可调用后端搜索接口
 	// 	  console.log('搜索关键词:', this.searchKeyword)
 	// 	}
+	
+				
 	}
 }
 </script>

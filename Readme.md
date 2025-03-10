@@ -183,7 +183,7 @@ Frontend service will run on http://localhost:5173
     "priceFourHour": "decimal",
     "priceDay": "decimal",
     "priceWeek": "decimal",
-    "status": "int"，
+    "status": "int",
     "longitude": "decimal",
     "latitude": "decimal"
   }
@@ -241,6 +241,14 @@ Frontend service will run on http://localhost:5173
     latitude:
 }
 ```
+
+#### change status: valid to invalid or invalid to valid
+
+**URL**: /api/scooters/changeStatus/{id}
+
+**method**:`Grt`
+
+**Success Response** (200 OK)
 
 ### Booking API
 

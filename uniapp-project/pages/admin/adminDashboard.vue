@@ -45,42 +45,40 @@
 				<text class="title">User Feedback</text>
 			</view>
 			<view v-if="activeMenu === 3">
-				<view class="page">
-  <text class="title">Show all scooters</text>
-
-  <!-- 滑板车列表 -->
-  <view class="scooter-list">
-    <view class="scooter-item" v-for="scooter in scooters" :key="scooter.id">
-      <view class="scooter-info">
-        <view class="info-row">
-          <text class="label">ID:</text> <text class="value">{{ scooter.id }}</text>
-        </view>
-        <view class="info-row">
-          <text class="label">Location:</text> <text class="value">{{ scooter.location }}</text>
-        </view>
-        <view class="info-row">
-          <text class="label">Price:</text>
-          <text class="value">
-            ${{ scooter.priceHour }}/hr | ${{ scooter.priceDay }}/day | ${{ scooter.priceWeek }}/week
-          </text>
-        </view>
-        <view class="info-row">
-          <text class="label">Coordinates:</text>
-          <text class="value">({{ scooter.longitude }}, {{ scooter.latitude }})</text>
-        </view>
-        <view class="status-tag" :class="getStatusClass(scooter.status)">
-          {{ getStatusText(scooter.status) }}
-        </view>
-      </view>
-
-      <!-- 按钮 -->
-      <button class="status-btn" @click="changeScooterStatus(scooter.id)">
-        <text>Change Status</text>
-      </button>
-    </view>
-  </view>
-</view>
-
+			<view class="page">
+			  <text class="title">Show all scooters</text>
+			  <!-- 滑板车列表 -->
+			  <view class="scooter-list">
+				<view class="scooter-item" v-for="scooter in scooters" :key="scooter.id">
+				  <view class="scooter-info">
+					<view class="info-row">
+					  <text class="label">ID:</text> <text class="value">{{ scooter.id }}</text>
+					</view>
+					<view class="info-row">
+					  <text class="label">Location:</text> <text class="value">{{ scooter.location }}</text>
+					</view>
+					<view class="info-row">
+					  <text class="label">Price:</text>
+					  <text class="value">
+						${{ scooter.priceHour }}/hr | ${{ scooter.priceDay }}/day | ${{ scooter.priceWeek }}/week
+					  </text>
+					</view>
+					<view class="info-row">
+					  <text class="label">Coordinates:</text>
+					  <text class="value">({{ scooter.longitude }}, {{ scooter.latitude }})</text>
+					</view>
+					<view class="status-tag" :class="getStatusClass(scooter.status)">
+					  {{ getStatusText(scooter.status) }}
+					</view>
+				  </view>
+				  <!-- 按钮 -->
+				  <button class="status-btn" @click="changeScooterStatus(scooter.id)">
+					<text>Change Status</text>
+				  </button>
+				</view>
+			  </view>
+			</view>
+	
 				
 			</view>
 			<view v-if="activeMenu === 4">
@@ -112,7 +110,7 @@ export default {
 				priceFourHour: null,
 				priceDay: null,
 				priceWeek: null,
-				status: 1,
+				status: null,
 				longitude: null,
 				latitude: null
 			}
@@ -190,17 +188,7 @@ export default {
 		      method: 'GET'
 		    });
 		    if (res.statusCode === 200) {
-		      // 更新本地数据中的滑板车状态
-		      const updatedScooter = res.data;
-		      const index = this.scooters.findIndex(scooter => scooter.id === id);
-		      if (index!== -1) {
-		        this.scooters[index] = {
-		         ...updatedScooter,
-		          iconPath: updatedScooter.status === 1 
-		           ? "/static/icons/available_scooter.png" 
-		            : "/static/icons/in_use_scooter.png"
-		        };
-		      }
+		      this.fetchScooters();
 		      uni.showToast({ title: '状态更新成功', icon:'success' });
 		    } else {
 		      uni.showToast({ title: '状态更新失败', icon: 'none' });

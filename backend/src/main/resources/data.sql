@@ -6,15 +6,17 @@ VALUES
 ('user', '$2a$10$bEZr1t7XF3CTMiwFdVg5JewuNrWVOMR1pG58F4Q5koRu8RSALRjkK', 'default_avatar.jpg', '1995-05-05', 0, '9876543210', 'user@example.com', 'paypal', 1, 1, 0);
 
 -- 添加测试滑板车数据
-INSERT INTO b_scooter (location, price_hour, price_four_hour, price_day, price_week, status, longitude, altitude)
-VALUES 
-('Campus Center', 5.00, 10.00, 20.00, 100.00, 1, 120,130),
-('Library', 5.00, 10.00, 20.00, 100.00, 1,100,100),
-('Student Union', 5.00, 10.00, 20.00, 100.00, 1, 110,130);
+INSERT INTO b_scooter (location, price_hour, price_four_hour, price_day, price_week, status, longitude, latitude)
+VALUES
+    ('Campus Center', 5.00, 10.00, 20.00, 100.00, 1, 103.984500, 30.765000),
+    ('Library', 5.00, 10.00, 20.00, 100.00, 1, 103.987000, 30.764000),
+    ('Student Union', 5.00, 10.00, 20.00, 100.00, 1, 103.986500, 30.766000);
+
 
 -- 添加折扣规则
 INSERT INTO b_discount_rule (user_type, discount_rate) 
 VALUES 
 ('student', 0.80),
 ('elderly', 0.70),
-('frequent', 0.85); 
+('frequent', 0.85);
+

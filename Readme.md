@@ -48,11 +48,11 @@ CREATE DATABASE IF NOT EXISTS vuesb;
 
 #### Admin account
 - Username: admin
-- Passowrd: Password
+- Passowrd: Password123
 
 #### User account
 - Username: user
-- Password: Password
+- Password: Password123
 
 ## Running the Project
 

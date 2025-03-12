@@ -174,13 +174,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Map<String, Object>> getBookingTimeline(Long scooterId) {
-        // 获取从当前时间开始的所有预订
+        // get all the bookings from the current time
         Date now = new Date();
         List<Order> orders = orderRepository.findActiveOrdersByScooterId(scooterId, now);
         
         List<Map<String, Object>> timeline = new ArrayList<>();
         
-        // 将预订信息转换为时间轴数据
+        // convert the booking information to the timeline data
         for (Order order : orders) {
             Map<String, Object> timeSlot = new HashMap<>();
             timeSlot.put("startTime", order.getStartTime());
@@ -190,13 +190,13 @@ public class BookingServiceImpl implements BookingService {
             timeline.add(timeSlot);
         }
         
-        // 如果有预订，在预订之间添加可用时间段
+        // if there are bookings, add the available time between the bookings
         if (!orders.isEmpty()) {
             for (int i = 0; i < orders.size() - 1; i++) {
                 Order currentOrder = orders.get(i);
                 Order nextOrder = orders.get(i + 1);
                 
-                // 如果两个预订之间有空隙，添加一个可用时间段
+                // if there is a gap between two bookings, add an available time
                 if (currentOrder.getEndTime().before(nextOrder.getStartTime())) {
                     Map<String, Object> availableSlot = new HashMap<>();
                     availableSlot.put("startTime", currentOrder.getEndTime());
@@ -206,11 +206,10 @@ public class BookingServiceImpl implements BookingService {
                 }
             }
             
-            // 添加最后一个预订之后的可用时间段
             Order lastOrder = orders.get(orders.size() - 1);
             Calendar cal = Calendar.getInstance();
             cal.setTime(lastOrder.getEndTime());
-            cal.add(Calendar.DAY_OF_MONTH, 7); // 显示未来7天的可用时间
+            cal.add(Calendar.DAY_OF_MONTH, 7); // show the available time for the next 7 days
             
             Map<String, Object> lastAvailableSlot = new HashMap<>();
             lastAvailableSlot.put("startTime", lastOrder.getEndTime());
@@ -218,7 +217,6 @@ public class BookingServiceImpl implements BookingService {
             lastAvailableSlot.put("status", "available");
             timeline.add(lastAvailableSlot);
         } else {
-            // 如果没有预订，显示从现在开始的7天都可用
             Calendar cal = Calendar.getInstance();
             cal.setTime(now);
             cal.add(Calendar.DAY_OF_MONTH, 7);

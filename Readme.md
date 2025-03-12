@@ -177,6 +177,57 @@ Frontend service will run on http://localhost:5173
   "Token validation failed: error message"
   ```
 
+###User API (管理员和普通用户应该都有)
+
+#### view my own bookings
+
+- **URL**: `/api/users/orders/{userId}`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  ```
+  [
+      {
+          "id": 1,
+          "orderTime": "2025-03-12T17:11:05.000+00:00",
+          "status": 1,
+          "startTime": "2025-03-12T17:20:00.000+00:00",
+          "endTime": "2025-03-12T18:20:00.000+00:00",
+          "hirePeriod": "HOUR",
+          "price": 5.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$5pscTMMTiM1NoWwzL//69u7NO07t7UsAPGdeMqZvd3TQ8oEARrspG",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0
+          },
+          "scooter": {
+              "id": 1,
+              "location": "Campus Center",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 0,
+              "longitude": 103.984500,
+              "latitude": 30.765000
+          }
+      }
+  ]
+  ```
+
+  ​
+
 ### Scooter API
 
 #### Add scooter
@@ -213,13 +264,6 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
-  **Error Response** (400 Bad Request):
-
-  ```
-  {
-    "message": "error message"
-  }
-  ```
 
 #### view all
 
@@ -254,7 +298,7 @@ Frontend service will run on http://localhost:5173
 
 #### change status: valid to invalid or invalid to valid
 
-**URL**: /api/scooters/changeStatus/{id}
+**URL**: `/api/scooters/changeStatus/{id}`
 
 **method**:`Grt`
 
@@ -317,6 +361,82 @@ Frontend service will run on http://localhost:5173
     "message": "Failed to get timeline: error message"
   }
   ```
+
+#### Get All bookings (only admin can) 
+
+- **URL**: `/api/bookings/getAll`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  ```
+  [
+      {
+          "id": 1,
+          "orderTime": "2025-03-12T17:11:05.000+00:00",
+          "status": 1,
+          "startTime": "2025-03-12T17:20:00.000+00:00",
+          "endTime": "2025-03-12T18:20:00.000+00:00",
+          "hirePeriod": "HOUR",
+          "price": 5.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$5pscTMMTiM1NoWwzL//69u7NO07t7UsAPGdeMqZvd3TQ8oEARrspG",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0
+          },
+          "scooter": {
+              "id": 1,
+              "location": "Campus Center",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 0,
+              "longitude": 103.984500,
+              "latitude": 30.765000
+          }
+      }
+  ]
+  ```
+
+#### Cancel booking
+
+- **URL**: `/api/bookings/cancel/{orderId}`
+
+- **Method**: `POST`
+
+- **Path Parameters**:
+
+  - `orderId`: ID of the order
+
+- **Success Response** (200 OK):
+
+  ```
+  {
+      "message": "Booking cancelled successfully"
+  }
+  ```
+
+
+- **Error Response** (400 Bad Request):
+
+  ```
+  {
+      “message”: "Order is already cancelled"
+  }
+  ```
+
+  ​
 
 ### Email Notifications
 

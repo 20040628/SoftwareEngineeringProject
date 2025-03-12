@@ -2,6 +2,7 @@ package group6.demo.controller;
 
 import group6.demo.dto.BookingDTO;
 import group6.demo.entity.Order;
+import group6.demo.entity.Scooter;
 import group6.demo.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,24 @@ public class BookingController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long orderId) {
+        try {
+            bookingService.cancelBooking(orderId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Booking cancelled successfully");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to cancel booking: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/getAll")
+    public List<Order> getAllBookings() {
+        return bookingService.getAllOrders();
     }
 } 

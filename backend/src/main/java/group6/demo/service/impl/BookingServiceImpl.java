@@ -230,4 +230,87 @@ public class BookingServiceImpl implements BookingService {
         
         return timeline;
     }
+
+    @Override
+    public void cancelBooking(Long orderId) {
+        // 根据订单 ID 查找订单
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
+
+        // 检查订单状态，如果已经取消则无需再次取消 status=2代表订单已经取消
+        if (order.getStatus() == 2) {
+            throw new IllegalArgumentException("Order is already cancelled");
+        }
+
+        // 更新订单状态为已取消
+        order.setStatus(2);
+        orderRepository.save(order);
+
+        // 更新关联的滑板车状态为可用
+        Scooter scooter = order.getScooter();
+        scooter.setStatus(1);
+        scooterRepository.save(scooter);
+
+        // 发送取消预订的邮件通知用户 待添加
+        sendCancellationEmail(order);
+    }
+
+
+    private void sendCancellationEmail(Order order) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+
+        String hirePeriodText;
+        switch (order.getHirePeriod()) {
+            case "HOUR":
+                hirePeriodText = "1 Hour";
+                break;
+            case "FOUR_HOURS":
+                hirePeriodText = "4 Hours";
+                break;
+            case "DAY":
+                hirePeriodText = "1 Day";
+                break;
+            case "WEEK":
+                hirePeriodText = "1 Week";
+                break;
+            default:
+                hirePeriodText = order.getHirePeriod();
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("E-Scooter Rental System <bc_somebody@qq.com>");
+        message.setTo(order.getUser().getEmail());
+        message.setSubject("E-Scooter Booking Cancellation");
+
+        String emailContent = String.format(
+                "Dear %s,\n\n" +
+                        "Your e-scooter booking has been cancelled!\n\n" +
+                        "Booking Details:\n" +
+                        "Order ID: %d\n" +
+                        "Location: %s\n" +
+                        "Start Time: %s\n" +
+                        "End Time: %s\n" +
+                        "Rental Duration: %s\n" +
+                        "Rental Fee: $%.2f\n\n" +
+                        "If you have any questions, please contact our customer service.\n\n" +
+                        "Best regards,\n" +
+                        "E-Scooter Rental Team",
+                order.getUser().getUsername(),
+                order.getId(),
+                order.getScooter().getLocation(),
+                dateFormat.format(order.getStartTime()),
+                dateFormat.format(order.getEndTime()),
+                hirePeriodText,
+                order.getPrice()
+        );
+
+        message.setText(emailContent);
+        emailSender.send(message);
+    }
+
+    @Override
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
 } 

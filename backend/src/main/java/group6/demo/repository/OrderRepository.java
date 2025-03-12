@@ -1,6 +1,7 @@
 package group6.demo.repository;
 
 import group6.demo.entity.Order;
+import group6.demo.entity.Scooter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         @Param("startTime") Date startTime,
         @Param("endTime") Date endTime
     );
+
+    List<Order> findByUser_Id(Long userId);
 } 

@@ -42,6 +42,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/feedback/all").hasRole("ADMIN")
                 .requestMatchers("/api/feedback/**").authenticated()
                 .requestMatchers("/api/bookings/**").authenticated()
+                .requestMatchers("/api/bookings/getAll").hasRole("ADMIN")
+                .requestMatchers("/api/users/**").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

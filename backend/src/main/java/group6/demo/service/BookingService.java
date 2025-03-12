@@ -9,4 +9,7 @@ public interface BookingService {
     Order createBooking(BookingDTO bookingDTO);
     void sendConfirmationEmail(Order order);
     List<Map<String, Object>> getBookingTimeline(Long scooterId);
+    void cancelBooking(Long orderId);
+
+    List<Order> getAllOrders();
 } 

@@ -22,10 +22,11 @@ public class JwtUtil {
     private final long jwtExpiration = 86400000;
 
     // Generate token for user
-    public String generateToken(String username, Long userId, Integer userType) {
+    public String generateToken(String username, Long userId, Integer userType, Integer role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("userType", userType);
+        claims.put("role", role);
         return createToken(claims, username);
     }
 
@@ -66,6 +67,12 @@ public class JwtUtil {
         return ((Number) claims.get("userType")).intValue();
     }
 
+    // Extract user role from token
+    public Integer extractRole(String token) {
+        Claims claims = extractAllClaims(token);
+        return ((Number) claims.get("role")).intValue();
+    }
+
     // Extract expiration date from token
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
@@ -79,7 +86,11 @@ public class JwtUtil {
 
     // Extract all claims from token
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     // Check if token is expired

@@ -44,6 +44,16 @@ CREATE DATABASE IF NOT EXISTS vuesb;
    - Username: root
    - Password: root
 
+### Default account
+
+#### Admin account
+- Username: admin
+- Passowrd: Password
+
+#### User account
+- Username: user
+- Password: Password
+
 ## Running the Project
 
 ### Backend
@@ -319,6 +329,167 @@ The system automatically sends email confirmations for successful bookings. The 
 - Rental fee
 - Contact information
 
+### Feedback API
+
+#### Create Feedback
+
+- **URL**: `/api/feedback`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Request Body**:
+  ```json
+  {
+    "content": "string"    // Feedback content
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "userId": "number",
+    "content": "string",
+    "createTime": "datetime",
+    "status": "string",      // "pending", "processing", or "resolved"
+    "priority": "number",    // 0: low, 1: medium, 2: high
+    "adminResponse": "string",
+    "responseTime": "datetime"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to create feedback: error message"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+
+#### Get User's Feedbacks
+
+- **URL**: `/api/feedback/user`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "userId": "number",
+      "content": "string",
+      "createTime": "datetime",
+      "status": "string",
+      "priority": "number",
+      "adminResponse": "string",
+      "responseTime": "datetime"
+    }
+  ]
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to get feedbacks: error message"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+
+#### Get All Feedbacks (Admin Only)
+
+- **URL**: `/api/feedback/all`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "userId": "number",
+      "content": "string",
+      "createTime": "datetime",
+      "status": "string",
+      "priority": "number",
+      "adminResponse": "string",
+      "responseTime": "datetime"
+    }
+  ]
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+
+#### Update Feedback (Admin Only)
+
+- **URL**: `/api/feedback/{id}`
+- **Method**: `PUT`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Request Body**:
+  ```json
+  {
+    "priority": "number",      // Optional, 0: low, 1: medium, 2: high
+    "status": "string",        // Optional, "pending", "processing", or "resolved"
+    "adminResponse": "string"  // Optional, admin's response to the feedback
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "userId": "number",
+    "content": "string",
+    "createTime": "datetime",
+    "status": "string",
+    "priority": "number",
+    "adminResponse": "string",
+    "responseTime": "datetime"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to update feedback: error message"
+  }
+  ```
 
 ## Validation Rules
 

@@ -42,7 +42,7 @@ public class AuthController {
             User user = userService.loginUser(loginDTO);
             
             // Generate JWT token
-            String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getUserType());
+            String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getUserType(), user.getRole());
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
@@ -50,6 +50,7 @@ public class AuthController {
             response.put("username", user.getUsername());
             response.put("userType", user.getUserType());
             response.put("email", user.getEmail());
+            response.put("role", user.getRole());
             response.put("token", token);
             
             return ResponseEntity.ok(response);
@@ -86,12 +87,14 @@ public class AuthController {
             User registeredUser = userService.registerUser(registrationDTO);
             
             // Generate JWT token
-            String token = jwtUtil.generateToken(registeredUser.getUsername(), registeredUser.getId(), registeredUser.getUserType());
+            String token = jwtUtil.generateToken(registeredUser.getUsername(), registeredUser.getId(), 
+                registeredUser.getUserType(), registeredUser.getRole());
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Registration successful");
             response.put("userId", registeredUser.getId());
             response.put("username", registeredUser.getUsername());
+            response.put("role", registeredUser.getRole());
             response.put("token", token);
             
             return ResponseEntity.ok(response);
@@ -116,6 +119,7 @@ public class AuthController {
             String username = jwtUtil.extractUsername(token);
             Long userId = jwtUtil.extractUserId(token);
             Integer userType = jwtUtil.extractUserType(token);
+            Integer role = jwtUtil.extractRole(token);
             
             if (username != null && !jwtUtil.isTokenExpired(token)) {
                 Map<String, Object> response = new HashMap<>();
@@ -123,6 +127,7 @@ public class AuthController {
                 response.put("userId", userId);
                 response.put("username", username);
                 response.put("userType", userType);
+                response.put("role", role);
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest().body("Invalid token");

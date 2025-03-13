@@ -5,7 +5,7 @@
 		</view>
 		<view class="container">
 			<view class="title">
-				<text v-if="!isCodeLogin">Register</text>
+				<text>Register</text>
 			</view>
 			<form>
 				<view class="form-group">
@@ -34,7 +34,7 @@
 				
 				<view class="form-group">
 				  <label>Birthday</label>
-				  <picker mode="date" :value="form.birthday" @change="getBirthday">
+				  <picker mode="date":value="form.birthday" @change="getBirthday">
 				  	 <view class="picker">{{ form.birthday || 'Please select a start date' }}</view>
 				  </picker>
 				  <span v-if="errors.birthday" class="error-message">{{ errors.birthday }}</span>
@@ -91,6 +91,9 @@ export default {
     };
   },
   methods: {
+	getBirthday(e){
+		this.form.birthday=e.detail.value.split("T")[0];
+	},
     validate() {
       this.errors = {};
 
@@ -158,38 +161,50 @@ export default {
             method: 'POST',
             data: {
               ...this.form,
-              birthday: new Date(this.form.birthday)
             },
+			header: {
+			    'Content-Type': 'application/json'
+			  },
             success: (res) => {
               if (res.statusCode === 200) {
+				uni.showToast({
+					title: 'Registration successful!',
+				    icon: 'success',
+				    duration: 2000  // 2秒后自动关闭
+				});
                 resolve(res.data);  // Resolving with response data
               } else {
                 reject(new Error('Request failed with status ' + res.statusCode));
               }
             },
             fail: (err) => {
+			uni.showToast({
+				title: 'Registration failed',
+				icon: 'error',
+				duration: 2000
+			});
               reject(err);  // Rejecting on failure
             }
           });
         });
 
-        // Handle successful registration
-        this.message = response.message || 'Registration successful';
-        this.messageType = 'success';
-        this.registeredUser = {
-          userId: response.userId,
-          username: response.username
-        };
+      //   // Handle successful registration
+      //   this.message = response.message || 'Registration successful';
+      //   this.messageType = 'success';
+      //   this.registeredUser = {
+      //     userId: response.userId,
+      //     username: response.username
+      //   };
 
-        // Clear form
-        this.form = {
-          username: '',
-          password: '',
-          email: '',
-          mobile: '',
-          birthday: '',
-          userType: 0,
-        };
+      //   // Clear form
+      //   this.form = {
+      //     username: '',
+      //     password: '',
+      //     email: '',
+      //     mobile: '',
+      //     birthday: '',
+      //     userType: 0,
+      //   };
       } catch (error) {
         // Handle errors
         if (error.response?.data && typeof error.response.data === 'object') {

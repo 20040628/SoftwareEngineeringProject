@@ -40,9 +40,12 @@
 	  @scroll="adjustListHeight"
       :style="{ height: listHeight + 'px' }"
     >
-
+	 <!-- 选择器 -->
+	  <picker @change="onPickerChange" :value="selectedIndex" :range="options">
+	       <view class="picker">当前选择：{{ options[selectedIndex] }}</view>
+	  </picker>
       <view 
-        v-for="scooter in scooters"
+        v-for="scooter in filteredScooters"
         :key="scooter.id"
         class="scooter-item"
 		@click="showScooterDetail(scooter)"
@@ -76,21 +79,19 @@ export default {
 	  isLoading:true,
       listHeight: 300,
 	  maxListHeight: 900, // 列表最大高度（单位 px）
-	  minListHeight: 300
+	  minListHeight: 300,
+	  options: ['all', 'available'], // 选项列表
+	  selectedIndex: 0, // 默认选择索引
+	  selectedOption: 'all' // 默认选择的值
     }
   },
-  // computed: {
-  //   filteredScooters() {
-  //     return this.scooters.filter(scooter => 
-  //       scooter.name.includes(this.searchKeyword)
-  //     ).map(scooter => ({
-  //       ...scooter,
-  //       iconPath: '/static/marker.png', // 地图标记图标
-  //       width: 30,
-  //       height: 40
-  //     }))
-  //   }
-  // },
+  computed: {
+    filteredScooters() {
+     return this.selectedOption === 'all'
+        ? this.scooters
+        : this.scooters.filter(scooter => scooter.status === 1);
+    }
+  },
   async mounted() {
      // this.getUserLocation();
      this.calcListHeight();
@@ -139,7 +140,10 @@ export default {
 	    url: `/pages/cardetail/cardetail?id=${scooter.id}`
 	  })
 	},
-
+	onPickerChange(event) {
+	      this.selectedIndex = event.detail.value;
+	      this.selectedOption = this.options[this.selectedIndex];
+	},
 
     //获取用户位置
     // async getUserLocation() {
@@ -300,5 +304,11 @@ export default {
   width: 30rpx;
   height: 30rpx;
   margin-right: 10rpx;
+}
+.picker {
+  padding: 10px;
+  background-color: #f5f5f5;
+  text-align: center;
+  margin: 10rpx;
 }
 </style>

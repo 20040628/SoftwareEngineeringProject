@@ -174,13 +174,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Map<String, Object>> getBookingTimeline(Long scooterId) {
-        // 获取从当前时间开始的所有预订
+        // get all the bookings from the current time
         Date now = new Date();
         List<Order> orders = orderRepository.findActiveOrdersByScooterId(scooterId, now);
         
         List<Map<String, Object>> timeline = new ArrayList<>();
         
-        // 将预订信息转换为时间轴数据
+        // convert the booking information to the timeline data
         for (Order order : orders) {
             Map<String, Object> timeSlot = new HashMap<>();
             timeSlot.put("startTime", order.getStartTime());
@@ -190,13 +190,13 @@ public class BookingServiceImpl implements BookingService {
             timeline.add(timeSlot);
         }
         
-        // 如果有预订，在预订之间添加可用时间段
+        // if there are bookings, add the available time between the bookings
         if (!orders.isEmpty()) {
             for (int i = 0; i < orders.size() - 1; i++) {
                 Order currentOrder = orders.get(i);
                 Order nextOrder = orders.get(i + 1);
                 
-                // 如果两个预订之间有空隙，添加一个可用时间段
+                // if there is a gap between two bookings, add an available time
                 if (currentOrder.getEndTime().before(nextOrder.getStartTime())) {
                     Map<String, Object> availableSlot = new HashMap<>();
                     availableSlot.put("startTime", currentOrder.getEndTime());
@@ -206,11 +206,10 @@ public class BookingServiceImpl implements BookingService {
                 }
             }
             
-            // 添加最后一个预订之后的可用时间段
             Order lastOrder = orders.get(orders.size() - 1);
             Calendar cal = Calendar.getInstance();
             cal.setTime(lastOrder.getEndTime());
-            cal.add(Calendar.DAY_OF_MONTH, 7); // 显示未来7天的可用时间
+            cal.add(Calendar.DAY_OF_MONTH, 7); // show the available time for the next 7 days
             
             Map<String, Object> lastAvailableSlot = new HashMap<>();
             lastAvailableSlot.put("startTime", lastOrder.getEndTime());
@@ -218,7 +217,6 @@ public class BookingServiceImpl implements BookingService {
             lastAvailableSlot.put("status", "available");
             timeline.add(lastAvailableSlot);
         } else {
-            // 如果没有预订，显示从现在开始的7天都可用
             Calendar cal = Calendar.getInstance();
             cal.setTime(now);
             cal.add(Calendar.DAY_OF_MONTH, 7);
@@ -232,4 +230,87 @@ public class BookingServiceImpl implements BookingService {
         
         return timeline;
     }
+
+    @Override
+    public void cancelBooking(Long orderId) {
+        // 根据订单 ID 查找订单
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
+
+        // 检查订单状态，如果已经取消则无需再次取消 status=2代表订单已经取消
+        if (order.getStatus() == 2) {
+            throw new IllegalArgumentException("Order is already cancelled");
+        }
+
+        // 更新订单状态为已取消
+        order.setStatus(2);
+        orderRepository.save(order);
+
+        // 更新关联的滑板车状态为可用
+        Scooter scooter = order.getScooter();
+        scooter.setStatus(1);
+        scooterRepository.save(scooter);
+
+        // 发送取消预订的邮件通知用户 待添加
+        sendCancellationEmail(order);
+    }
+
+
+    private void sendCancellationEmail(Order order) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+
+        String hirePeriodText;
+        switch (order.getHirePeriod()) {
+            case "HOUR":
+                hirePeriodText = "1 Hour";
+                break;
+            case "FOUR_HOURS":
+                hirePeriodText = "4 Hours";
+                break;
+            case "DAY":
+                hirePeriodText = "1 Day";
+                break;
+            case "WEEK":
+                hirePeriodText = "1 Week";
+                break;
+            default:
+                hirePeriodText = order.getHirePeriod();
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("E-Scooter Rental System <bc_somebody@qq.com>");
+        message.setTo(order.getUser().getEmail());
+        message.setSubject("E-Scooter Booking Cancellation");
+
+        String emailContent = String.format(
+                "Dear %s,\n\n" +
+                        "Your e-scooter booking has been cancelled!\n\n" +
+                        "Booking Details:\n" +
+                        "Order ID: %d\n" +
+                        "Location: %s\n" +
+                        "Start Time: %s\n" +
+                        "End Time: %s\n" +
+                        "Rental Duration: %s\n" +
+                        "Rental Fee: $%.2f\n\n" +
+                        "If you have any questions, please contact our customer service.\n\n" +
+                        "Best regards,\n" +
+                        "E-Scooter Rental Team",
+                order.getUser().getUsername(),
+                order.getId(),
+                order.getScooter().getLocation(),
+                dateFormat.format(order.getStartTime()),
+                dateFormat.format(order.getEndTime()),
+                hirePeriodText,
+                order.getPrice()
+        );
+
+        message.setText(emailContent);
+        emailSender.send(message);
+    }
+
+    @Override
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
 } 

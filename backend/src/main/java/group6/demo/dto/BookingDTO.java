@@ -5,15 +5,15 @@ import lombok.Data;
 
 @Data
 public class BookingDTO {
-    @NotNull(message = "用户ID不能为空")
+    @NotNull(message = "user ID cannot be empty")
     private Long userId;
     
-    @NotNull(message = "滑板车ID不能为空")
+    @NotNull(message = "scooter ID cannot be empty")
     private Long scooterId;
     
-    @NotNull(message = "租赁类型不能为空")
+    @NotNull(message = "hire type cannot be empty")
     private String hireType; // HOUR, FOUR_HOURS, DAY, WEEK
     
-    @NotNull(message = "开始时间不能为空")
+    @NotNull(message = "start time cannot be empty")
     private String startTime;
 } 

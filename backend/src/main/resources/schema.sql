@@ -63,17 +63,15 @@ CREATE TABLE `b_discount_rule` (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- 创建反馈表
-CREATE TABLE `b_feedback`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `content` text NOT NULL,
-  `submit_time` datetime NOT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT 0,
-  `priority` tinyint(1)  NOT NULL,
-  `user_id` bigint NOT NULL,
-  `scooter_id` bigint NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `b_feedback_user_id_fk`(`user_id`) USING BTREE,
-  INDEX `b_feedback_scooter_id_fk`(`scooter_id`) USING BTREE,
-  CONSTRAINT `b_feedback_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `b_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `b_feedback_scooter_id_fk` FOREIGN KEY (`scooter_id`) REFERENCES `b_scooter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic; 
+CREATE TABLE `b_feedback` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `user_id` bigint NOT NULL,
+    `content` text NOT NULL,
+    `create_time` datetime NOT NULL,
+    `status` varchar(50) DEFAULT 'pending',
+    `priority` int DEFAULT 0,
+    `admin_response` varchar(500),
+    `response_time` datetime,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `b_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci; 

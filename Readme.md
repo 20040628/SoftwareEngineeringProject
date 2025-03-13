@@ -44,6 +44,16 @@ CREATE DATABASE IF NOT EXISTS vuesb;
    - Username: root
    - Password: root
 
+### Default account
+
+#### Admin account
+- Username: admin
+- Passowrd: Password123
+
+#### User account
+- Username: user
+- Password: Password123
+
 ## Running the Project
 
 ### Backend
@@ -167,6 +177,57 @@ Frontend service will run on http://localhost:5173
   "Token validation failed: error message"
   ```
 
+###User API (管理员和普通用户应该都有)
+
+#### view my own bookings
+
+- **URL**: `/api/users/orders/{userId}`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  ```
+  [
+      {
+          "id": 1,
+          "orderTime": "2025-03-12T17:11:05.000+00:00",
+          "status": 1,
+          "startTime": "2025-03-12T17:20:00.000+00:00",
+          "endTime": "2025-03-12T18:20:00.000+00:00",
+          "hirePeriod": "HOUR",
+          "price": 5.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$5pscTMMTiM1NoWwzL//69u7NO07t7UsAPGdeMqZvd3TQ8oEARrspG",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0
+          },
+          "scooter": {
+              "id": 1,
+              "location": "Campus Center",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 0,
+              "longitude": 103.984500,
+              "latitude": 30.765000
+          }
+      }
+  ]
+  ```
+
+  ​
+
 ### Scooter API
 
 #### Add scooter
@@ -203,13 +264,6 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
-  **Error Response** (400 Bad Request):
-
-  ```
-  {
-    "message": "error message"
-  }
-  ```
 
 #### view all
 
@@ -244,7 +298,7 @@ Frontend service will run on http://localhost:5173
 
 #### change status: valid to invalid or invalid to valid
 
-**URL**: /api/scooters/changeStatus/{id}
+**URL**: `/api/scooters/changeStatus/{id}`
 
 **method**:`Grt`
 
@@ -308,6 +362,82 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
+#### Get All bookings (only admin can) 
+
+- **URL**: `/api/bookings/getAll`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  ```
+  [
+      {
+          "id": 1,
+          "orderTime": "2025-03-12T17:11:05.000+00:00",
+          "status": 1,
+          "startTime": "2025-03-12T17:20:00.000+00:00",
+          "endTime": "2025-03-12T18:20:00.000+00:00",
+          "hirePeriod": "HOUR",
+          "price": 5.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$5pscTMMTiM1NoWwzL//69u7NO07t7UsAPGdeMqZvd3TQ8oEARrspG",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0
+          },
+          "scooter": {
+              "id": 1,
+              "location": "Campus Center",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 0,
+              "longitude": 103.984500,
+              "latitude": 30.765000
+          }
+      }
+  ]
+  ```
+
+#### Cancel booking
+
+- **URL**: `/api/bookings/cancel/{orderId}`
+
+- **Method**: `POST`
+
+- **Path Parameters**:
+
+  - `orderId`: ID of the order
+
+- **Success Response** (200 OK):
+
+  ```
+  {
+      "message": "Booking cancelled successfully"
+  }
+  ```
+
+
+- **Error Response** (400 Bad Request):
+
+  ```
+  {
+      “message”: "Order is already cancelled"
+  }
+  ```
+
+  ​
+
 ### Email Notifications
 
 The system automatically sends email confirmations for successful bookings. The email includes:
@@ -319,6 +449,167 @@ The system automatically sends email confirmations for successful bookings. The 
 - Rental fee
 - Contact information
 
+### Feedback API
+
+#### Create Feedback
+
+- **URL**: `/api/feedback`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Request Body**:
+  ```json
+  {
+    "content": "string"    // Feedback content
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "userId": "number",
+    "content": "string",
+    "createTime": "datetime",
+    "status": "string",      // "pending", "processing", or "resolved"
+    "priority": "number",    // 0: low, 1: medium, 2: high
+    "adminResponse": "string",
+    "responseTime": "datetime"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to create feedback: error message"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+
+#### Get User's Feedbacks
+
+- **URL**: `/api/feedback/user`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "userId": "number",
+      "content": "string",
+      "createTime": "datetime",
+      "status": "string",
+      "priority": "number",
+      "adminResponse": "string",
+      "responseTime": "datetime"
+    }
+  ]
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to get feedbacks: error message"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+
+#### Get All Feedbacks (Admin Only)
+
+- **URL**: `/api/feedback/all`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "userId": "number",
+      "content": "string",
+      "createTime": "datetime",
+      "status": "string",
+      "priority": "number",
+      "adminResponse": "string",
+      "responseTime": "datetime"
+    }
+  ]
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+
+#### Update Feedback (Admin Only)
+
+- **URL**: `/api/feedback/{id}`
+- **Method**: `PUT`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Request Body**:
+  ```json
+  {
+    "priority": "number",      // Optional, 0: low, 1: medium, 2: high
+    "status": "string",        // Optional, "pending", "processing", or "resolved"
+    "adminResponse": "string"  // Optional, admin's response to the feedback
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "userId": "number",
+    "content": "string",
+    "createTime": "datetime",
+    "status": "string",
+    "priority": "number",
+    "adminResponse": "string",
+    "responseTime": "datetime"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Failed to update feedback: error message"
+  }
+  ```
 
 ## Validation Rules
 

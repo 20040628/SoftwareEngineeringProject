@@ -243,7 +243,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         // 更新订单状态为已取消
-        order.setStatus(2);
+        order.setStatus(3);
         orderRepository.save(order);
 
         // 更新关联的滑板车状态为可用

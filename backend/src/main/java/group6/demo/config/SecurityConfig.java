@@ -44,6 +44,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/bookings/**").authenticated()
                 .requestMatchers("/api/bookings/getAll").hasRole("ADMIN")
                 .requestMatchers("/api/users/**").authenticated()
+                .requestMatchers("/api/alipay/**").authenticated()
+                .requestMatchers("/api/alipay/**").authenticated()
+
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -62,7 +65,7 @@ public class SecurityConfig {
                 })
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 

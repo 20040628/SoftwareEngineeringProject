@@ -49,7 +49,7 @@ const routes = [
   {
     path: '/my-bookings',
     name: 'MyBookings',
-    component: () => import('../components/MyBookings.vue'),
+    component: () => import('../components/OrderAll.vue'),
     meta: {
       requiresAuth: true
     }

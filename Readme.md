@@ -300,7 +300,7 @@ Frontend service will run on http://localhost:5173
 
 **URL**: `/api/scooters/changeStatus/{id}`
 
-**method**:`Grt`
+**method**:`Get`
 
 **Success Response** (200 OK)
 
@@ -610,6 +610,51 @@ The system automatically sends email confirmations for successful bookings. The 
     "message": "Failed to update feedback: error message"
   }
   ```
+
+### Pay Api 
+
+- **URL**: `/api/alipay/pay/{orderId}`
+
+- **Method**: `GET`
+
+- **Headers**:
+
+  ```
+  Authorization: Bearer {token}
+  ```
+
+
+- **Success**:
+
+情况一：如果订单还没有被支付（沙盒支付自己会判断），网址会自动跳转到如下支付页面
+
+账户名：mxledn9076@sandbox.com
+
+密码：111111
+
+![74205260598](assets/1742052605989.png)
+
+点击下一步，会继续跳转，再次输入密码111111
+
+![74205272711](assets/1742052727118.png)
+
+继续自动跳转，如下
+
+![74205273676](assets/1742052736768.png)
+
+过几秒后再次自动跳转，至全部订单页面（这个页面后续要改，改成个人中心全部订单的http）
+
+
+
+情况二：如果orderId对应的订单已经被支付，网址会自动跳转到支付宝沙盒支付的固定页面，如下
+
+![74205254168](assets/1742052541687.png)**Fail**: 有时会失败，如下图3种情况，感觉是自动跳转不稳定，目前没找出原因
+
+![74205311981](assets/1742053119817.png)
+
+![74205293195](assets/1742052931955.png)
+
+![74205299234](assets/1742052992349.png)
 
 ## Validation Rules
 

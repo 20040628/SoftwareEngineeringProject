@@ -78,7 +78,7 @@ router.beforeEach(async (to, from, next) => {
     // 如果路由需要管理员权限
     if (to.meta.requiresAdmin) {
       const user = store.getters.user
-      if (!user || user.userType !== 'ADMIN') {
+      if (!user || user.role !== 0) {
         // 没有管理员权限，重定向到滑板车列表页
         return next({ name: 'ScooterList' })
       }

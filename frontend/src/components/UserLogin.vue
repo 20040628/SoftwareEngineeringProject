@@ -63,18 +63,27 @@ export default {
         const response = await axios.post('http://localhost:8080/api/auth/login', loginForm)
         
         if (response.data && response.data.token) {
+          console.log('登录成功获取的令牌：', response.data.token)
+          console.log('用户信息：', {
+            userId: response.data.userId,
+            username: response.data.username,
+            userType: response.data.userType,
+            role: response.data.role
+          })
+          
           // 登录成功，保存令牌和用户信息到Vuex store
           store.dispatch('login', {
             token: response.data.token,
             user: {
               userId: response.data.userId,
               username: response.data.username,
-              userType: response.data.userType
+              userType: response.data.userType,
+              role: response.data.role
             }
           })
           
-          // 根据用户类型导航到相应页面
-          if (response.data.userType === 'ADMIN') {
+          // 根据用户角色导航到相应页面
+          if (response.data.role === 0) {
             router.push('/admin/dashboard')
           } else {
             router.push('/scooters')

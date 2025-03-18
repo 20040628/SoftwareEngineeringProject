@@ -55,6 +55,12 @@ const routes = [
     }
   },
   {
+    path: '/admin/weekly-revenue',
+    name: 'WeeklyRevenue',
+    component: () => import('@/views/admin/WeeklyRevenue.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/scooters'
   }

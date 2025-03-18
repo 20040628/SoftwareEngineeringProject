@@ -49,7 +49,7 @@ export default {
         <nav v-if="isAuthenticated" class="main-nav">
           <router-link to="/scooters" class="nav-link">浏览滑板车</router-link>
           <router-link v-if="currentUser && currentUser.role === 0" to="/admin/dashboard" class="nav-link">管理面板</router-link>
-          <router-link v-if="currentUser && currentUser.role === 0" to="/admin/rental-stats" class="nav-link">租赁统计</router-link>
+          <router-link v-if="currentUser && currentUser.role === 0" to="/admin/weekly-revenue" class="nav-link">周收入统计</router-link>
           <router-link to="/my-bookings" class="nav-link">我的预订</router-link>
         </nav>
         

@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS `b_order`;
 DROP TABLE IF EXISTS `b_discount_rule`;
 DROP TABLE IF EXISTS `b_scooter`;
 DROP TABLE IF EXISTS `b_user`;
+DROP TABLE IF EXISTS `b_weekly_revenue`;
 
 -- 创建用户表
 CREATE TABLE `b_user`  (
@@ -74,4 +75,21 @@ CREATE TABLE `b_feedback` (
     `response_time` datetime,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `b_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- 创建周收入统计表
+CREATE TABLE `b_weekly_revenue` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `week_start_date` datetime NOT NULL,
+    `week_end_date` datetime NOT NULL,
+    `hourly_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `four_hours_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `daily_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `weekly_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `total_revenue` decimal(12, 2) NOT NULL DEFAULT 0.00,
+    `orders_count` int NOT NULL DEFAULT 0,
+    `created_at` datetime NOT NULL,
+    `updated_at` datetime NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_week_start_date` (`week_start_date`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci; 

@@ -432,7 +432,7 @@ Frontend service will run on http://localhost:5173
 
   ```
   {
-      “message”: "Order is already cancelled"
+      "message": "Order is already cancelled"
   }
   ```
 
@@ -655,6 +655,206 @@ The system automatically sends email confirmations for successful bookings. The 
 ![74205293195](assets/1742052931955.png)
 
 ![74205299234](assets/1742052992349.png)
+
+### Weekly Revenue API
+
+#### Get Current Week Revenue
+
+- **URL**: `/api/weekly-revenue/current`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "weekStartDate": "datetime",
+    "weekEndDate": "datetime",
+    "hourlyRevenue": "decimal",
+    "fourHoursRevenue": "decimal",
+    "dailyRevenue": "decimal",
+    "weeklyRevenue": "decimal",
+    "totalRevenue": "decimal",
+    "ordersCount": "number",
+    "createdAt": "datetime",
+    "updatedAt": "datetime"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+
+#### Get Revenue by Date
+
+- **URL**: `/api/weekly-revenue/by-date`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Query Parameters**:
+  - `date`: Date in format "YYYY-MM-DD"
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "weekStartDate": "datetime",
+    "weekEndDate": "datetime",
+    "hourlyRevenue": "decimal",
+    "fourHoursRevenue": "decimal",
+    "dailyRevenue": "decimal",
+    "weeklyRevenue": "decimal",
+    "totalRevenue": "decimal",
+    "ordersCount": "number",
+    "createdAt": "datetime",
+    "updatedAt": "datetime"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Invalid date format"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+
+#### Get Recent Weekly Revenues
+
+- **URL**: `/api/weekly-revenue/recent`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Query Parameters**:
+  - `weeks`: Number of weeks to retrieve (default: 4)
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "weekStartDate": "datetime",
+      "weekEndDate": "datetime",
+      "hourlyRevenue": "decimal",
+      "fourHoursRevenue": "decimal",
+      "dailyRevenue": "decimal",
+      "weeklyRevenue": "decimal",
+      "totalRevenue": "decimal",
+      "ordersCount": "number",
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+  ]
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+
+#### Get Revenue by Date Range
+
+- **URL**: `/api/weekly-revenue/range`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Query Parameters**:
+  - `startDate`: Start date in format "YYYY-MM-DD"
+  - `endDate`: End date in format "YYYY-MM-DD"
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "weekStartDate": "datetime",
+      "weekEndDate": "datetime",
+      "hourlyRevenue": "decimal",
+      "fourHoursRevenue": "decimal",
+      "dailyRevenue": "decimal",
+      "weeklyRevenue": "decimal",
+      "totalRevenue": "decimal",
+      "ordersCount": "number",
+      "createdAt": "datetime",
+      "updatedAt": "datetime"
+    }
+  ]
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "Invalid date format"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
+
+#### Manually Update Weekly Revenue
+
+- **URL**: `/api/weekly-revenue/update`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "Weekly revenue updated successfully"
+  }
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  {
+    "error": "No access authorization"
+  }
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  {
+    "error": "Permission denied"
+  }
+  ```
 
 ## Validation Rules
 

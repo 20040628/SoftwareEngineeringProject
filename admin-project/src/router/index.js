@@ -80,8 +80,10 @@ router.beforeEach(async (to, from, next) => {
       const user = store.getters.user
       console.log('User:', user.role); // 输出完整的 user 对象
       console.log('User:', user); // 输出完整的 user 对象
+      console.log('Vuex Store 中的 token：', store.state.auth.token);
       if (!user || user.role !== 0) {
         // 没有管理员权限，重定向到滑板车列表页
+        console.log("return to login");
         return next({ name: 'Login' })
       }
     }

@@ -129,61 +129,53 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      activeMenu: 1, // 默认选中的菜单项
       menus: [
-        { id: 1, name: 'Scooter Management', icon: '@/static/center/book.png' },
-        { id: 2, name: 'User Feedback', icon: '@/static/center/comment.png' },
-        { id: 3, name: 'Show all scooters', icon: '@/static/center/share.png' },
-        { id: 4, name: 'Add to desktop', icon: '/static/center/appstore-add.png' },
-        { id: 5, name: 'Logout', icon: '/static/center/poweroff.png' },
+        { id: 1, name: 'Scooter Management', icon: 'path/to/icon1.png' },
+        { id: 2, name: 'User Feedback', icon: 'path/to/icon2.png' },
+        { id: 3, name: 'Show all scooters', icon: 'path/to/icon3.png' },
+        { id: 4, name: 'Add to Desktop', icon: 'path/to/icon4.png' },
+        { id: 5, name: 'Logout', icon: 'path/to/icon5.png' }
       ],
-      scooters: [], // 滑板车列表
-      feedbacks: [], // 用户反馈列表
+      activeMenu: 1, // 默认选中第一个菜单项
+      scooters: [],
       newScooter: {
         location: '',
-        priceHour: null,
-        priceFourHour: null,
-        priceDay: null,
-        priceWeek: null,
-        status: null,
-        longitude: null,
-        latitude: null,
+        priceHour: '',
+        priceDay: ''
       },
+      feedbacks: []
     };
   },
   mounted() {
-    this.fetchScooters();
+    // 检查 Token 是否存在
+    const token = localStorage.getItem('token');
+    console.log('Token 是否存在:', token !== null);
+    if (!token) {
+      this.$router.push('/login');
+    } else {
+      // 设置 axios 默认的 Authorization 头
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      this.fetchScooters();
+    }
   },
-
   methods: {
-    selectMenu(id) {
-      this.activeMenu = id;
-      if (id === 1) {
-        this.fetchScooters();
-      } else if (id === 5) {
-        this.logout(); // 调用退出登录方法
-      }
-    },
-    // 退出登录方法
-    logout() {
-      // 清除用户登录状态
-      localStorage.removeItem('token'); // 假设 token 存储在 localStorage 中
-      localStorage.removeItem('user'); // 假设用户信息存储在 localStorage 中
-
-      // 重定向到登录页面
-      this.$router.push('/login'); // 假设登录页面的路由是 '/login'
-    },
-    // 获取滑板车列表
+    // 获取滑板车列表（已通过拦截器附加 Token）
     fetchScooters() {
       axios.get('http://localhost:8080/api/scooters/getAll')
           .then((res) => {
             this.scooters = res.data;
           })
-          .catch(() => {
-            alert('Failed to load scooters');
+          .catch((err) => {
+            if (err.response?.status === 401) {
+              alert('请重新登录');
+              this.$router.push('/login');
+            } else {
+              alert('Failed to load scooters');
+            }
           });
     },
-    // 添加新滑板车
+
+    // 添加滑板车（已通过拦截器附加 Token）
     addScooter() {
       if (!this.newScooter.location || !this.newScooter.priceHour || !this.newScooter.priceDay) {
         alert('Please enter required fields');
@@ -193,25 +185,36 @@ export default {
           .then((res) => {
             if (res.status === 200) {
               alert('Scooter Added');
-              this.newScooter = {
-                location: '',
-                priceHour: null,
-                priceFourHour: null,
-                priceDay: null,
-                priceWeek: null,
-                status: 1,
-                longitude: null,
-                latitude: null,
-              };
+              this.newScooter = { location: '', priceHour: '', priceDay: '' }; // 重置表单
               this.fetchScooters();
-            } else {
-              alert(res.data.message);
             }
           })
-          .catch(() => {
-            alert('Failed to add scooter');
+          .catch((err) => {
+            if (err.response?.status === 401) {
+              this.$router.push('/login');
+            } else {
+              alert('Failed to add scooter');
+            }
           });
     },
+
+    // 修改滑板车状态（已通过拦截器附加 Token）
+    async changeScooterStatus(id) {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/scooters/changeStatus/${id}`);
+        if (res.status === 200) {
+          this.fetchScooters();
+          alert('状态更新成功');
+        }
+      } catch (err) {
+        if (err.response?.status === 401) {
+          this.$router.push('/login');
+        } else {
+          alert('网络错误');
+        }
+      }
+    },
+
     // 获取用户反馈数据
     fetchFeedbacks() {
       axios.get('http://localhost:8080/api/feedback/all')
@@ -226,6 +229,7 @@ export default {
             alert('Failed to load feedbacks');
           });
     },
+
     getStatusClass(status) {
       const statusMap = {
         0: 'unavailable',
@@ -234,6 +238,7 @@ export default {
       };
       return statusMap[status] || 'unknown';
     },
+
     getStatusText(status) {
       const textMap = {
         0: 'Unavailable',
@@ -241,19 +246,6 @@ export default {
         2: 'Maintenance',
       };
       return textMap[status] || 'Unknown';
-    },
-    async changeScooterStatus(id) {
-      try {
-        const res = await axios.get(`http://localhost:8080/api/scooters/changeStatus/${id}`);
-        if (res.status === 200) {
-          this.fetchScooters();
-          alert('状态更新成功');
-        } else {
-          alert('状态更新失败');
-        }
-      } catch (err) {
-        alert('网络错误');
-      }
     },
   },
 };

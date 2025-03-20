@@ -2,6 +2,8 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { ElNotification } from "element-plus";
+import { User, Lock } from "@element-plus/icons-vue";
 import axios from "axios";
 
 const router = useRouter();
@@ -12,110 +14,83 @@ const loginForm = reactive({
   password: "",
 });
 
+// 表单校验规则
+const loginRules = reactive({
+  username: [{ required: true, message: "Please enter username", trigger: "blur" }],
+  password: [{ required: true, message: "Please enter password", trigger: "blur" }],
+});
+
+const loginFormRef = ref();
 const errorMessage = ref("");
 const loading = ref(false);
 
 const login = async () => {
-  if (!loginForm.username || !loginForm.password) {
-    errorMessage.value = "用户名和密码不能为空";
-    return;
-  }
+  if (!loginFormRef.value) return;
 
-  loading.value = true;
-  errorMessage.value = "";
+  loginFormRef.value.validate(async (valid) => {
+    if (!valid) return;
 
-  try {
-    const response = await axios.post("http://localhost:8080/api/auth/login", loginForm);
+    loading.value = true;
+    errorMessage.value = "";
 
-    if (response.data && response.data.token) {
-      console.log('Login response:', response.data);
-      await store.dispatch("login", {
-        token: response.data.token,
-        user: {
-          userId: response.data.userId,
-          username: response.data.username,
-          userType: response.data.userType,
-          role: response.data.role,
-        },
-      });
+    try {
+      const response = await axios.post("http://localhost:8080/api/auth/login", loginForm);
+      if (response.data && response.data.token) {
+        await store.dispatch("login", {
+          token: response.data.token,
+          user: {
+            userId: response.data.userId,
+            username: response.data.username,
+            userType: response.data.userType,
+            role: response.data.role,
+          },
+        });
 
-      console.log('Vuex Store 中的 token：', store.state.auth.token);
-      console.log('Vuex Store 中的 user：', store.state.auth.user);
-
-      if (response.data.role === 0) {
-        console.log('Vuex Store 中的 token：', store.state.auth.token);
-        console.log('Vuex Store 中的 user：', store.state.auth.user);
-        router.push("/admin/ScooterAdd");
-      } else {
-        console.log('Vuex Store 中的 token：', store.state.auth.token);
-        console.log('Vuex Store 中的 user：', store.state.auth.user);
-        router.push("/login");
+        router.push(response.data.role === 0 ? "/admin/ScooterAdd" : "/login");
+        ElNotification({ title: "登录成功", message: `欢迎回来，${response.data.username}`, type: "success" });
       }
-
-      alert(`登录成功，欢迎回来，${response.data.username}`);
+    } catch (error) {
+      errorMessage.value = error.response?.data?.message || "用户名或密码错误";
+    } finally {
+      loading.value = false;
     }
-  } catch (error) {
-    if (error.response) {
-      errorMessage.value = error.response.data.message || "用户名或密码错误";
-    } else {
-      errorMessage.value = "无法连接到服务器，请稍后再试";
-    }
-  } finally {
-    loading.value = false;
-  }
-};
-
-const resetForm = () => {
-  loginForm.username = "";
-  loginForm.password = "";
-  errorMessage.value = "";
+  });
 };
 </script>
 
+
 <template>
-  <div class="login-container">
-    <div class="login-form">
-      <h2>用户登录</h2>
-
-      <div v-if="errorMessage" class="alert alert-danger">
-        {{ errorMessage }}
-      </div>
-
-      <form @submit.prevent="login">
-        <div class="form-group">
-          <label for="username">用户名</label>
-          <input
-              type="text"
-              id="username"
-              v-model="loginForm.username"
-              class="form-control"
-              placeholder="请输入用户名"
-              required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="password">密码</label>
-          <input
-              type="password"
-              id="password"
-              v-model="loginForm.password"
-              class="form-control"
-              placeholder="请输入密码"
-              required
-          />
-        </div>
-
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary" :disabled="loading">
-            {{ loading ? "登录中..." : "登录" }}
-          </button>
-          <router-link to="/register" class="btn btn-link">注册新账号</router-link>
-        </div>
-      </form>
-    </div>
+  <div v-if="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
   </div>
+
+  <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef">
+    <!-- 用户名 -->
+    <el-form-item prop="username">
+      <el-input v-model.trim="loginForm.username" placeholder="Username" class="custom-input" size="large">
+        <template #prefix>
+          <el-icon><User /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+
+    <!-- 密码 -->
+    <el-form-item prop="password">
+      <el-input v-model.trim="loginForm.password" type="password" placeholder="Password" class="custom-input" show-password size="large">
+        <template #prefix>
+          <el-icon><Lock /></el-icon>
+        </template>
+      </el-input>
+    </el-form-item>
+
+    <!-- 按钮 -->
+    <el-form-item>
+      <el-button type="primary" :loading="loading" native-type="submit" @click="login">Login</el-button>
+      <router-link to="/register" class="btn-link">Register</router-link>
+    </el-form-item>
+  </el-form>
 </template>
+
 
 <style scoped>
 .login-container {
@@ -142,6 +117,36 @@ h2 {
   font-weight: 500;
 }
 
+/* 自定义 Element Plus 的 el-input 样式 */
+.custom-input {
+  --el-input-border-color: #dcdfe6; /* 统一边框色 */
+  --el-input-hover-border-color: #409eff; /* 悬停变色 */
+  --el-input-focus-border-color: #409eff;
+  --el-input-placeholder-color: #909399;
+}
+
+/* 调整 el-input 里面的图标 */
+.el-input__prefix {
+  color: #c0c4cc;
+  font-size: 16px;
+}
+
+/* 表单按钮样式 */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+}
+
+/* Element Plus 按钮调整 */
+.el-button {
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 0;
+}
+
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -156,16 +161,37 @@ label {
 .form-control {
   width: 100%;
   padding: 10px 15px;
-  border: 1px solid #ddd;
+  border: 1px solid #dcdfe6; /* Element Plus 主题默认边框色 */
   border-radius: 4px;
   font-size: 16px;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+  color: #606266;
 }
 
 .form-control:focus {
-  border-color: #4a90e2;
+  border-color: #009688; /* Element Plus 主题的高亮色 */
   outline: none;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  box-shadow: #009688;
 }
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.input-wrapper .icon {
+  position: absolute;
+  left: 10px;
+  color: #c0c4cc;
+  font-size: 16px;
+}
+
+.input-wrapper input {
+  padding-left: 35px; /* 预留左侧空间给图标 */
+}
+
 
 .alert {
   padding: 12px 15px;
@@ -186,26 +212,27 @@ label {
   margin-top: 25px;
 }
 
-.btn {
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.el-button {
+  padding: 10px 20px !important; /* 这里必须加 !important 强制覆盖 */
+  border-radius: 4px !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
 }
 
-.btn-primary {
-  background-color: #4a90e2;
-  color: white;
-  border: none;
+
+.el-button--primary {
+  background-color: #009688 !important;
+  border: none !important;
+  color: white !important;
 }
 
-.btn-primary:hover {
-  background-color: #3a7fcb;
+.el-button--primary:hover {
+  background-color: #00796b !important; /* 让 hover 颜色稍微不同 */
 }
 
 .btn-link {
-  color: #4a90e2;
+  color: #009688;
   text-decoration: none;
 }
 

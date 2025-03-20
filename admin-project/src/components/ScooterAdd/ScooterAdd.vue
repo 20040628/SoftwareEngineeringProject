@@ -3,7 +3,7 @@
     <!-- 侧边栏 -->
     <div class="sidebar">
       <div class="user">
-        <img src="@/static/center/avatar.png" alt="avatar" />
+        <img src="/static/center/avatar.png" alt="avatar" />
         <span>Administrator</span>
       </div>
       <div class="menu">
@@ -131,12 +131,13 @@ export default {
     return {
       activeMenu: 1, // 默认选中的菜单项
       menus: [
-        { id: 1, name: 'Scooter Management', icon: '@/static/center/book.png' },
-        { id: 2, name: 'User Feedback', icon: '@/static/center/comment.png' },
-        { id: 3, name: 'Show all scooters', icon: '@/static/center/share.png' },
+        { id: 1, name: 'Scooter Management', icon: '/static/center/book.png' },
+        { id: 2, name: 'User Feedback', icon: '/static/center/comment.png' },
+        { id: 3, name: 'Show all scooters', icon: '/static/center/share.png' },
         { id: 4, name: 'Add to desktop', icon: '/static/center/appstore-add.png' },
         { id: 5, name: 'Logout', icon: '/static/center/poweroff.png' },
       ],
+
       scooters: [], // 滑板车列表
       feedbacks: [], // 用户反馈列表
       newScooter: {
@@ -401,4 +402,11 @@ export default {
 .status-btn:hover {
   background-color: #46a3a8;
 }
+.menu-item img {
+  width: 28px;  
+  height: 28px; 
+  margin-right: 10px; 
+  object-fit: contain; 
+}
+
 </style>

@@ -46,7 +46,7 @@ const login = async () => {
           },
         });
 
-        router.push(response.data.role === 0 ? "/admin/ScooterAdd" : "/login");
+        router.push(response.data.role === 0 ? "/add_scooter" : "/login");
         ElNotification({ title: "登录成功", message: `欢迎回来，${response.data.username}`, type: "success" });
       }
     } catch (error) {

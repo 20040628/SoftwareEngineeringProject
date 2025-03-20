@@ -6,12 +6,14 @@ const UserLogin = () => import('../views/login/index.vue')
 // const UserRegister = () => import('../components/UserRegister.vue')
 const ScooterAdd = () => import('../components/ScooterAdd/ScooterAdd.vue')
 // const ScooterAdd = () => import('../components/ScooterAdd.vue')
+const MainLayout = () => import('@/components/MainLayout.vue')
+
 
 // 路由配置
 const routes = [
   {
     path: '/',
-    redirect: '/admin/ScooterAdd'
+    redirect: '/add_scooter'
   },
   {
     path: '/login',
@@ -21,39 +23,28 @@ const routes = [
       requiresAuth: false
     }
   },
-  // {
-  //   path: '/register',
-  //   name: 'Register',
-  //   component: UserRegister,
-  //   meta: {
-  //     requiresAuth: false
-  //   }
-  // },
-  // {
-  //   path: '/scooters',
-  //   name: 'ScooterList',
-  //   component: ScooterAll,
-  //   meta: {
-  //     requiresAuth: true
-  //   }
-  // },
   {
-    path: '/admin/ScooterAdd',
-    name: 'ScooterAdd',
-    component: ScooterAdd,
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true
-    }
+    path: '/',
+    component: MainLayout,
+    children: [
+      { path: '/add_scooter', component: () => import('@/components/ScooterAdd/ScooterAdd.vue') },
+      { path: '/user-feedback', component: () => import('@/components/UserFeedback.vue') },
+      { path: '/all-scooters', component: () => import('@/components/AllScooters.vue') },
+      { path: '/add-to-desktop', component: () => import('@/components/AddToDesktop.vue') },
+      { path: '/logout', component: () => import('@/components/Logout.vue') },
+    ],
   },
+
   // {
-  //   path: '/my-bookings',
-  //   name: 'MyBookings',
-  //   component: () => import('../components/OrderAll.vue'),
+  //   path: '/admin/ScooterAdd',
+  //   name: 'ScooterAdd',
+  //   component: ScooterAdd,
   //   meta: {
-  //     requiresAuth: true
+  //     requiresAuth: true,
+  //     requiresAdmin: true
   //   }
   // },
+
   {
     path: '/:pathMatch(.*)*',
     redirect: '/admin/ScooterAdd'

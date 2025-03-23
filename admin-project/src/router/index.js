@@ -30,25 +30,13 @@ const routes = [
       { path: '/add_scooter', component: () => import('@/components/ScooterAdd/ScooterAdd.vue') },
       { path: '/user-feedback', component: () => import('@/components/UserFeedback.vue') },
       { path: '/all-scooters', component: () => import('@/components/AllScooters.vue') },
-      { path: '/add-to-desktop', component: () => import('@/components/AddToDesktop.vue') },
+      { path: '/data-analysis', component: () => import('@/components/DataAnalysis.vue') },
+      { path: '/order-management', component: () => import('@/components/BookingManagement.vue') },
+      { path: '/user-management', component: () => import('@/components/UserManagement.vue') },
       { path: '/logout', component: () => import('@/components/Logout.vue') },
     ],
   },
 
-  // {
-  //   path: '/admin/ScooterAdd',
-  //   name: 'ScooterAdd',
-  //   component: ScooterAdd,
-  //   meta: {
-  //     requiresAuth: true,
-  //     requiresAdmin: true
-  //   }
-  // },
-
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/admin/ScooterAdd'
-  }
 ]
 
 const router = createRouter({

@@ -30,7 +30,9 @@
 import ScooterManagement from './ScooterAdd/ScooterAdd.vue';
 import UserFeedback from './UserFeedback.vue';
 import AllScooters from './AllScooters.vue';
-import AddToDesktop from './AddToDesktop.vue';
+import DataAnalysis from './DataAnalysis.vue';
+import BookingManagement from './BookingManagement.vue';
+import UserManagement from './UserManagement.vue';
 import Logout from './Logout.vue';
 
 export default {
@@ -38,7 +40,9 @@ export default {
     ScooterManagement,
     UserFeedback,
     AllScooters,
-    AddToDesktop,
+    DataAnalysis,
+    BookingManagement,
+    UserManagement,
     Logout,
   },
   data() {
@@ -48,8 +52,10 @@ export default {
         { id: 1, name: 'Scooter Management', icon: '/static/center/book.png' },
         { id: 2, name: 'User Feedback', icon: '/static/center/comment.png' },
         { id: 3, name: 'Show all scooters', icon: '/static/center/share.png' },
-        { id: 4, name: 'Add to desktop', icon: '/static/center/appstore-add.png' },
-        { id: 5, name: 'Logout', icon: '/static/center/poweroff.png' },
+        { id: 4, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
+        { id: 5, name: 'Order Management', icon: '/static/center/poweroff.png' },
+        { id: 6, name: 'User Management', icon: '/static/center/poweroff.png' },
+        { id: 7, name: 'Logout', icon: '/static/center/poweroff.png' },
       ],
     };
   },
@@ -59,8 +65,10 @@ export default {
         1: 'ScooterManagement',
         2: 'UserFeedback',
         3: 'AllScooters',
-        4: 'AddToDesktop',
-        5: 'Logout',
+        4: 'DataAnalysis',
+        5: 'BookingManagement',
+        6: 'UserManagement',
+        7: 'Logout'
       };
       return componentMap[this.activeMenu] || 'ScooterManagement'; // 默认返回 ScooterManagement
     },
@@ -72,8 +80,10 @@ export default {
         1: '/add_scooter',
         2: '/user-feedback',
         3: '/all-scooters',
-        4: '/add-to-desktop',
-        5: '/logout',
+        4: '/data-analysis',
+        5: '/order-management',
+        6: '/user-management',
+        7: '/logout'
       };
       const route = routeMap[id];
       if (route) {

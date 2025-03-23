@@ -3,56 +3,103 @@
   position: relative;
   height: 100vh;
 }
-.search-bar.data-v-1cf27b2a {
-  position: absolute;
-  top: 20rpx;
-  left: 20rpx;
-  right: 20rpx;
-  z-index: 999;
+.swiper.data-v-1cf27b2a {
+  width: 100%;
+  height: 180px;
+}
+.swiper image.data-v-1cf27b2a {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.soso-box.data-v-1cf27b2a {
   display: flex;
-  gap: 15rpx;
-  background: rgba(255, 255, 255, 0.9);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20rpx;
+  margin: 10rpx;
+}
+.soso-input-box.data-v-1cf27b2a {
+  display: flex;
+  align-items: center;
+  border: 2px solid #7f669d;
   border-radius: 50rpx;
-  padding: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
-}
-.search-input.data-v-1cf27b2a {
-  flex: 1;
   height: 60rpx;
-  padding-left: 30rpx;
-}
-.location-btn.data-v-1cf27b2a {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
+  width: 600rpx;
+  padding: 0 20rpx;
   background: #fff;
-  padding: 0;
 }
-.location-icon.data-v-1cf27b2a {
-  width: 50rpx;
-  height: 50rpx;
+.soso-icon.data-v-1cf27b2a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10rpx;
+image.data-v-1cf27b2a {
+    width: 32rpx;
+    height: 32rpx;
 }
-.custom-controls.data-v-1cf27b2a {
-  position: absolute;
-  right: 30rpx;
-  bottom: 200rpx;
 }
-.control-btn.data-v-1cf27b2a {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+input.data-v-1cf27b2a {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 28rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: transparent;
+}
+.screening-boxA.data-v-1cf27b2a {
+		display: flex;
+		justify-content: space-between;
+		background: #fff;
+		padding: 20rpx;
+.screeningA-con.data-v-1cf27b2a {
+			width: 120rpx;
+			border-radius: 50rpx;
+			color: #999;
+			font-size: 24rpx;
+			text-align: center;
+			height: 48rpx;
+			line-height: 48rpx;
+}
+.screeningA-con-active.data-v-1cf27b2a {
+			background-image: linear-gradient(to right, #A289C1, #745994);
+			color: #fff;
+			font-size: 20rpx;
+}
+}
+.pricing-table.data-v-1cf27b2a {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 10px;
+}
+.pricing-card.data-v-1cf27b2a {
+  flex: 1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 5px;
+}
+.plan-duration.data-v-1cf27b2a {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+.plan-price.data-v-1cf27b2a {
+  font-size: 18px;
+  color: #ff5722;
+  font-weight: bold;
+  margin-top: 5px;
 }
 .scooter-list.data-v-1cf27b2a {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin: 10rpx;
   background: #fff;
   border-radius: 40rpx 40rpx 0 0;
   padding: 30rpx;
   box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.1);
-  z-index: 999;
 }
 .scooter-item.data-v-1cf27b2a {
   display: flex;
@@ -62,35 +109,30 @@
   border-radius: 20rpx;
   margin-bottom: 20rpx;
 }
-.scooter-image.data-v-1cf27b2a {
-  width: 200rpx;
-  height: 160rpx;
-  margin-right: 30rpx;
-}
 .scooter-info.data-v-1cf27b2a {
-  flex: 1;
-}
-.scooter-name.data-v-1cf27b2a {
-  font-size: 34rpx;
-  font-weight: bold;
-  color: #333;
-}
-.details.data-v-1cf27b2a {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15rpx;
-}
-.distance.data-v-1cf27b2a {
-  color: #666;
-  font-size: 28rpx;
-}
-.battery.data-v-1cf27b2a {
-  display: flex;
+/*  display: flex; */
+  /* justify-content: space-between; */
   align-items: center;
-  color: #4CAF50;
+  width: 100%;
+  padding: 0 10px;
 }
-.battery-icon.data-v-1cf27b2a {
-  width: 30rpx;
-  height: 30rpx;
-  margin-right: 10rpx;
+.location.data-v-1cf27b2a{
+	font-size: 34rpx;
+	font-weight: bold;
+	color: #333;
+}
+.reserve-btn.data-v-1cf27b2a {
+  height: 55rpx;
+  width: 90rpx;
+  background: #aaaaff;
+  color: white;
+  padding: 6px;
+  border-radius: 20px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.reserve-btn.data-v-1cf27b2a:hover {
+  background: #aa55ff;
 }

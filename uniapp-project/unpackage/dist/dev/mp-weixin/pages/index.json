@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 100,
+  "usingComponents": {
+    "index-page": "./index/index",
+    "my-page": "./UserCenter/UserCenter",
+    "map-page": "./map/map",
+    "tab-bar": "../components/tabBar"
+  }
+}

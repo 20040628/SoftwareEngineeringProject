@@ -49,14 +49,6 @@
 			  </button>
 			</div>
 			
-			<div v-if="message" :class="['message', messageType]">
-			  <p>{{ message }}</p>
-			  <template v-if="registeredUser">
-			    <p>User ID: {{ registeredUser.userId }}</p>
-			    <p>Username: {{ registeredUser.username }}</p>
-			  </template>
-			</div>
-			
 			<div class="form-group">
 			  <button @click="goToLogin" class="login-btn">
 			    Go to Login
@@ -91,6 +83,7 @@ export default {
     };
   },
   methods: {
+	  
 	getBirthday(e){
 		this.form.birthday=e.detail.value.split("T")[0];
 	},
@@ -140,93 +133,92 @@ export default {
 
       return Object.keys(this.errors).length === 0;
     },
-    async register() {
-      this.loading = true;
-      this.message = '';
-      this.registeredUser = null;
-
-      // Validate form before submission
-      if (!this.validate()) {
-        this.message = 'Please correct the errors below';
-        this.messageType = 'error';
-        this.loading = false;
-        return;
-      }
-
-      try {
-        // Use uni.request instead of axios
-        const response = await new Promise((resolve, reject) => {
-          uni.request({
-            url: 'http://localhost:8080/api/auth/register', // replace with your actual URL
-            method: 'POST',
-            data: {
-              ...this.form,
-            },
-			header: {
-			    'Content-Type': 'application/json'
-			  },
-            success: (res) => {
-              if (res.statusCode === 200) {
-				uni.showToast({
-					title: 'Registration successful!',
-				    icon: 'success',
-				    duration: 2000  // 2秒后自动关闭
-				});
-                resolve(res.data);  // Resolving with response data
-              } else {
-                reject(new Error('Request failed with status ' + res.statusCode));
-              }
-            },
-            fail: (err) => {
-			uni.showToast({
-				title: 'Registration failed',
-				icon: 'error',
-				duration: 2000
-			});
-              reject(err);  // Rejecting on failure
-            }
-          });
-        });
-
-      //   // Handle successful registration
-      //   this.message = response.message || 'Registration successful';
-      //   this.messageType = 'success';
-      //   this.registeredUser = {
-      //     userId: response.userId,
-      //     username: response.username
-      //   };
-
-      //   // Clear form
-      //   this.form = {
-      //     username: '',
-      //     password: '',
-      //     email: '',
-      //     mobile: '',
-      //     birthday: '',
-      //     userType: 0,
-      //   };
-      } catch (error) {
-        // Handle errors
-        if (error.response?.data && typeof error.response.data === 'object') {
-          // Handle validation errors
-          this.errors = error.response.data;
-          this.message = 'Please correct the errors below';
-        } else {
-          // Handle other errors
-          this.message = error.message || 'Registration failed';
-        }
-        this.messageType = 'error';
-      } finally {
-        this.loading = false;
-      }
-    },
-    goToLogin() {
-      uni.navigateTo({
-        url: '/pages/index/index' 
-      });
-    }
-  }
-};
+   async register() {
+     this.loading = true;
+     this.message = '';
+     this.registeredUser = null;
+   
+     // 验证表单
+     if (!this.validate()) {
+       this.message = 'Please correct the errors below';
+       this.messageType = 'error';
+       this.loading = false;
+       return;
+     }
+   
+     try {
+       // 发送注册请求
+       const [err, res] = await uni.request({
+         url: 'http://localhost:8080/api/auth/register', // 后端地址
+         method: 'POST',
+         data: this.form,
+         header: { 'Content-Type': 'application/json' }
+       }).then(res => [null, res]).catch(err => [err, null]); // 兼容 `try-catch` 方式
+   
+        if (err || res.statusCode !== 200) {
+             // 这里处理后端返回的错误信息
+             let errorMessage = 'Registration failed';
+             
+             if (res?.data) {
+				if (typeof res.data === 'string') {
+				  // 如果后端直接返回字符串
+				  errorMessage = res.data;
+				} else if (typeof res.data === 'object' && res.data.message) {
+				  // 如果后端返回 JSON 对象
+				  errorMessage = res.data.message;
+				}
+			  } else if (err) {
+				errorMessage = err.message || 'Network error, please try again';
+			  }
+	
+             this.message = errorMessage;
+             this.messageType = 'error';
+       
+             uni.showToast({
+               title: this.message,
+               icon: 'none',
+               duration: 2000
+             });
+       
+             throw new Error(errorMessage);
+           }
+       
+           // 显示成功提示
+           uni.showToast({
+             title: 'Registration successful!',
+             icon: 'success',
+             duration: 2000
+           });
+       
+           // 注册成功后清空表单
+           this.form = {
+             username: '',
+             password: '',
+             email: '',
+             mobile: '',
+             birthday: '',
+             userType: 0,
+           };
+       
+           // 延迟跳转到登录页面
+           setTimeout(() => {
+             this.goToLogin();
+           }, 2000);
+       
+         } catch (error) {
+           console.error('Registration error:', error);
+         } finally {
+           this.loading = false;
+         }
+       },
+	   
+	   goToLogin() {
+		 uni.navigateTo({
+		   url: '/pages/UserLogin/UserLogin'
+		 });
+	   }
+   }
+}
 </script>
 
 <style scoped lang="scss">

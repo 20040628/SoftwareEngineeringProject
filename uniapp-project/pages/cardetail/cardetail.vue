@@ -82,9 +82,6 @@
     	    {{ isLoading ? 'In process...' : 'Confirming a Reservation' }}
     	</button>
     </view>
-	<view v-if="message" :class="messageType === 'success' ? 'success-msg' : 'error-msg'">
-		{{ message }}
-	</view>
   </view>
 </template>
 
@@ -107,7 +104,7 @@ export default {
 	  timeline: [],
 	  isLoading:true,
 	  currentUser:{
-		  userId:null
+		userId:null
 	  }
     }
   },
@@ -215,15 +212,22 @@ export default {
 	},
 	// 添加刷新时间轴的方法
 	async refreshTimeline() {
+		const token = String(uni.getStorageSync('token'));
 	      if (!this.scooterID) return; // 确保有 scooterID
+		  console.log(this.scooterID)
 	      try {
 	        this.timeline = await this.request({
 	          url: `http://localhost:8080/api/bookings/timeline/${this.scooterID}`,
-	          method: 'GET'
+	          method: 'GET',
+			  header: {
+			  	'Content-Type': 'application/json',
+			  	"Authorization": `Bearer ${token}`
+			  	},
 	        });
 	      } catch (err) {
 	        console.error('刷新时间轴失败:', err);
 	      }
+		  console.log(this.timeline)
 	},
 	
 	calculateSlotWidth(slot) {
@@ -283,7 +287,7 @@ export default {
 	    this.updateStartTime();
 	},
 	
-	    // 更新完整的日期时间
+	// 更新完整的日期时间
 	updateStartTime() {
 	    if (this.bookingForm.startDate && this.bookingForm.startTime) {
 	    this.bookingForm.startDateTime = `${this.bookingForm.startDate} ${this.bookingForm.startTime}`;
@@ -342,17 +346,46 @@ export default {
 
 				if (res.statusCode === 200) {
 					this.showMessage('book successfully', 'success');
+					uni.showToast({
+						title: 'Book successful!',
+					    icon: 'success',
+					    duration: 2000  // 2秒后自动关闭
+					});
+					await this.getPaymentData(res.data);
 					await this.refreshTimeline();
 				} else {
 					console.log('Error message:', res.data.message);
-					this.showMessage(res.data.message || '预订失败', 'error');
+					uni.showToast({
+					  title: res.data|| 'Scheduled failure',
+					  icon: 'none',
+					  duration: 2000
+					});
 				}
 			} catch (error) {
-				this.showMessage('请求失败，请重试', 'error');
+				uni.showToast({
+				      title: error.message || 'Scheduled failure',
+				      icon: 'none',
+				      duration: 2000
+				    });
 			} finally {
 				this.isLoading = false;
 				uni.hideLoading();
 			}
+	},
+	async getPaymentData(order) {
+	  // 假设你需要向后台请求支付数据
+	  const token = String(uni.getStorageSync('token'));
+	  const res = await new Promise((resolve, reject) => {
+	    uni.request({
+	      url: `http://localhost:8080/api/alipay/pay/${order.orderId}`,  // 后台支付初始化接口
+	      method: 'GET',
+	      header: {
+	        'Authorization': `Bearer ${token}`
+	      },
+	      success: (response) => resolve(response.data),  // 返回支付所需的数据
+	      fail: (error) => reject(error)
+	    });
+	  });
 	},
 
 	// 显示提示信息

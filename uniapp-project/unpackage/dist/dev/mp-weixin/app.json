@@ -1,7 +1,20 @@
 {
   "pages": [
+    "pages/index",
+    "pages/UserLogin/UserLogin",
+    "pages/UserRegister/UserRegister",
     "pages/index/index",
-    "pages/cardetail/cardetail"
+    "pages/map/map",
+    "pages/found/found",
+    "pages/cardetail/cardetail",
+    "pages/UserCenter/UserCenter",
+    "pages/feedback/feedbackIndex/feedbackIndex",
+    "pages/feedback/feedbackList/feedbackList",
+    "pages/feedback/feedback/feedback",
+    "pages/feedback/helpDetail/helpDetail",
+    "pages/feedback/feedbackDetail/feedbackDetail",
+    "pages/feedback/showImage/showImage",
+    "pages/admin/adminDashboard"
   ],
   "window": {
     "navigationBarTextStyle": "black",

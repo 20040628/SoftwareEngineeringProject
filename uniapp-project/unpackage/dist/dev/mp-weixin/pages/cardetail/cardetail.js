@@ -14,20 +14,24 @@ const _sfc_main = {
       bookingForm: {
         hireType: "",
         startDate: "",
-        startTime: ""
+        startTime: "",
+        startDateTime: ""
       },
       timeline: [],
-      loading: false,
+      isLoading: true,
       currentUser: {
-        userId: common_vendor.index.getStorageSync("userId") || null
+        userId: null
       }
     };
   },
   async onLoad(options) {
     this.scooterID = options.id;
     await this.loadScooterDetail();
-    this.refreshTimeline();
-    this.bookingForm.startTime = (/* @__PURE__ */ new Date()).toISOString();
+    await this.refreshTimeline();
+    const userInfo = common_vendor.index.getStorageSync("userInfo");
+    if (userInfo) {
+      this.currentUser.userId = userInfo.userId || null;
+    }
   },
   computed: {
     // 计算总价格
@@ -36,22 +40,25 @@ const _sfc_main = {
         return 0;
       const option = this.durationOptions[this.selectedDuration];
       return ((option == null ? void 0 : option.price) || 0).toFixed(2);
+    },
+    statusClass() {
+      const statusMap = {
+        0: "unavailable",
+        1: "available",
+        2: "maintenance"
+      };
+      return statusMap[this.scooter.status] || "unknown";
+    },
+    statusText() {
+      const textMap = {
+        0: "unavailable",
+        1: "available",
+        2: "maintenance"
+      };
+      return textMap[this.scooter.status] || "unknown";
     }
   },
-  // // 车辆状态处理
-  // statusText() {
-  //   const statusMap = {
-  //     available: '可租用',
-  //     rented: '使用中',
-  //     low_battery: '低电量',
-  //     maintenance: '维护中'
-  //   }
-  //   return statusMap[this.scooter.status]
-  // },
-  // statusClass() {
-  //   return `status-${this.scooter.status}`
-  // },
-  //   // 是否可租用
+  // 是否可租用
   //   canRent() {
   //     return this.scooter.status === 'available' || 
   //           this.scooter.status === 'low_battery'
@@ -63,32 +70,108 @@ const _sfc_main = {
   //     return '暂时不可用'
   //   }
   methods: {
+    // 封装 uni.request 成 Promise 以支持 async/await
+    request(options) {
+      return new Promise((resolve, reject) => {
+        common_vendor.index.request({
+          ...options,
+          success: (res) => {
+            if (res.statusCode === 200) {
+              resolve(res.data);
+            } else {
+              reject(new Error(`请求失败: ${res.statusCode}`));
+            }
+          },
+          fail: (err) => reject(err)
+        });
+      });
+    },
     async loadScooterDetail() {
       try {
-        const res = await common_vendor.index.request({
+        common_vendor.index.showLoading({ title: "加载中...", mask: true });
+        const data = await this.request({
           url: `http://localhost:8080/api/scooters/${this.scooterID}`,
           method: "GET"
         });
-        if (res.statusCode === 200) {
-          this.scooter = res.data;
-          this.durationOptions = [
-            { label: "1小时", value: 1, type: "hour", price: this.scooter.priceHour },
-            { label: "4小时", value: 4, type: "hour", price: this.scooter.priceHour * 4 },
-            { label: "1天", value: 1, type: "day", price: this.scooter.priceDay },
-            { label: "1周", value: 1, type: "week", price: this.scooter.priceWeek }
-          ];
-        } else {
-          common_vendor.index.showToast({ title: "车辆信息获取失败", icon: "none" });
-        }
+        this.scooter = data;
+        this.durationOptions = [
+          { label: "1 Hour", value: 1, type: "hour", price: this.scooter.priceHour },
+          { label: "4 Hours", value: 4, type: "hour", price: this.scooter.priceHour * 4 },
+          { label: "1 Day", value: 1, type: "day", price: this.scooter.priceDay },
+          { label: "1 Week", value: 1, type: "week", price: this.scooter.priceWeek }
+        ];
       } catch (err) {
         common_vendor.index.showToast({ title: "网络错误", icon: "none" });
       } finally {
+        common_vendor.index.hideLoading();
         this.isLoading = false;
       }
     },
     retryLoad() {
       this.isLoading = true;
       this.loadScooterDetail();
+    },
+    addDays(date, days) {
+      return new Date(date.getTime() + days * 864e5);
+    },
+    formatDate(date) {
+      return `${date.getMonth() + 1}.${date.getDate()}`;
+    },
+    // 添加刷新时间轴的方法
+    async refreshTimeline() {
+      const token = String(common_vendor.index.getStorageSync("token"));
+      if (!this.scooterID)
+        return;
+      common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:220", this.scooterID);
+      try {
+        this.timeline = await this.request({
+          url: `http://localhost:8080/api/bookings/timeline/${this.scooterID}`,
+          method: "GET",
+          header: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+      } catch (err) {
+        common_vendor.index.__f__("error", "at pages/cardetail/cardetail.vue:231", "刷新时间轴失败:", err);
+      }
+      common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:233", this.timeline);
+    },
+    calculateSlotWidth(slot) {
+      const start = new Date(slot.startTime).getTime();
+      const end = new Date(slot.endTime).getTime();
+      const duration = end - start;
+      common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:240", slot.startTime, new Date(slot.startTime));
+      const totalDuration = 7 * 24 * 60 * 60 * 1e3;
+      return duration / totalDuration * 100;
+    },
+    formatTimeSlot(slot) {
+      const start = new Date(slot.startTime);
+      const end = new Date(slot.endTime);
+      if (slot.status === "booked") {
+        let hirePeriodText;
+        switch (slot.hirePeriod) {
+          case "HOUR":
+            hirePeriodText = "1hour";
+            break;
+          case "FOUR_HOURS":
+            hirePeriodText = "4hours";
+            break;
+          case "DAY":
+            hirePeriodText = "1day";
+            break;
+          case "WEEK":
+            hirePeriodText = "1week";
+            break;
+          default:
+            hirePeriodText = slot.hirePeriod;
+        }
+        return `${this.formatTime(start)} - ${this.formatTime(end)} (${hirePeriodText})`;
+      }
+      return "Available";
+    },
+    formatTime(date) {
+      return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
     },
     selectDuration(index) {
       this.selectedDuration = index;
@@ -105,16 +188,14 @@ const _sfc_main = {
     // 更新完整的日期时间
     updateStartTime() {
       if (this.bookingForm.startDate && this.bookingForm.startTime) {
-        const startDateTime = `${this.bookingForm.startDate} ${this.bookingForm.startTime}`;
-        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:209", "选中的开始时间:", startDateTime);
+        this.bookingForm.startDateTime = `${this.bookingForm.startDate} ${this.bookingForm.startTime}`;
       }
-    },
-    // 处理租赁类型选择
-    onHireTypeChange(e) {
-      this.bookingForm.hireType = this.durationOptions[this.selectedDuration];
     },
     // 提交预订
     async submitBooking() {
+      var _a, _b;
+      this.bookingForm.hireType = this.durationOptions[this.selectedDuration].type.toUpperCase();
+      const token = String(common_vendor.index.getStorageSync("token"));
       if (!this.bookingForm.startTime) {
         this.showMessage("请选择开始时间", "error");
         return;
@@ -123,36 +204,55 @@ const _sfc_main = {
         this.showMessage("请选择租赁类型", "error");
         return;
       }
-      this.loading = true;
-      common_vendor.index.showLoading({ title: "提交中..." });
+      this.isLoading = true;
+      common_vendor.index.showLoading({ title: "Under submission..." });
       try {
-        const startTime = this.bookingForm.startTime.replace("T", " ") + ":00";
+        const startTime = this.bookingForm.startDateTime.replace("T", " ") + ":00";
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:318", "startDateTime:", startTime);
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:319", "User ID:", (_a = this.currentUser) == null ? void 0 : _a.userId);
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:320", "Scooter ID:", (_b = this.scooter) == null ? void 0 : _b.id);
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:321", "Token:", token);
+        const payloadBase64 = token.split(".")[1];
+        const payload = JSON.parse(atob(payloadBase64));
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:324", "Token Payload:", payload);
         const bookingData = {
           userId: this.currentUser.userId,
-          scooterId: this.selectedScooter.id,
+          scooterId: this.scooter.id,
           hireType: this.bookingForm.hireType,
           startTime
         };
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:332", "Booking Data:", bookingData);
         const res = await new Promise((resolve, reject) => {
           common_vendor.index.request({
             url: "http://localhost:8080/api/bookings",
             method: "POST",
             data: bookingData,
-            header: { "Content-Type": "application/json" },
+            header: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
             success: (response) => resolve(response),
             fail: (error) => reject(error)
           });
         });
+        common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:348", "API Response:", res);
         if (res.statusCode === 200) {
-          this.showMessage("预订成功", "success");
+          this.showMessage("book successfully", "success");
+          common_vendor.index.showToast({
+            title: "Book successful!",
+            icon: "success",
+            duration: 2e3
+            // 2秒后自动关闭
+          });
           await this.refreshTimeline();
         } else {
+          common_vendor.index.__f__("log", "at pages/cardetail/cardetail.vue:359", "Error message:", res.data.message);
           this.showMessage(res.data.message || "预订失败", "error");
         }
       } catch (error) {
         this.showMessage("请求失败，请重试", "error");
       } finally {
-        this.loading = false;
+        this.isLoading = false;
         common_vendor.index.hideLoading();
       }
     },
@@ -164,100 +264,49 @@ const _sfc_main = {
         this.message = "";
       }, 3e3);
     }
-  },
-  // 添加刷新时间轴的方法
-  async refreshTimeline() {
-    if (this.scooter) {
-      try {
-        common_vendor.index.request({
-          url: `http://localhost:8080/api/bookings/timeline/${this.scooterID}`,
-          method: "GET",
-          success: (res) => {
-            this.timeline = res.data;
-          },
-          fail: (err) => {
-            common_vendor.index.__f__("error", "at pages/cardetail/cardetail.vue:287", "刷新时间轴失败:", err);
-          }
-        });
-      } catch (error) {
-        common_vendor.index.__f__("error", "at pages/cardetail/cardetail.vue:291", "刷新时间轴出错:", error);
-      }
-    }
-  },
-  calculateSlotWidth(slot) {
-    const start = new Date(slot.startTime).getTime();
-    const end = new Date(slot.endTime).getTime();
-    const duration = end - start;
-    const totalDuration = 7 * 24 * 60 * 60 * 1e3;
-    return duration / totalDuration * 100;
-  },
-  formatTimeSlot(slot) {
-    const start = new Date(slot.startTime);
-    const end = new Date(slot.endTime);
-    if (slot.status === "booked") {
-      let hirePeriodText;
-      switch (slot.hirePeriod) {
-        case "HOUR":
-          hirePeriodText = "1小时";
-          break;
-        case "FOUR_HOURS":
-          hirePeriodText = "4小时";
-          break;
-        case "DAY":
-          hirePeriodText = "1天";
-          break;
-        case "WEEK":
-          hirePeriodText = "1周";
-          break;
-        default:
-          hirePeriodText = slot.hirePeriod;
-      }
-      return `${this.formatTime(start)} - ${this.formatTime(end)} (${hirePeriodText})`;
-    }
-    return "可预订";
-  },
-  formatTime(date) {
-    return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-  },
-  formatDate(date) {
-    return `${date.getMonth() + 1}月${date.getDate()}日`;
-  },
-  addDays(date, days) {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
   }
+  // openMap() {
+  //   uni.openLocation({
+  //     latitude: this.scooter.latitude,
+  //     longitude: this.scooter.longitude,
+  //     name: this.scooter.location
+  //   });
+  // }
 };
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   return common_vendor.e({
-    a: common_vendor.t($data.scooter.id),
-    b: common_vendor.t($options.calculatedPrice),
-    c: $data.durationOptions.length
-  }, $data.durationOptions.length ? {
-    d: common_vendor.t($data.durationOptions[$data.selectedDuration].label)
-  } : {}, {
-    e: $data.scooter
+    a: $data.scooter
   }, $data.scooter ? {
-    f: common_assets._imports_0,
-    g: common_vendor.t($data.scooter.location || "未知地址"),
-    h: common_assets._imports_1$1,
-    i: common_vendor.o((...args) => _ctx.openMap && _ctx.openMap(...args))
+    b: common_vendor.t($data.scooter.id),
+    c: common_vendor.t($options.statusText),
+    d: common_vendor.n($options.statusClass)
   } : {}, {
-    j: common_vendor.f(7, (day, k0, i0) => {
+    e: common_vendor.t($options.calculatedPrice),
+    f: $data.durationOptions.length
+  }, $data.durationOptions.length ? {
+    g: common_vendor.t($data.durationOptions[$data.selectedDuration].label)
+  } : {}, {
+    h: $data.scooter
+  }, $data.scooter ? {
+    i: common_assets._imports_0,
+    j: common_vendor.t($data.scooter.location || "Getting location information"),
+    k: common_assets._imports_1
+  } : {}, {
+    l: common_vendor.f(7, (day, k0, i0) => {
       return {
-        a: common_vendor.t(_ctx.formatDate(_ctx.addDays(/* @__PURE__ */ new Date(), day - 1))),
+        a: common_vendor.t($options.formatDate($options.addDays(/* @__PURE__ */ new Date(), day - 1))),
         b: day
       };
     }),
-    k: common_vendor.f($data.timeline, (slot, index, i0) => {
+    m: common_vendor.f($data.timeline, (slot, index, i0) => {
       return {
-        a: common_vendor.t(_ctx.formatTimeSlot(slot)),
+        a: common_vendor.t($options.formatTimeSlot(slot)),
         b: index,
         c: common_vendor.n(slot.status),
-        d: _ctx.calculateSlotWidth(slot) + "%"
+        d: $options.calculateSlotWidth(slot) + "%"
       };
     }),
-    l: common_vendor.f($data.durationOptions, (option, index, i0) => {
+    n: common_vendor.f($data.durationOptions, (option, index, i0) => {
       return {
         a: common_vendor.t(option.label),
         b: common_vendor.t(option.subLabel),
@@ -266,20 +315,19 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         e: common_vendor.o(($event) => $options.selectDuration(index), index)
       };
     }),
-    m: common_vendor.t($data.bookingForm.startDate || "请选择开始日期"),
-    n: $data.bookingForm.startDate,
-    o: common_vendor.o((...args) => $options.onDateChange && $options.onDateChange(...args)),
-    p: common_vendor.t($data.bookingForm.startTime || "请选择开始时间"),
-    q: $data.bookingForm.startTime,
-    r: common_vendor.o((...args) => $options.onTimeChange && $options.onTimeChange(...args)),
-    s: common_vendor.t($data.loading ? "处理中..." : "确认预订"),
-    t: common_vendor.o((...args) => $options.submitBooking && $options.submitBooking(...args)),
-    v: $data.loading,
-    w: common_vendor.o((...args) => _ctx.closeModal && _ctx.closeModal(...args)),
-    x: $data.message
+    o: common_vendor.t($data.bookingForm.startDate || "Please select a start date"),
+    p: $data.bookingForm.startDate,
+    q: common_vendor.o((...args) => $options.onDateChange && $options.onDateChange(...args)),
+    r: common_vendor.t($data.bookingForm.startTime || "Please select a start time"),
+    s: $data.bookingForm.startTime,
+    t: common_vendor.o((...args) => $options.onTimeChange && $options.onTimeChange(...args)),
+    v: common_vendor.t($data.isLoading ? "In process..." : "Confirming a Reservation"),
+    w: common_vendor.o((...args) => $options.submitBooking && $options.submitBooking(...args)),
+    x: $data.isLoading,
+    y: $data.message
   }, $data.message ? {
-    y: common_vendor.t($data.message),
-    z: common_vendor.n($data.messageType === "success" ? "success-msg" : "error-msg")
+    z: common_vendor.t($data.message),
+    A: common_vendor.n($data.messageType === "success" ? "success-msg" : "error-msg")
   } : {});
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-a91970b9"]]);

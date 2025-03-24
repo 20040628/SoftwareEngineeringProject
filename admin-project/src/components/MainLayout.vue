@@ -53,8 +53,8 @@ export default {
         { id: 2, name: 'User Feedback', icon: '/static/center/comment.png' },
         { id: 3, name: 'Show all scooters', icon: '/static/center/share.png' },
         { id: 4, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
-        { id: 5, name: 'Order Management', icon: '/static/center/poweroff.png' },
-        { id: 6, name: 'User Management', icon: '/static/center/poweroff.png' },
+        { id: 5, name: 'Order Management', icon: '/static/center/comment.png' },
+        { id: 6, name: 'User Management', icon: '/static/center/share.png' },
         { id: 7, name: 'Logout', icon: '/static/center/poweroff.png' },
       ],
     };

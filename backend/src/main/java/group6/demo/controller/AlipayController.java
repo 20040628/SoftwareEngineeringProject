@@ -3,7 +3,9 @@ package group6.demo.controller;
 import com.alipay.api.domain.AlipayTradePayModel;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradePayRequest;
 import group6.demo.config.AlipayConfig;
 import group6.demo.entity.Order;
 import group6.demo.repository.OrderRepository;
@@ -48,7 +50,41 @@ public class AlipayController {
             // 跳转到我们的页面，要改成最新前端的
             String url = "http://localhost:5173/my-bookings";
             alipayRequest.setReturnUrl(url);
+
             String result = alipayClient.pageExecute(alipayRequest).getBody();
+            response.setContentType("text/html;charset=utf-8");
+            response.getWriter().println(result);
+
+            // mark the status of order as has been paid 还要改一下 没有完成支付也会变成2
+            order.setStatus(2);
+            orderRepository.save(order);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/appPay/{orderId}")
+    public void payApp(@PathVariable Long orderId, HttpServletResponse response) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Order order = optionalOrder.orElse(null);
+
+        try {
+            AlipayClient alipayClient = new DefaultAlipayClient(GATEWAY_URL, alipayConfig.getAppId(),
+                    alipayConfig.getAppPrivateKey(), FORMAT, CHARSET, alipayConfig.getAlipayPublicKey(), SIGN_TYPE);
+            AlipayTradeAppPayRequest alipayRequest = new AlipayTradeAppPayRequest();
+            AlipayTradePayModel model = new AlipayTradePayModel();
+            model.setOutTradeNo(orderId.toString());
+            model.setTotalAmount(order.getPrice().toString());
+            model.setSubject("Your order");
+            model.setBody("This is your rent order");
+            model.setProductCode("FAST_INSTANT_TRADE_PAY");
+            alipayRequest.setBizModel(model);
+
+            // 跳转到我们的页面，要改成最新前端的
+            String url = "http://localhost:5173/my-bookings";
+            alipayRequest.setReturnUrl(url);
+
+            String result = alipayClient.sdkExecute(alipayRequest).getBody();
             response.setContentType("text/html;charset=utf-8");
             response.getWriter().println(result);
 

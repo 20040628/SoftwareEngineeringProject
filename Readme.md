@@ -613,6 +613,8 @@ The system automatically sends email confirmations for successful bookings. The 
 
 ### Pay Api 
 
+#### web端
+
 - **URL**: `/api/alipay/pay/{orderId}`
 
 - **Method**: `GET`
@@ -660,13 +662,33 @@ The system automatically sends email confirmations for successful bookings. The 
 
 情况二：如果orderId对应的订单已经被支付，网址会自动跳转到支付宝沙盒支付的固定页面，如下
 
-![74205254168](assets/1742052541687.png)**Fail**: 有时会失败，如下图3种情况，感觉是自动跳转不稳定，目前没找出原因
+![74205254168](assets/1742052541687.png)**Fail**: 有时会失败，如下图3种情况，是自动跳转不稳定，刷新即可
 
 ![74205311981](assets/1742053119817.png)
 
 ![74205293195](assets/1742052931955.png)
 
 ![74205299234](assets/1742052992349.png)
+
+#### App端
+
+- **URL**: `/api/alipay/appPay/{orderId}`
+
+- **Method**: `GET`
+
+- **Headers**:
+
+  ```
+  Authorization: Bearer {token}
+
+  ```
+
+
+- **Success**:
+
+```
+alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2021000146632430&biz_content=%7B%22body%22%3A%22This+is+your+rent+order%22%2C%22out_trade_no%22%3A%221%22%2C%22product_code%22%3A%22FAST_INSTANT_TRADE_PAY%22%2C%22subject%22%3A%22Your+order%22%2C%22total_amount%22%3A%225.00%22%7D&charset=utf-8&format=JSON&method=alipay.trade.app.pay&return_url=http%3A%2F%2Flocalhost%3A5173%2Fmy-bookings&sign=fU9opIqEPq6yLErRgFAmDeaphmPr06Px1CeSq7s5yT8mS2ycdENv2plpjwrh4%2BZn1XKLTCzcCpLw61Zq%2FW%2BxhQ0ODFTCVAKGxaLUS7Q0%2Bznc%2B7LqbYLVqtw3narA%2FcyAfbSy3mPa3r9TOY6jmy5%2FGVPc1JK%2BV6it1LlLVNzJMA%2Fa07sLsAgGYaVsWiBe1IwBxZYfzFfIoPGDwdRasWJdTgNYd4Mimf3IjAD41j0614TRdQLsk90ScvrhLktdY35bP7KbkmHG%2Bv79KWDXkJ5qEMEcKNLc3uShi5cWEnJy3zNeiq7KSWoIqrr9GxAfN%2F9DyoJ69pansjan%2FvzAvvlv9g%3D%3D&sign_type=RSA2&timestamp=2025-03-25+11%3A56%3A33&version=1.0
+```
 
 ### Weekly Revenue API
 

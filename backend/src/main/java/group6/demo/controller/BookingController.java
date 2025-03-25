@@ -2,7 +2,6 @@ package group6.demo.controller;
 
 import group6.demo.dto.BookingDTO;
 import group6.demo.entity.Order;
-import group6.demo.entity.Scooter;
 import group6.demo.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,8 @@ public class BookingController {
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingDTO bookingDTO) {
         try {
             Order order = bookingService.createBooking(bookingDTO);
-            
+
+
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Booking successful");
             response.put("orderId", order.getId());
@@ -66,5 +66,10 @@ public class BookingController {
     @GetMapping("/getAll")
     public List<Order> getAllBookings() {
         return bookingService.getAllOrders();
+    }
+
+    @GetMapping("/{orderId}")
+    public Optional<Order> getBookingById(@PathVariable Long id) {
+        return bookingService.getOrderById(id);
     }
 } 

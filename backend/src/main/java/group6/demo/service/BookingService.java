@@ -4,6 +4,7 @@ import group6.demo.dto.BookingDTO;
 import group6.demo.entity.Order;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface BookingService {
     Order createBooking(BookingDTO bookingDTO);
@@ -12,4 +13,7 @@ public interface BookingService {
     void cancelBooking(Long orderId);
 
     List<Order> getAllOrders();
+    Optional<Order> getOrderById(Long id);
+
+
 } 

@@ -409,6 +409,55 @@ Frontend service will run on http://localhost:5173
   ]
   ```
 
+#### Get One booking by id
+
+- **URL**: `/api/bookings/{orderId}`
+
+- **Method**: `GET`
+
+- **Path Parameters**:
+
+  - `orderId`: ID of the order
+
+- **An example of Success Response** (200 OK):
+
+  ```
+  {
+      "id": 1,
+      "orderTime": "2025-03-12T17:11:05.000+00:00",
+      "status": 2,
+      "startTime": "2025-03-12T17:20:00.000+00:00",
+      "endTime": "2025-03-12T18:20:00.000+00:00",
+      "hirePeriod": "HOUR",
+      "price": 5.00,
+      "user": {
+          "id": 3,
+          "username": "dejavu",
+          "password": "$2a$10$2ECPgQqk59EEFmUb6iVeAOp8rq1tkWJlTNj1xaRyp9/vfEoYuc8Uy",
+          "avatar": "default_avatar.jpg",
+          "birthday": "2022-06-02",
+          "userType": 0,
+          "mobile": "15806120102",
+          "email": "2079815209@qq.com",
+          "paymentMethod": null,
+          "status": 1,
+          "role": 1,
+          "isFrequentUser": 0
+      },
+      "scooter": {
+          "id": 1,
+          "location": "Campus Center",
+          "priceHour": 5.00,
+          "priceFourHour": 10.00,
+          "priceDay": 20.00,
+          "priceWeek": 100.00,
+          "status": 0,
+          "longitude": 103.984500,
+          "latitude": 30.765000
+      }
+  }
+  ```
+
 #### Cancel booking
 
 - **URL**: `/api/bookings/cancel/{orderId}`

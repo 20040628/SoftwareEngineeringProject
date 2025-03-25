@@ -16,13 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -315,4 +309,8 @@ public class BookingServiceImpl implements BookingService {
         return orderRepository.findAll();
     }
 
+    @Override
+    public Optional<Order> getOrderById(Long id) {
+        return orderRepository.findById(id);
+    }
 } 

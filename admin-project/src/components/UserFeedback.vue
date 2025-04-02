@@ -1,18 +1,32 @@
 <template>
   <div>
-    <h2 class="title">User Feedback</h2>
+    <div class="header-container">
+      <h2 class="title">User Feedback</h2>
+      <div class="filter-container">
+        <label>Filter by Status:</label>
+        <select v-model="selectedStatus" class="status-filter">
+          <option value="">All</option>
+          <option v-for="(status, key) in statusOptions"
+                  :key="key"
+                  :value="key">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+    </div>
     <div class="feedback-list">
       <div class="table-header">
         <div class="table-cell">ID</div>
         <div class="table-cell">User ID</div>
         <div class="table-cell">Content</div>
+
         <div class="table-cell">Create Time</div>
         <div class="table-cell">Status</div>
         <div class="table-cell">Priority</div>
         <div class="table-cell">Admin Response</div>
         <div class="table-cell">Action</div>
       </div>
-      <div class="feedback-item" v-for="feedback in feedbacks" :key="feedback.id">
+      <div class="feedback-item" v-for="feedback in filteredFeedbacks" :key="feedback.id">
         <div class="table-cell">{{ feedback.id }}</div>
         <div class="table-cell">{{ feedback.userId }}</div>
         <div class="table-cell">{{ feedback.content }}</div>
@@ -88,12 +102,19 @@ export default {
         processing: { label: 'Processing', color: '#ffc107' },
         resolved: { label: 'Resolved', color: '#28a745' }
       },
+      selectedStatus: '',
       priorityOptions: {
         2: { label: 'High', color: '#dc3545' },
         1: { label: 'Medium', color: '#ffc107' },
         0: { label: 'Low', color: '#28a745' }
       }
     };
+  },
+  computed: {
+    filteredFeedbacks() {
+      if (!this.selectedStatus) return this.feedbacks;
+      return this.feedbacks.filter(f => f.status === this.selectedStatus);
+    }
   },
   mounted() {
     this.fetchFeedbacks();
@@ -193,6 +214,47 @@ export default {
   color: #2c3e50;
   margin-bottom: 25px;
   font-weight: 600;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 0 15px;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-filter {
+  padding: 6px 12px;
+  border: 1px solid #e0e3e7;
+  border-radius: 20px;
+  background-color: white;
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.3s;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  padding-right: 30px;
+}
+
+.status-filter:focus {
+  outline: none;
+  border-color: #4d90fe;
+  box-shadow: 0 0 0 2px rgba(77, 144, 254, 0.15);
+}
+
+.status-filter option {
+  padding: 8px;
 }
 
 .feedback-list {

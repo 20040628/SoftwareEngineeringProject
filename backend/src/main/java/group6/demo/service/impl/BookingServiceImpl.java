@@ -104,10 +104,6 @@ public class BookingServiceImpl implements BookingService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // update the status of scooter
-        scooter.setStatus(0);
-        scooterRepository.save(scooter);
-
         sendConfirmationEmail(savedOrder);
         
         return savedOrder;
@@ -241,11 +237,6 @@ public class BookingServiceImpl implements BookingService {
         // 更新订单状态为已取消
         order.setStatus(3);
         orderRepository.save(order);
-
-        // 更新关联的滑板车状态为可用
-        Scooter scooter = order.getScooter();
-        scooter.setStatus(1);
-        scooterRepository.save(scooter);
 
         // 发送取消预订的邮件通知用户 待添加
         sendCancellationEmail(order);

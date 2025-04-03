@@ -4,7 +4,6 @@ import group6.demo.entity.Order;
 import group6.demo.entity.User;
 import group6.demo.repository.OrderRepository;
 import group6.demo.repository.UserRepository;
-import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +19,7 @@ public class UserController {
     @Autowired
     private OrderRepository orderRepository;
 
-    @GetMapping
+    @GetMapping("/getAll")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -39,4 +38,5 @@ public class UserController {
     public List<Order> getAllOrders(@PathVariable Long userId) {
         return orderRepository.findByUser_Id(userId);
     }
+
 }

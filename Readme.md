@@ -179,7 +179,7 @@ Frontend service will run on http://localhost:5173
   "Token validation failed: error message"
   ```
 
-###User API (管理员和普通用户应该都有)
+###User API
 
 #### view my own bookings
 
@@ -228,7 +228,46 @@ Frontend service will run on http://localhost:5173
   ]
   ```
 
-  ​
+#### get all users
+
+- **URL**: `/api/users/getAll`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  ```
+  [
+      {
+          "id": 1,
+          "username": "admin",
+          "password": "$2a$10$5pscTMMTiM1NoWwzL//69u7NO07t7UsAPGdeMqZvd3TQ8oEARrspG",
+          "avatar": "default_avatar.jpg",
+          "birthday": "1990-01-01",
+          "userType": 0,
+          "mobile": "1234567890",
+          "email": "admin@example.com",
+          "paymentMethod": "credit_card",
+          "status": 1,
+          "role": 0,
+          "isFrequentUser": 0
+      },
+      {
+          "id": 2,
+          "username": "user",
+          "password": "$2a$10$5pscTMMTiM1NoWwzL//69u7NO07t7UsAPGdeMqZvd3TQ8oEARrspG",
+          "avatar": "default_avatar.jpg",
+          "birthday": "1995-05-05",
+          "userType": 0,
+          "mobile": "9876543210",
+          "email": "user@example.com",
+          "paymentMethod": "paypal",
+          "status": 1,
+          "role": 1,
+          "isFrequentUser": 0
+      }
+  ]
+  ```
 
 ### Scooter API
 

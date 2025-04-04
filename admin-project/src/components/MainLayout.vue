@@ -56,6 +56,7 @@ export default {
         { id: 5, name: 'Order Management', icon: '/static/center/comment.png' },
         { id: 6, name: 'User Management', icon: '/static/center/share.png' },
         { id: 7, name: 'Logout', icon: '/static/center/poweroff.png' },
+
       ],
     };
   },
@@ -73,9 +74,28 @@ export default {
       return componentMap[this.activeMenu] || 'ScooterManagement'; // 默认返回 ScooterManagement
     },
   },
+  created() {
+    this.setActiveMenuFromRoute();
+  },
+
   methods: {
+    setActiveMenuFromRoute() {
+      const routeToIdMap = {
+        '/add_scooter': 1,
+        '/user-feedback': 2,
+        '/all-scooters': 3,
+        '/data-analysis': 4,
+        '/order-management': 5,
+        '/user-management': 6,
+        '/logout': 7
+      };
+
+      const currentRoute = this.$route.path;
+      this.activeMenu = routeToIdMap[currentRoute] || 1; // Default to 1 if route not found
+    },
+
     selectMenu(id) {
-      this.activeMenu = id; // 更新选中的菜单项
+      this.activeMenu = id;
       const routeMap = {
         1: '/add_scooter',
         2: '/user-feedback',
@@ -87,10 +107,16 @@ export default {
       };
       const route = routeMap[id];
       if (route) {
-        this.$router.push(route); // 导航到相应的路由
+        this.$router.push(route);
       }
-    },
+    }
   },
+
+  watch: {
+    '$route'(to) {
+      this.setActiveMenuFromRoute();
+    }
+  }
 };
 </script>
 

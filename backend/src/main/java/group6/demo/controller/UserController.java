@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     private PriceDiscountService priceDiscountService;
 
-    @GetMapping
+    @GetMapping("/getAll")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/orders/{userId}")
-    public List<Order> getUserOrders(@PathVariable Long userId) {
+    public List<Order> getAllOrders(@PathVariable Long userId) {
         return orderRepository.findByUser_Id(userId);
     }
 

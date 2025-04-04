@@ -21,6 +21,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(UserRegistrationDTO registrationDTO) {
+        // 调试日志
+        System.out.println("开始注册用户: " + registrationDTO.getUsername());
+        System.out.println("收到的生日信息: " + (registrationDTO.getBirthday() != null ? registrationDTO.getBirthday().toString() : "null"));
+        
         // Validate input data
         if (!ValidationUtil.isValidUsername(registrationDTO.getUsername())) {
             throw new IllegalArgumentException("Invalid username format. Username must be 3-20 characters long and can only contain letters, numbers and underscore.");
@@ -41,6 +45,8 @@ public class UserServiceImpl implements UserService {
         if (!ValidationUtil.isValidBirthday(registrationDTO.getBirthday())) {
             throw new IllegalArgumentException("Invalid birthday. Birthday cannot be in the future.");
         }
+        
+        System.out.println("验证通过，开始创建用户实体");
 
         // Create new user entity
         User user = new User();
@@ -50,6 +56,8 @@ public class UserServiceImpl implements UserService {
         user.setMobile(registrationDTO.getMobile());
         user.setBirthday(registrationDTO.getBirthday());
         
+        System.out.println("设置生日: " + (user.getBirthday() != null ? user.getBirthday().toString() : "null"));
+        
         // Set default values
         user.setUserType(0);  // 0: normal user
         user.setPaymentMethod(null);  // no payment method
@@ -57,8 +65,15 @@ public class UserServiceImpl implements UserService {
         user.setStatus(1);  // 1: account enabled
         user.setRole(1);    // 1: normal user
         user.setIsFrequentUser(0);  // 0: not frequent user
+        user.setIsStudent(0);  // 初始设置为非学生
+        user.setIsSenior(0);   // 初始设置为非老人
         
-        return userRepository.save(user);
+        // 保存用户
+        User savedUser = userRepository.save(user);
+        System.out.println("用户创建成功，ID: " + savedUser.getId());
+        System.out.println("保存的生日信息: " + (savedUser.getBirthday() != null ? savedUser.getBirthday().toString() : "null"));
+        
+        return savedUser;
     }
 
     @Override

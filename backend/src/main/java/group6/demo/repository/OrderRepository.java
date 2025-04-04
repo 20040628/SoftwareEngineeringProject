@@ -23,4 +23,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     );
 
     List<Order> findByUser_Id(Long userId);
+    
+    /**
+     * 查询用户在过去一周内的订单总使用时间（小时）
+     * 只计算已完成的订单（status = 2）
+     * @param userId 用户ID
+     * @param startDate 一周前的日期
+     * @param endDate 当前日期
+     * @return 使用时间总和（小时）
+     */
+    @Query("SELECT SUM(TIMESTAMPDIFF(HOUR, o.startTime, o.endTime)) FROM Order o " +
+           "WHERE o.user.id = :userId AND o.status = 2 " +
+           "AND o.startTime >= :startDate AND o.endTime <= :endDate")
+    Long getTotalHoursInLastWeek(
+        @Param("userId") Long userId,
+        @Param("startDate") Date startDate,
+        @Param("endDate") Date endDate
+    );
 } 

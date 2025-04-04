@@ -6,6 +6,7 @@ const UserLogin = () => import('../components/UserLogin.vue')
 const UserRegister = () => import('../components/UserRegister.vue')
 const ScooterAll = () => import('../components/ScooterAll.vue')
 const ScooterAdd = () => import('../components/ScooterAdd.vue')
+const UserProfile = () => import('../components/UserProfile.vue')
 
 // 路由配置
 const routes = [
@@ -50,6 +51,14 @@ const routes = [
     path: '/my-bookings',
     name: 'MyBookings',
     component: () => import('../components/OrderAll.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile,
     meta: {
       requiresAuth: true
     }

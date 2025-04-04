@@ -26,10 +26,26 @@
     </div>
     
     <div class="form-group">
-      <label>Birthday:</label>
-      <input v-model="form.birthday" type="date">
-      <span v-if="errors.birthday" class="error-message">{{ errors.birthday }}</span>
+      <label for="birthday">出生日期:</label>
+      <input
+        type="date"
+        id="birthday"
+        v-model="form.birthday"
+        required
+        class="form-control"
+      />
+      <small class="form-text text-muted">生日信息将用于自动判断您的折扣资格</small>
     </div>
+
+    <p class="discount-info">
+      注册后，系统将根据您的出生日期自动判断折扣资格:
+      <ul>
+        <li>18-25岁的用户享受学生折扣 (15%)</li>
+        <li>60岁以上的用户享受老年人折扣 (20%)</li>
+        <li>每周租赁8小时以上的用户享受常客折扣 (10%)</li>
+        <li>折扣可叠加使用，为您提供更多优惠!</li>
+      </ul>
+    </p>
 
     <div class="form-group">
       <button @click="register" :disabled="loading">
@@ -87,9 +103,20 @@ export default {
       }
       
       try {
+        // 打印生日信息，调试用
+        console.log("注册用户生日（原始值）:", this.form.birthday);
+        
+        const birthDate = new Date(this.form.birthday);
+        console.log("注册用户生日（Date对象）:", birthDate);
+        console.log("注册用户生日（ISO字符串）:", birthDate.toISOString());
+        
+        // 使用ISO格式的日期字符串，保留日期部分
+        const birthDateString = birthDate.toISOString().split('T')[0];
+        console.log("注册用户生日（最终发送格式）:", birthDateString);
+        
         const response = await axios.post('http://localhost:8080/api/auth/register', {
           ...this.form,
-          birthday: new Date(this.form.birthday)
+          birthday: birthDateString // 使用YYYY-MM-DD格式
         })
         
         this.message = response.data.message

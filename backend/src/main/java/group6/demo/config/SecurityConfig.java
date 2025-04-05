@@ -45,8 +45,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/bookings/getAll").hasRole("ADMIN")
                 .requestMatchers("/api/users/**").authenticated()
                 .requestMatchers("/api/alipay/**").authenticated()
-                .requestMatchers("/api/alipay/**").authenticated()
-
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

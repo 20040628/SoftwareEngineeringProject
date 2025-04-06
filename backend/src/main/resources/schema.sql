@@ -20,6 +20,8 @@ CREATE TABLE `b_user`  (
   `status` tinyint(1) NOT NULL DEFAULT 1,
   `role` tinyint(1) NOT NULL DEFAULT 1,
   `is_frequent_user` tinyint(1) NOT NULL DEFAULT 0,
+  `is_student` INT DEFAULT 0,
+  `is_senior` INT DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

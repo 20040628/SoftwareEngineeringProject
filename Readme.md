@@ -91,15 +91,17 @@ Frontend service will run on http://localhost:5173
     "email": "string",        // Valid email format
     "mobile": "string",       // 10-13 digits
     "birthday": "date"        // Format: YYYY-MM-DD, must be in the past
+                             // Will be used to automatically determine discount eligibility
   }
   ```
 - **Success Response** (200 OK):
   ```json
   {
-    "message": "Registration successful",
+    "message": "User registered successfully",
     "userId": "number",
     "username": "string",
-    "token": "string"
+    "isStudent": "number",    // 1: yes, 0: no
+    "isSenior": "number"      // 1: yes, 0: no
   }
   ```
 - **Error Response** (400 Bad Request):
@@ -1016,3 +1018,118 @@ Integers have a maximum of three digits, and decimal places have a maximum of 6 
 #### price per hour/day/week
 
 - Integers have a maximum of three digits, and decimal places have a maximum of two digits
+
+## Discount System
+
+The application provides automatic discount calculation based on user profiles and behavior.
+
+### Discount Types
+
+#### Student Discount (15%)
+- Automatically applied to users aged 18-25
+- Based on birth date provided during registration or profile update
+- System automatically calculates user's age and applies discount
+
+#### Senior Citizen Discount (20%)
+- Automatically applied to users aged 60 and above
+- Based on birth date provided during registration or profile update
+- System automatically calculates user's age and applies discount
+
+#### Frequent User Discount (10%)
+- Automatically applied to users who rent scooters for 8+ hours per week
+- System tracks rental duration over the past 7 days
+- Updated weekly and whenever user makes a new booking
+
+### Discount Stacking
+- Discounts can be combined if users qualify for multiple types
+- For example, a 20-year-old student who is also a frequent user would receive both student and frequent user discounts
+
+### API for Scooters with Discounts
+
+#### Get All Scooters with Discounts
+
+- **URL**: `/api/scooters/getAll?userId={userId}`
+- **Method**: `GET`
+- **Query Parameters**:
+  - `userId`: ID of the current user (optional)
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "id": "number",
+      "location": "string",
+      "status": "number",
+      "longitude": "decimal",
+      "latitude": "decimal",
+      "priceHour": "decimal",
+      "priceFourHour": "decimal",
+      "priceDay": "decimal",
+      "priceWeek": "decimal",
+      "discountedPriceHour": "decimal",
+      "discountedPriceFourHour": "decimal",
+      "discountedPriceDay": "decimal",
+      "discountedPriceWeek": "decimal",
+      "hasDiscount": "boolean"
+    }
+  ]
+  ```
+
+#### Get Single Scooter with Discounts
+
+- **URL**: `/api/scooters/{id}?userId={userId}`
+- **Method**: `GET`
+- **Path Parameters**:
+  - `id`: ID of the scooter
+- **Query Parameters**:
+  - `userId`: ID of the current user (optional)
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "location": "string",
+    "status": "number",
+    "longitude": "decimal",
+    "latitude": "decimal",
+    "priceHour": "decimal",
+    "priceFourHour": "decimal",
+    "priceDay": "decimal",
+    "priceWeek": "decimal",
+    "discountedPriceHour": "decimal",
+    "discountedPriceFourHour": "decimal",
+    "discountedPriceDay": "decimal",
+    "discountedPriceWeek": "decimal",
+    "hasDiscount": "boolean"
+  }
+  ```
+
+### User Profile with Discount Status
+
+#### Update User Profile
+
+- **URL**: `/api/users/{id}`
+- **Method**: `PUT`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Request Body**:
+  ```json
+  {
+    "email": "string",
+    "mobile": "string",
+    "birthDate": "string"  // Format: YYYY-MM-DD
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "username": "string",
+    "email": "string",
+    "mobile": "string",
+    "birthDate": "string",
+    "isStudent": "number",  // 1: yes, 0: no
+    "isSenior": "number",   // 1: yes, 0: no
+    "isFrequentUser": "number"  // 1: yes, 0: no
+  }
+  ```

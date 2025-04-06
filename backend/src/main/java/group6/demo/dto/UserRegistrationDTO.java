@@ -28,4 +28,17 @@ public class UserRegistrationDTO {
     @NotNull(message = "Birthday is required")
     @Past(message = "Birthday must be in the past")
     private Date birthday;
+
+    private Integer isStudent;
+    private Integer isSenior;
+
+    @Override
+    public String toString() {
+        return "UserRegistrationDTO{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", birthday=" + (birthday != null ? birthday.toString() : "null") +
+                '}';
+    }
 } 

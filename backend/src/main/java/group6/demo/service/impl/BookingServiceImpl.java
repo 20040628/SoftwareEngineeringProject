@@ -8,6 +8,7 @@ import group6.demo.repository.OrderRepository;
 import group6.demo.repository.ScooterRepository;
 import group6.demo.repository.UserRepository;
 import group6.demo.service.BookingService;
+import group6.demo.service.PriceDiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,6 +33,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private JavaMailSender emailSender;
+
+    @Autowired
+    private PriceDiscountService priceDiscountService;
 
     @Override
     public Order createBooking(BookingDTO bookingDTO) {
@@ -92,6 +96,9 @@ public class BookingServiceImpl implements BookingService {
                 throw new IllegalArgumentException("Invalid hire type");
         }
 
+        // 应用折扣价格
+        BigDecimal discountedPrice = priceDiscountService.calculateDiscountedPrice(price, user.getId());
+        
         // Check for booking conflicts
         Date endTime = calendar.getTime();
         List<Order> conflictingOrders = orderRepository.findConflictingOrders(scooter.getId(), startTime, endTime);
@@ -100,7 +107,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         order.setEndTime(endTime);
-        order.setPrice(price);
+        order.setPrice(discountedPrice);
 
         Order savedOrder = orderRepository.save(order);
 

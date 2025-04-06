@@ -26,4 +26,10 @@ public class User {
     private Integer status;
     private Integer role;
     private Integer isFrequentUser;
+    
+    // 新增字段：是否为学生 (1:是, 0:否)
+    private Integer isStudent;
+    
+    // 新增字段：是否为老年人 (1:是, 0:否)
+    private Integer isSenior;
 } 

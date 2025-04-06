@@ -3,8 +3,9 @@ package group6.demo.controller;
 import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
 import group6.demo.entity.User;
-import group6.demo.service.UserService;
 import group6.demo.util.JwtUtil;
+import group6.demo.service.PriceDiscountService;
+import group6.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private PriceDiscountService priceDiscountService;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginDTO loginDTO,
@@ -62,48 +66,43 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO registrationDTO,
-                                        BindingResult bindingResult) {
-        // Check validation errors
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(errors);
-        }
-
-        // Check if username exists
-        if (userService.isUsernameExists(registrationDTO.getUsername())) {
-            return ResponseEntity.badRequest().body("Username already exists");
-        }
-
-        // Check if email exists
-        if (userService.isEmailExists(registrationDTO.getEmail())) {
-            return ResponseEntity.badRequest().body("Email already registered");
-        }
-
+    public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
         try {
+            // 打印收到的注册信息，特别是生日信息
+            System.out.println("收到注册请求：" + registrationDTO.getUsername());
+            System.out.println("生日信息：" + (registrationDTO.getBirthday() != null ? registrationDTO.getBirthday().toString() : "null"));
+            
+            // 检查用户名是否已存在
+            if (userService.isUsernameExists(registrationDTO.getUsername())) {
+                return ResponseEntity.badRequest().body("Username already exists");
+            }
+            
+            // 检查邮箱是否已存在
+            if (userService.isEmailExists(registrationDTO.getEmail())) {
+                return ResponseEntity.badRequest().body("Email already exists");
+            }
+            
+            // 注册用户
             User registeredUser = userService.registerUser(registrationDTO);
             
-            // Generate JWT token
-            String token = jwtUtil.generateToken(registeredUser.getUsername(), registeredUser.getId(), 
-                registeredUser.getUserType(), registeredUser.getRole());
+            // 注册后直接更新折扣状态
+            System.out.println("注册成功，正在更新折扣状态...");
+            priceDiscountService.updateUserDiscountStatusByBirthday(registeredUser.getId());
             
+            // 构建响应
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Registration successful");
+            response.put("message", "User registered successfully");
             response.put("userId", registeredUser.getId());
             response.put("username", registeredUser.getUsername());
-            response.put("role", registeredUser.getRole());
-            response.put("token", token);
+            response.put("isStudent", registeredUser.getIsStudent());
+            response.put("isSenior", registeredUser.getIsSenior());
             
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            // Handle validation errors
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            // Handle other unexpected errors
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error during registration: " + e.getMessage());
         }
     }
     

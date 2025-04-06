@@ -69,7 +69,7 @@ public class BookingController {
     }
 
     @GetMapping("/{orderId}")
-    public Optional<Order> getBookingById(@PathVariable Long id) {
-        return bookingService.getOrderById(id);
+    public Optional<Order> getBookingById(@PathVariable Long orderId) {
+        return bookingService.getOrderById(orderId);
     }
 } 

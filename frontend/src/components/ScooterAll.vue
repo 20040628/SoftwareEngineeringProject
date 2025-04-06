@@ -1,28 +1,52 @@
 <template>
   <div class="scooter-list">
-    <h2>Available Scooters</h2>
+    <h2>可用滑板车</h2>
     <div v-if="scooters.length > 0" class="scooter-grid">
       <div v-for="scooter in scooters" :key="scooter.id" class="scooter-card">
-        <h3>Location: {{ scooter.location }}</h3>
+        <h3>位置: {{ scooter.location }}</h3>
         <div class="price-info">
-          <p>Hourly Rate: ${{ scooter.priceHour }}</p>
-          <p>4-Hour Rate: ${{ scooter.priceFourHour }}</p>
-          <p>Daily Rate: ${{ scooter.priceDay }}</p>
-          <p>Weekly Rate: ${{ scooter.priceWeek }}</p>
+          <template v-if="scooter.hasDiscount">
+            <p>
+              小时费率: <span class="original-price">${{ scooter.priceHour }}</span> 
+              <span class="discount-price">${{ scooter.discountedPriceHour }}</span>
+            </p>
+            <p>
+              4小时费率: <span class="original-price">${{ scooter.priceFourHour }}</span> 
+              <span class="discount-price">${{ scooter.discountedPriceFourHour }}</span>
+            </p>
+            <p>
+              日费率: <span class="original-price">${{ scooter.priceDay }}</span> 
+              <span class="discount-price">${{ scooter.discountedPriceDay }}</span>
+            </p>
+            <p>
+              周费率: <span class="original-price">${{ scooter.priceWeek }}</span> 
+              <span class="discount-price">${{ scooter.discountedPriceWeek }}</span>
+            </p>
+            <p class="discount-badge">已应用折扣!</p>
+            <p class="debug-info" v-if="isAuthenticated">折扣比率: {{ 
+              ((1 - (scooter.discountedPriceHour / scooter.priceHour)) * 100).toFixed(0) 
+            }}%</p>
+          </template>
+          <template v-else>
+            <p>小时费率: ${{ scooter.priceHour }}</p>
+            <p>4小时费率: ${{ scooter.priceFourHour }}</p>
+            <p>日费率: ${{ scooter.priceDay }}</p>
+            <p>周费率: ${{ scooter.priceWeek }}</p>
+          </template>
         </div>
         <button @click="showBookingModal(scooter)" :disabled="!isAuthenticated">
-          {{ isAuthenticated ? 'Book Now' : 'Login to Book' }}
+          {{ isAuthenticated ? '立即预订' : '登录后预订' }}
         </button>
       </div>
     </div>
     <div v-else>
-      <p>No scooters available.</p>
+      <p>暂无可用滑板车。</p>
     </div>
 
     <!-- Booking Modal -->
     <div v-if="showModal" class="modal">
       <div class="modal-content">
-        <h3>Book Scooter</h3>
+        <h3>预订滑板车</h3>
         
         <!-- 添加时间轴显示 -->
         <div class="timeline-container">
@@ -46,25 +70,61 @@
 
         <div class="booking-form">
           <div class="form-group">
-            <label>Hire Period:</label>
+            <label>租赁时长:</label>
             <select v-model="bookingForm.hireType">
-              <option value="HOUR">1 Hour (${{ selectedScooter?.priceHour }})</option>
-              <option value="FOUR_HOURS">4 Hours (${{ selectedScooter?.priceFourHour }})</option>
-              <option value="DAY">1 Day (${{ selectedScooter?.priceDay }})</option>
-              <option value="WEEK">1 Week (${{ selectedScooter?.priceWeek }})</option>
+              <option value="HOUR">
+                1 小时 
+                <template v-if="selectedScooter?.hasDiscount">
+                  <span class="original-price">${{ selectedScooter?.priceHour }}</span> 
+                  ${{ selectedScooter?.discountedPriceHour }}
+                </template>
+                <template v-else>
+                  ${{ selectedScooter?.priceHour }}
+                </template>
+              </option>
+              <option value="FOUR_HOURS">
+                4 小时 
+                <template v-if="selectedScooter?.hasDiscount">
+                  <span class="original-price">${{ selectedScooter?.priceFourHour }}</span> 
+                  ${{ selectedScooter?.discountedPriceFourHour }}
+                </template>
+                <template v-else>
+                  ${{ selectedScooter?.priceFourHour }}
+                </template>
+              </option>
+              <option value="DAY">
+                1 天 
+                <template v-if="selectedScooter?.hasDiscount">
+                  <span class="original-price">${{ selectedScooter?.priceDay }}</span> 
+                  ${{ selectedScooter?.discountedPriceDay }}
+                </template>
+                <template v-else>
+                  ${{ selectedScooter?.priceDay }}
+                </template>
+              </option>
+              <option value="WEEK">
+                1 周 
+                <template v-if="selectedScooter?.hasDiscount">
+                  <span class="original-price">${{ selectedScooter?.priceWeek }}</span> 
+                  ${{ selectedScooter?.discountedPriceWeek }}
+                </template>
+                <template v-else>
+                  ${{ selectedScooter?.priceWeek }}
+                </template>
+              </option>
             </select>
           </div>
           
           <div class="form-group">
-            <label>Start Time:</label>
+            <label>开始时间:</label>
             <input type="datetime-local" v-model="bookingForm.startTime">
           </div>
 
           <div class="modal-buttons">
             <button @click="submitBooking" :disabled="loading">
-              {{ loading ? 'Processing...' : 'Confirm Booking' }}
+              {{ loading ? '处理中...' : '确认预订' }}
             </button>
-            <button @click="closeModal" class="cancel-button">Cancel</button>
+            <button @click="closeModal" class="cancel-button">取消</button>
           </div>
         </div>
 
@@ -127,15 +187,33 @@ export default {
   methods: {
     async fetchScooters() {
       try {
-        const response = await axios.get('http://localhost:8080/api/scooters/getAll');
-        this.scooters = response.data;
+        // 检查是否已登录，如果登录则获取折扣价格
+        if (this.isAuthenticated && this.currentUser?.userId) {
+          const response = await axios.get(`http://localhost:8080/api/scooters/getAll?userId=${this.currentUser.userId}`);
+          this.scooters = response.data;
+        } else {
+          const response = await axios.get('http://localhost:8080/api/scooters/getAll');
+          this.scooters = response.data;
+        }
       } catch (error) {
-        console.error('Error fetching scooters:', error);
+        console.error('获取滑板车列表失败:', error);
       }
     },
     
     async showBookingModal(scooter) {
-      this.selectedScooter = scooter;
+      // 如果已有折扣信息则使用，否则尝试获取
+      if (!scooter.hasDiscount && this.isAuthenticated && this.currentUser?.userId) {
+        try {
+          const response = await axios.get(`http://localhost:8080/api/scooters/${scooter.id}?userId=${this.currentUser.userId}`);
+          this.selectedScooter = response.data;
+        } catch (error) {
+          console.error('获取滑板车折扣信息失败:', error);
+          this.selectedScooter = scooter;
+        }
+      } else {
+        this.selectedScooter = scooter;
+      }
+      
       this.showModal = true;
       
       // 获取时间轴数据
@@ -143,10 +221,10 @@ export default {
         const response = await axios.get(`http://localhost:8080/api/bookings/timeline/${scooter.id}`);
         this.timeline = response.data;
       } catch (error) {
-        console.error('Error fetching timeline:', error);
+        console.error('获取时间轴失败:', error);
       }
       
-      // Set default start time to current time
+      // 设置默认开始时间为当前时间
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       this.bookingForm.startTime = now.toISOString().slice(0, 16);
@@ -444,5 +522,34 @@ button:disabled {
   text-align: center;
   line-height: 1.2;
   width: 100%;
+}
+
+/* 新增样式 - 折扣价格 */
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-right: 5px;
+  font-size: 0.9em;
+}
+
+.discount-price {
+  color: #e44d26;
+  font-weight: bold;
+}
+
+.discount-badge {
+  background-color: #e44d26;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.8em;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.debug-info {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 5px;
 }
 </style>

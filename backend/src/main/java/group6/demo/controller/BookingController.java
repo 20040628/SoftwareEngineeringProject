@@ -40,6 +40,7 @@ public class BookingController {
             response.put("orderId", order.getId());
             response.put("startTime", order.getStartTime());
             response.put("endTime", order.getEndTime());
+            response.put("priceBeforeDiscount", order.getPriceBeforeDiscount());
             response.put("price", order.getPrice());
             
             return ResponseEntity.ok(response);
@@ -84,6 +85,7 @@ public class BookingController {
             response.put("orderId", order.getId());
             response.put("startTime", order.getStartTime());
             response.put("endTime", order.getEndTime());
+            response.put("priceBeforeDiscount", order.getPriceBeforeDiscount());
             response.put("price", order.getPrice());
 
             return ResponseEntity.ok(response);

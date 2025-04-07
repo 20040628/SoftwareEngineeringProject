@@ -16,7 +16,7 @@ VALUES
 -- 添加折扣规则
 INSERT INTO b_discount_rule (user_type, discount_rate) 
 VALUES 
-('student', 0.80),
-('elderly', 0.70),
-('frequent', 0.85);
+('student', 0.85),
+('elderly', 0.80),
+('frequent', 0.90);
 

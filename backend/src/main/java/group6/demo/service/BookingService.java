@@ -1,6 +1,7 @@
 package group6.demo.service;
 
 import group6.demo.dto.BookingDTO;
+import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.entity.Order;
 import java.util.List;
 import java.util.Map;
@@ -15,5 +16,5 @@ public interface BookingService {
     List<Order> getAllOrders();
     Optional<Order> getOrderById(Long id);
 
-
+    Order extendBooking(Long id, ExtendBookingDTO extendBookingDTO);
 } 

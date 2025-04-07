@@ -1,6 +1,7 @@
 package group6.demo.controller;
 
 import group6.demo.dto.BookingDTO;
+import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.entity.Order;
 import group6.demo.service.BookingService;
 import jakarta.validation.Valid;
@@ -72,4 +73,24 @@ public class BookingController {
     public Optional<Order> getBookingById(@PathVariable Long orderId) {
         return bookingService.getOrderById(orderId);
     }
-} 
+
+    @PostMapping("/extend/{orderId}")
+    public ResponseEntity<?> exntendBooking(@PathVariable Long orderId, @Valid @RequestBody ExtendBookingDTO extendBookingDTO){
+        try {
+            Order order = bookingService.extendBooking(orderId, extendBookingDTO);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Extend Booking successfully");
+            response.put("orderId", order.getId());
+            response.put("startTime", order.getStartTime());
+            response.put("endTime", order.getEndTime());
+            response.put("price", order.getPrice());
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Extend Booking failed: " + e.getMessage());
+        }
+    }
+}

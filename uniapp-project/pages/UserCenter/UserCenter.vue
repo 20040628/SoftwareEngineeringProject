@@ -6,16 +6,16 @@
 				<view class="my-info-box" >
 					<view>
 						<view @click="informaition()" class="my-nickName overOne">{{userInfo.username||'点击授权登录'}}</view>
-						<view @click="informaition()" class="my-vip-num">{{'未开通vip'}}</view>
+						<view @click="informaition()" class="my-vip-num">{{'Not vip'}}</view>
 	
 						<view class="my-amount-box">
 							<view>
 								<view>{{balance||0}}</view>
-								<view>我的钱包</view>
+								<view>wallet</view>
 							</view>
 							<view>
 								<view>{{totalGainedBonus||0}}</view>
-								<view>我的佣金</view>
+								<view>scooters</view>
 							</view>
 						</view>
 					</view>
@@ -138,7 +138,7 @@ export default {
 		switch (e) {
 			case 1:
 				uni.navigateTo({
-					url: './myorder/myorder'
+					url: './myorder/orderlist/orderlist'
 				})
 				break;
 			case 2:

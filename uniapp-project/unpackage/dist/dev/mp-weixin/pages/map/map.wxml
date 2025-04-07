@@ -1,1 +1,0 @@
-<map id="map" latitude="{{c}}" longitude="{{d}}" markers="{{e}}" show-location="{{true}}" style="width:100%;height:90vh" bindmarkertap="{{f}}"><cover-view class="custom-controls"><cover-image src="{{a}}" bindtap="{{b}}" class="control-btn"/></cover-view></map>

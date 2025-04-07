@@ -205,7 +205,8 @@ export default {
 		 uni.request({
 		    url: `https://restapi.amap.com/v3/geocode/regeo?output=json&location=${scooter.longitude},${scooter.latitude}&key=5f722ef9e435cec7d4dba6f5daba0030&radius=1000&extensions=all&language=en`,
 		    success: (res) => {
-		      console.log('高德逆地理编码返回数据：', res.data);
+		      // console.log('高德逆地理编码返回数据：', res.data);
+			
 
 		      if (res.data.status === '1') {
 		        // 动态为 scooter 对象添加 locationName 属性

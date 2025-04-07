@@ -83,6 +83,7 @@
     	</button>
     </view>
   </view>
+  <!-- <web-view :src="paymentUrl"></web-view> -->
 </template>
 
 <script>
@@ -105,7 +106,8 @@ export default {
 	  isLoading:true,
 	  currentUser:{
 		userId:null
-	  }
+	  },
+	  paymentUrl:''
     }
   },
   async onLoad(options){
@@ -214,7 +216,7 @@ export default {
 	async refreshTimeline() {
 		const token = String(uni.getStorageSync('token'));
 	      if (!this.scooterID) return; // 确保有 scooterID
-		  console.log(this.scooterID)
+		  // console.log(this.scooterID)
 	      try {
 	        this.timeline = await this.request({
 	          url: `http://localhost:8080/api/bookings/timeline/${this.scooterID}`,
@@ -227,14 +229,14 @@ export default {
 	      } catch (err) {
 	        console.error('刷新时间轴失败:', err);
 	      }
-		  console.log(this.timeline)
+		  // console.log(this.timeline)
 	},
 	
 	calculateSlotWidth(slot) {
 		const start = new Date(slot.startTime).getTime();
 		const end = new Date(slot.endTime).getTime();
 		const duration = end - start;
-		console.log(slot.startTime, new Date(slot.startTime))
+		// console.log(slot.startTime, new Date(slot.startTime))
 		      
 		// 计算时间段占总时间范围的百分比
 		const totalDuration = 7 * 24 * 60 * 60 * 1000; // 7天的毫秒数
@@ -312,13 +314,13 @@ export default {
 
 		try {
 				const startTime = this.bookingForm.startDateTime.replace('T', ' ') + ':00';
-				console.log('startDateTime:', startTime);
-				console.log('User ID:', this.currentUser?.userId);
-				console.log('Scooter ID:', this.scooter?.id);
-				console.log("Token:", token);
+				// console.log('startDateTime:', startTime);
+				// console.log('User ID:', this.currentUser?.userId);
+				// console.log('Scooter ID:', this.scooter?.id);
+				// console.log("Token:", token);
 				const payloadBase64 = token.split('.')[1]; // JWT 的 payload 部分
 				const payload = JSON.parse(atob(payloadBase64)); 
-				console.log("Token Payload:", payload);
+				// console.log("Token Payload:", payload);
 
 				const bookingData = {
 					userId: this.currentUser.userId,
@@ -326,7 +328,7 @@ export default {
 					hireType: this.bookingForm.hireType,
 					startTime: startTime
 				};
-				console.log("Booking Data:", bookingData);
+				// console.log("Booking Data:", bookingData);
 
 				// 发送请求
 				const res = await new Promise((resolve, reject) => {
@@ -342,7 +344,7 @@ export default {
 						fail: (error) => reject(error)
 					});
 				});
-				console.log("API Response:", res);
+				// console.log("API Response:", res);
 
 				if (res.statusCode === 200) {
 					this.showMessage('book successfully', 'success');
@@ -351,10 +353,9 @@ export default {
 					    icon: 'success',
 					    duration: 2000  // 2秒后自动关闭
 					});
-					await this.getPaymentData(res.data);
+					await this.handlePay(res.data);
 					await this.refreshTimeline();
 				} else {
-					console.log('Error message:', res.data.message);
 					uni.showToast({
 					  title: res.data|| 'Scheduled failure',
 					  icon: 'none',
@@ -372,20 +373,10 @@ export default {
 				uni.hideLoading();
 			}
 	},
-	async getPaymentData(order) {
-	  // 假设你需要向后台请求支付数据
-	  const token = String(uni.getStorageSync('token'));
-	  const res = await new Promise((resolve, reject) => {
-	    uni.request({
-	      url: `http://localhost:8080/api/alipay/pay/${order.orderId}`,  // 后台支付初始化接口
-	      method: 'GET',
-	      header: {
-	        'Authorization': `Bearer ${token}`
-	      },
-	      success: (response) => resolve(response.data),  // 返回支付所需的数据
-	      fail: (error) => reject(error)
-	    });
-	  });
+	async handlePay(order) {
+		uni.navigateTo({
+			url: `/pages/payment/payh5?id=${order.orderId}`
+		})
 	},
 
 	// 显示提示信息

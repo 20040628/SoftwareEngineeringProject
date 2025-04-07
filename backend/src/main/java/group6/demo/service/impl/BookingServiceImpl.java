@@ -1,6 +1,7 @@
 package group6.demo.service.impl;
 
 import group6.demo.dto.BookingDTO;
+import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.entity.Order;
 import group6.demo.entity.Scooter;
 import group6.demo.entity.User;
@@ -95,6 +96,7 @@ public class BookingServiceImpl implements BookingService {
             default:
                 throw new IllegalArgumentException("Invalid hire type");
         }
+        order.setPriceBeforeDiscount(price);
 
         // 应用折扣价格
         BigDecimal discountedPrice = priceDiscountService.calculateDiscountedPrice(price, user.getId());
@@ -310,5 +312,79 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);
+    }
+
+    @Override
+    public Order extendBooking(Long id, ExtendBookingDTO extendBookingDTO){
+        Order oldOrder = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + id));;
+
+        // 检查用户是否存在和是否有邮箱
+        User user = userRepository.findById(oldOrder.getUser().getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("User email is required for booking");
+        }
+
+        Scooter scooter = scooterRepository.findById(oldOrder.getScooter().getId()).orElseThrow(() -> new IllegalArgumentException("Scooter not found"));
+        Date oldEndTime = oldOrder.getEndTime();
+
+        // Calculate start time
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(oldEndTime);
+        calendar.add(Calendar.SECOND, 1);
+        Date newStartTime = calendar.getTime();
+
+        // create a new order
+        Order order = new Order();
+        order.setOrderTime(new Date());
+        order.setStartTime(newStartTime);
+        order.setStatus(1);
+        order.setUser(user);
+        order.setScooter(scooter);
+        order.setHirePeriod(extendBookingDTO.getHireType());
+
+        // Calculate end time and price based on hire type
+        calendar.setTime(newStartTime);
+        BigDecimal price;
+        switch (extendBookingDTO.getHireType()) {
+            case "HOUR":
+                calendar.add(Calendar.HOUR, 1);
+                price = scooter.getPriceHour();
+                break;
+            case "FOUR_HOURS":
+                calendar.add(Calendar.HOUR, 4);
+                price = scooter.getPriceFourHour();
+                break;
+            case "DAY":
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                price = scooter.getPriceDay();
+                break;
+            case "WEEK":
+                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+                price = scooter.getPriceWeek();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid hire type");
+        }
+
+        order.setPriceBeforeDiscount(price);
+
+        // 应用折扣价格
+        BigDecimal discountedPrice = priceDiscountService.calculateDiscountedPrice(price, user.getId());
+
+        // Check for booking conflicts
+        Date endTime = calendar.getTime();
+        List<Order> conflictingOrders = orderRepository.findConflictingOrders(scooter.getId(), newStartTime, endTime);
+        if (!conflictingOrders.isEmpty()) {
+            throw new IllegalArgumentException("Selected time period is already booked");
+        }
+
+        order.setEndTime(endTime);
+        order.setPrice(discountedPrice);
+
+        Order newOrder = orderRepository.save(order);
+
+        sendConfirmationEmail(newOrder);
+
+        return newOrder;
     }
 } 

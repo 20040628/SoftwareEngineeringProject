@@ -47,6 +47,7 @@ CREATE TABLE `b_order`  (
   `start_time` datetime NOT NULL,
   `end_time` datetime NOT NULL,
   `hire_period` varchar(10)  NOT NULL,
+  `price_before_discount` decimal(7, 2) NOT NULL,
   `price` decimal(7, 2) NOT NULL,
   `user_id` bigint NOT NULL,
   `scooter_id` bigint NOT NULL,

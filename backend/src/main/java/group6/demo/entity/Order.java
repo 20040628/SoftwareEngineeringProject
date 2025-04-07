@@ -15,9 +15,10 @@ public class Order {
     
     @Column(name = "order_time", nullable = false)
     private Date orderTime;
-    
+
+    // 1: active, 2: completed, 3: cancelled
     @Column(nullable = false)
-    private Integer status; // 1: active, 2: completed, 3: cancelled
+    private Integer status;
     
     @Column(name = "start_time", nullable = false)
     private Date startTime;
@@ -27,7 +28,10 @@ public class Order {
     
     @Column(name = "hire_period", nullable = false)
     private String hirePeriod;
-    
+
+    @Column(nullable = false)
+    private BigDecimal PriceBeforeDiscount;
+
     @Column(nullable = false)
     private BigDecimal price;
     

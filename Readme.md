@@ -198,6 +198,7 @@ Frontend service will run on http://localhost:5173
           "startTime": "2025-03-12T17:20:00.000+00:00",
           "endTime": "2025-03-12T18:20:00.000+00:00",
           "hirePeriod": "HOUR",
+          "price_before_discount": 5.00,
           "price": 5.00,
           "user": {
               "id": 2,
@@ -367,6 +368,7 @@ Frontend service will run on http://localhost:5173
     "orderId": "number",
     "startTime": "string",
     "endTime": "string",
+    "priceBeforeDiscount": "decimal",
     "price": "decimal"
   }
   ```
@@ -420,6 +422,7 @@ Frontend service will run on http://localhost:5173
           "startTime": "2025-03-12T17:20:00.000+00:00",
           "endTime": "2025-03-12T18:20:00.000+00:00",
           "hirePeriod": "HOUR",
+          "price_before_discount": 5.00,
           "price": 5.00,
           "user": {
               "id": 2,
@@ -460,6 +463,7 @@ Frontend service will run on http://localhost:5173
 
   - `orderId`: ID of the order
 
+
 - **An example of Success Response** (200 OK):
 
   ```
@@ -470,6 +474,7 @@ Frontend service will run on http://localhost:5173
       "startTime": "2025-03-12T17:20:00.000+00:00",
       "endTime": "2025-03-12T18:20:00.000+00:00",
       "hirePeriod": "HOUR",
+      "price_before_discount": 5.00,
       "price": 5.00,
       "user": {
           "id": 3,
@@ -523,6 +528,35 @@ Frontend service will run on http://localhost:5173
   ```
   {
       "message": "Order is already cancelled"
+  }
+  ```
+
+#### Extend booking
+
+- **URL**: `/api/bookings/extend/{orderId}`
+
+- **Method**: `POST`
+
+- **Path Parameters**: `orderId`: ID of the order
+
+- **Request Body**:
+
+  ```
+  {
+    "hireType": "string",     // One of: "HOUR", "FOUR_HOURS", "DAY", "WEEK"
+  }
+  ```
+
+- **Success Response** (200 OK):
+
+  ```
+  {
+    "message": "Booking successful",
+    "orderId": "number",
+    "startTime": "string",
+    "endTime": "string",
+    "priceBeforeDiscount": "decimal",
+    "price": "decimal"
   }
   ```
 

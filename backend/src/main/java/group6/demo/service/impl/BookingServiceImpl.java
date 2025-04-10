@@ -236,11 +236,9 @@ public class BookingServiceImpl implements BookingService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
 
-        // 检查订单状态，如果已经取消则无需再次取消 status=3代表订单已经取消;如果已经支付完成也不能再取消 status=2代表订单已经支付完成
-        if (order.getStatus() == 3) {
+        // 检查订单状态，如果已经取消则无需再次取消 status=2代表订单已经取消
+        if (order.getStatus() == 2) {
             throw new IllegalArgumentException("Order is already cancelled");
-        } else if (order.getStatus() == 2) {
-            throw new IllegalArgumentException("Order is already payed");
         }
 
         // 更新订单状态为已取消

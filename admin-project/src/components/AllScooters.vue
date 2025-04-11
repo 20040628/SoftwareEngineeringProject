@@ -13,7 +13,7 @@
           <div class="info-row">
             <span class="label">Price:</span>
             <span class="value">
-              ${{ scooter.priceHour }}/hr | ${{ scooter.priceDay }}/day | ${{ scooter.priceWeek }}/week
+              £{{ scooter.priceHour }}/hr | £{{ scooter.priceDay }}/day | £{{ scooter.priceWeek }}/week
             </span>
           </div>
           <div class="info-row">
@@ -72,7 +72,7 @@ export default {
     },
     async changeScooterStatus(id) {
       try {
-        const res = await axios.get(`http://localhost:8080/api/scooters/changeStatus/${id}`);
+        const res = await axios.get(`http://localhost:8080/api/scooters/changeStatus/£{id}`);
         if (res.status === 200) {
           this.fetchScooters();
           alert('状态更新成功');

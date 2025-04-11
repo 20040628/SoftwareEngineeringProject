@@ -106,26 +106,26 @@
               <div class="revenue-row">
                 <div class="revenue-item">
                   <span class="label">Hourly Revenue:</span>
-                  <span class="value">¥{{ currentWeekRevenue.hourlyRevenue }}</span>
+                  <span class="value">£{{ currentWeekRevenue.hourlyRevenue }}</span>
                 </div>
                 <div class="revenue-item">
                   <span class="label">4-Hour Revenue:</span>
-                  <span class="value">¥{{ currentWeekRevenue.fourHoursRevenue }}</span>
+                  <span class="value">£{{ currentWeekRevenue.fourHoursRevenue }}</span>
                 </div>
               </div>
               <div class="revenue-row">
                 <div class="revenue-item">
                   <span class="label">Daily Revenue:</span>
-                  <span class="value">¥{{ currentWeekRevenue.dailyRevenue }}</span>
+                  <span class="value">£{{ currentWeekRevenue.dailyRevenue }}</span>
                 </div>
                 <div class="revenue-item">
                   <span class="label">Weekly Revenue:</span>
-                  <span class="value">¥{{ currentWeekRevenue.weeklyRevenue }}</span>
+                  <span class="value">£{{ currentWeekRevenue.weeklyRevenue }}</span>
                 </div>
               </div>
               <div class="revenue-item total">
                 <span class="label">Total Revenue:</span>
-                <span class="value">¥{{ currentWeekRevenue.totalRevenue }}</span>
+                <span class="value">£{{ currentWeekRevenue.totalRevenue }}</span>
               </div>
               <div class="revenue-item order-count">
                 <span class="label">Order Count:</span>
@@ -134,7 +134,7 @@
               <!-- Top Performing Revenue Type -->
               <div class="revenue-item top-performing" v-if="topPerformingType">
                 <span class="label">Top Performing Type:</span>
-                <span class="value">{{ topPerformingType.label }} (¥{{ topPerformingType.value }})</span>
+                <span class="value">{{ topPerformingType.label }} (£{{ topPerformingType.value }})</span>
               </div>
             </div>
           </div>
@@ -476,7 +476,7 @@ export default {
               }
             },
             label: {
-              formatter: '{b}: ¥{c} ({d}%)'
+              formatter: '{b}: £{c} ({d}%)'
             },
             labelLine: {
               length: 10,
@@ -522,7 +522,7 @@ export default {
           },
           formatter: params => {
             const data = params[0].data
-            return `${data.name}<br/>Amount: ¥${data.value}<br/>Percentage: ${data.percentage}%`
+            return `${data.name}<br/>Amount: £${data.value}<br/>Percentage: ${data.percentage}%`
           }
         },
         grid: {
@@ -534,7 +534,7 @@ export default {
         xAxis: {
           type: 'value',
           axisLabel: {
-            formatter: '¥{value}'
+            formatter: '£{value}'
           }
         },
         yAxis: {
@@ -550,7 +550,7 @@ export default {
               show: true,
               position: 'right',
               formatter: params => {
-                return `¥${params.data.value} (${params.data.percentage}%)`
+                return `£${params.data.value} (${params.data.percentage}%)`
               }
             },
             itemStyle: {

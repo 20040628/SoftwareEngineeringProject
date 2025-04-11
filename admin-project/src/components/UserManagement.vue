@@ -536,22 +536,16 @@ export default {
   transition: background-color 0.2s;
 }
 
-.action-btn:hover {
-  background-color: #f0f0f0;
-}
 
 .action-icon {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
 }
 
 .edit-btn:hover {
   background-color: #e6f7ff;
 }
 
-.delete-btn:hover {
-  background-color: #fff2f0;
-}
 
 /* Pagination Styles */
 .pagination-container {

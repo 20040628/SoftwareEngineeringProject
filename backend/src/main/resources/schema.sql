@@ -51,11 +51,14 @@ CREATE TABLE `b_order`  (
   `price` decimal(7, 2) NOT NULL,
   `user_id` bigint NOT NULL,
   `scooter_id` bigint NOT NULL,
+  `staff_id` bigint NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `b_order_scooter_id_fk`(`scooter_id`) USING BTREE,
   INDEX `b_order_user_id_fk`(`user_id`) USING BTREE,
+  INDEX `b_order_staff_id_fk`(`staff_id`) USING BTREE,
   CONSTRAINT `b_order_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `b_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `b_order_scooter_id_fk` FOREIGN KEY (`scooter_id`) REFERENCES `b_scooter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `b_order_scooter_id_fk` FOREIGN KEY (`scooter_id`) REFERENCES `b_scooter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `b_order_staff_id_fk` FOREIGN KEY (`staff_id`) REFERENCES `b_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- 创建折扣规则表

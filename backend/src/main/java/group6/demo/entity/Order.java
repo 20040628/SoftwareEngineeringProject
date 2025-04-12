@@ -42,4 +42,8 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "scooter_id", nullable = false)
     private Scooter scooter;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id", nullable = true)
+    private User staff;
 } 

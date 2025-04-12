@@ -2,6 +2,7 @@ package group6.demo.controller;
 
 import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
+import group6.demo.dto.StaffBookingDTO;
 import group6.demo.entity.Order;
 import group6.demo.service.BookingService;
 import jakarta.validation.Valid;
@@ -34,7 +35,6 @@ public class BookingController {
         try {
             Order order = bookingService.createBooking(bookingDTO);
 
-
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Booking successful");
             response.put("orderId", order.getId());
@@ -50,6 +50,28 @@ public class BookingController {
             return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage());
         }
     }
+
+    @PostMapping("/forUnregistered")
+    public ResponseEntity<?> createForUnregistered(@Valid @RequestBody StaffBookingDTO bookingDTO){
+        try {
+            Order order = bookingService.staffCreateBooking(bookingDTO);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Booking successful");
+            response.put("orderId", order.getId());
+            response.put("startTime", order.getStartTime());
+            response.put("endTime", order.getEndTime());
+            response.put("priceBeforeDiscount", order.getPriceBeforeDiscount());
+            response.put("price", order.getPrice());
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Booking failed: " + e.getMessage());
+        }
+    }
+
 
     @PostMapping("/cancel/{orderId}")
     public ResponseEntity<?> cancelBooking(@PathVariable Long orderId) {
@@ -78,6 +100,7 @@ public class BookingController {
     @PostMapping("/extend/{orderId}")
     public ResponseEntity<?> exntendBooking(@PathVariable Long orderId, @Valid @RequestBody ExtendBookingDTO extendBookingDTO){
         try {
+            // 无法续订已完成的订单
             Order order = bookingService.extendBooking(orderId, extendBookingDTO);
 
             Map<String, Object> response = new HashMap<>();

@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/scooters/getAll", "/api/scooters/{id}").permitAll()
                 .requestMatchers("/api/feedback/all").hasRole("ADMIN")
                 .requestMatchers("/api/feedback/**").authenticated()
+                .requestMatchers("/api/bookings/forUnregistered").hasRole("ADMIN")
                 .requestMatchers("/api/bookings/getAll").hasRole("ADMIN")
                 .requestMatchers("/api/bookings/**").authenticated()
                 .requestMatchers("/api/users/changeStatus/{id}").hasRole("ADMIN")

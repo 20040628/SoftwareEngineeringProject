@@ -446,6 +446,43 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
+#### Create booking for unregistered users （only admin）
+
+1. register the user, see 7.1.1
+
+2. create book
+
+   - **URL**: `/api/bookings/forUnregistered`
+
+   - **Method**: `GET`
+
+   - **Request Body**:
+
+     ```
+     {
+       "userId": "number",       // User ID
+       "scooterId": "number",    // Scooter ID
+       "hireType": "string",     // One of: "HOUR", "FOUR_HOURS", "DAY", "WEEK"
+       "startTime": "string",     // Format: "YYYY-MM-DD HH:mm:ss"
+       "staffId": "number"
+     }
+     ```
+
+   - **Success Response** (200 OK):
+
+     ```
+     {
+         "orderId": 1,
+         "priceBeforeDiscount": 5.00,
+         "price": 5.00,
+         "startTime": "2025-04-21T16:00:00.000+00:00",
+         "endTime": "2025-04-21T17:00:00.000+00:00",
+         "message": "Booking successful"
+     }
+     ```
+
+     ​
+
 #### Get All bookings (only admin can) 
 
 - **URL**: `/api/bookings/getAll`
@@ -489,6 +526,22 @@ Frontend service will run on http://localhost:5173
               "status": 0,
               "longitude": 103.984500,
               "latitude": 30.765000
+          },
+          "staff": {
+              "id": 1,
+              "username": "admin",
+              "password": "$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1990-01-01",
+              "userType": 0,
+              "mobile": "1234567890",
+              "email": "admin@example.com",
+              "paymentMethod": "credit_card",
+              "status": 1,
+              "role": 0,
+              "isFrequentUser": 0,
+              "isStudent": 0,
+              "isSenior": 0
           }
       }
   ]
@@ -541,6 +594,22 @@ Frontend service will run on http://localhost:5173
           "status": 0,
           "longitude": 103.984500,
           "latitude": 30.765000
+      },
+      "staff": {
+          "id": 1,
+          "username": "admin",
+          "password": "$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni",
+          "avatar": "default_avatar.jpg",
+          "birthday": "1990-01-01",
+          "userType": 0,
+          "mobile": "1234567890",
+          "email": "admin@example.com",
+          "paymentMethod": "credit_card",
+          "status": 1,
+          "role": 0,
+          "isFrequentUser": 0,
+          "isStudent": 0,
+          "isSenior": 0
       }
   }
   ```

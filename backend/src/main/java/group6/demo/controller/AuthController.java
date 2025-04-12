@@ -8,6 +8,7 @@ import group6.demo.service.PriceDiscountService;
 import group6.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -44,7 +45,14 @@ public class AuthController {
 
         try {
             User user = userService.loginUser(loginDTO);
-            
+
+            // Check user status
+            if (user.getStatus() == 0) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("You do not have permission to log in, please contact the platform.");
+            }
+
             // Generate JWT token
             String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getUserType(), user.getRole());
             

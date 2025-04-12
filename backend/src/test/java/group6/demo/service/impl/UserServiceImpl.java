@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -83,5 +85,20 @@ public class UserServiceImpl implements UserService {
         }
         
         return user;
+    }
+
+    @Override
+    public Optional<User> changeUserStatus(Long id){
+        Optional<User> User = userRepository.findById(id);
+        if (User.isPresent()) {
+            User user = User.get();
+            if (user.getStatus()==1){
+                user.setStatus(0);
+            } else {
+                user.setStatus(1);
+            }
+            return Optional.of(userRepository.save(user));
+        }
+        return User;
     }
 } 

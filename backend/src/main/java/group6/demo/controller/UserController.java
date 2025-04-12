@@ -5,6 +5,7 @@ import group6.demo.entity.User;
 import group6.demo.repository.OrderRepository;
 import group6.demo.repository.UserRepository;
 import group6.demo.service.PriceDiscountService;
+import group6.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,9 @@ public class UserController {
     
     @Autowired
     private PriceDiscountService priceDiscountService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/getAll")
     public List<User> getAllUsers() {
@@ -137,5 +141,10 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("更新用户信息失败: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/changeStatus/{id}")
+    public Optional<User> changeUserStatus(@PathVariable Long id) {
+        return userService.changeUserStatus(id);
     }
 }

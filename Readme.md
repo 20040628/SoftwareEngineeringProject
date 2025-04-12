@@ -118,7 +118,9 @@ Frontend service will run on http://localhost:5173
 #### User Login
 
 - **URL**: `/api/auth/login`
+
 - **Method**: `POST`
+
 - **Request Body**:
   ```json
   {
@@ -126,6 +128,7 @@ Frontend service will run on http://localhost:5173
     "password": "string"
   }
   ```
+
 - **Success Response** (200 OK):
   ```json
   {
@@ -137,6 +140,7 @@ Frontend service will run on http://localhost:5173
     "token": "string"
   }
   ```
+
 - **Error Response** (400 Bad Request):
   ```json
   {
@@ -148,6 +152,14 @@ Frontend service will run on http://localhost:5173
   ```json
   "Login failed: error message"
   ```
+
+- **Error Response** (403Forbidden): [When user.status==0]
+
+  ```
+  "You do not have permission to log in, please contact the platform."
+  ```
+
+  ​
 
 #### Validate Token
 
@@ -269,6 +281,35 @@ Frontend service will run on http://localhost:5173
       }
   ]
   ```
+
+####Change status of a user [only admin]
+
+- **URL**: `/api/users/changeStatus/{id}`
+
+- **Method**: `Get`
+
+- **Success Response** (200 OK):
+
+  ```
+  {
+      "id": 2,
+      "username": "user",
+      "password": "$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni",
+      "avatar": "default_avatar.jpg",
+      "birthday": "1995-05-05",
+      "userType": 0,
+      "mobile": "9876543210",
+      "email": "user@example.com",
+      "paymentMethod": "paypal",
+      "status": 0,
+      "role": 1,
+      "isFrequentUser": 0,
+      "isStudent": 0,
+      "isSenior": 0
+  }
+  ```
+
+  ​
 
 ### Scooter API
 

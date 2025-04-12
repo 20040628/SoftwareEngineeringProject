@@ -3,88 +3,147 @@
     <div class="header-container">
       <h2 class="title">User Feedback</h2>
       <div class="filter-container">
-        <label>Filter by Status:</label>
-        <select v-model="selectedStatus" class="status-filter">
-          <option value="">All</option>
-          <option v-for="(status, key) in statusOptions"
-                  :key="key"
-                  :value="key">
-            {{ status.label }}
-          </option>
-        </select>
+        <div class="search-box">
+          <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="Search feedback..."
+              @keyup.enter="handleSearch"
+          >
+          <button class="reset-button" @click="resetSearch">
+            <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
+          </button>
+          <button class="search-button" @click="handleSearch">
+            <img src="/static/center/search.svg" alt="Search" class="search-icon">
+          </button>
+        </div>
+        <div class="status-filter">
+          <label for="status-select">Filter by Status:</label>
+          <select id="status-select" v-model="selectedStatus" @change="filterFeedbacks">
+            <option value="">All</option>
+            <option v-for="(status, key) in statusOptions"
+                    :key="key"
+                    :value="key">
+              {{ status.label }}
+            </option>
+          </select>
+        </div>
       </div>
     </div>
-    <div class="feedback-list">
-      <div class="table-header">
-        <div class="table-cell">ID</div>
-        <div class="table-cell">User ID</div>
-        <div class="table-cell">Content</div>
 
-        <div class="table-cell">Create Time</div>
-        <div class="table-cell">Status</div>
-        <div class="table-cell">Priority</div>
-        <div class="table-cell">Admin Response</div>
-        <div class="table-cell">Action</div>
+    <div class="table-container">
+      <table class="feedback-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>User ID</th>
+          <th>Content</th>
+          <th>Create Time</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Admin Response</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="feedback in filteredPaginatedFeedbacks" :key="feedback.id">
+          <td>{{ feedback.id }}</td>
+          <td>{{ feedback.userId }}</td>
+          <td>{{ feedback.content }}</td>
+          <td>{{ formatDate(feedback.createTime) }}</td>
+          <td>
+            <div class="status-group">
+              <button
+                  v-for="(status, key) in statusOptions"
+                  :key="key"
+                  @click="feedback.status = key"
+                  class="status-button"
+                  :class="{ 'active': feedback.status === key }"
+              >
+                <span class="color-dot" :style="{ backgroundColor: status.color }"></span>
+                {{ status.label }}
+              </button>
+            </div>
+          </td>
+          <td>
+            <div class="priority-group">
+              <button
+                  v-for="(priority, key) in priorityOptions"
+                  :key="key"
+                  @click="feedback.priority = Number(key)"
+                  class="priority-button"
+                  :class="{ 'active': feedback.priority === Number(key) }"
+              >
+                <span class="color-dot" :style="{ backgroundColor: priority.color }"></span>
+                {{ priority.label }}
+              </button>
+            </div>
+          </td>
+          <td>
+              <textarea
+                  v-model="feedback.adminResponse"
+                  class="admin-response"
+                  placeholder="输入回复..."
+              ></textarea>
+          </td>
+          <td>
+            <button @click="updateFeedback(feedback)" class="update-button">Update</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <span class="pagination-info">Total {{ filteredFeedbacks.length }} Feedbacks</span>
+
+      <div class="pagination-buttons">
+        <button
+            class="pagination-prev"
+            :disabled="currentPage === 1"
+            @click="goToPage(currentPage - 1)"
+        >
+          &lt;
+        </button>
+
+        <template v-for="page in displayedPages" :key="page">
+          <button
+              v-if="page === 'ellipsis'"
+              class="pagination-ellipsis"
+              disabled
+          >
+            ⋯
+          </button>
+          <button
+              v-else
+              class="pagination-page"
+              :class="{ 'pagination-active': page === currentPage }"
+              @click="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        </template>
+
+        <button
+            class="pagination-next"
+            :disabled="currentPage === totalPages"
+            @click="goToPage(currentPage + 1)"
+        >
+          &gt;
+        </button>
       </div>
-      <div class="feedback-item" v-for="feedback in filteredFeedbacks" :key="feedback.id">
-        <div class="table-cell">{{ feedback.id }}</div>
-        <div class="table-cell">{{ feedback.userId }}</div>
-        <div class="table-cell">{{ feedback.content }}</div>
-        <div class="table-cell">{{ feedback.createTime }}</div>
-        <!-- <div class="table-cell">
-          <select v-model="feedback.status" class="status-dropdown">
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="resolved">Resolved</option>
-          </select>
-        </div> -->
-        <!-- 状态选择 -->
-        <div class="table-cell">
-          <div class="status-group">
-            <button
-                v-for="(status, key) in statusOptions"
-                :key="key"
-                @click="feedback.status = key"
-                class="status-button"
-                :class="{ 'active': feedback.status === key }"
-            >
-              <span class="color-dot" :style="{ backgroundColor: status.color }"></span>
-              {{ status.label }}
-            </button>
-          </div>
-        </div>
-        <!-- <div class="table-cell">
-          <select v-model="feedback.priority" class="priority-dropdown">
-            <option :value="0">Low</option>
-            <option :value="1">Medium</option>
-            <option :value="2">High</option>
-          </select>
-        </div> -->
-        <!-- 优先级选择 -->
-        <div class="table-cell">
-          <div class="priority-group">
-            <button
-                v-for="(priority, key) in priorityOptions"
-                :key="key"
-                @click="feedback.priority = Number(key)"
-                class="priority-button"
-                :class="{ 'active': feedback.priority === Number(key) }"
-            >
-              <span class="color-dot" :style="{ backgroundColor: priority.color }"></span>
-              {{ priority.label }}
-            </button>
-          </div>
-        </div>
-        <div class="table-cell">
-            <textarea
-                v-model="feedback.adminResponse"
-                class="admin-response"
-                placeholder="输入回复..."
-            ></textarea>
-        </div>
-        <div class="table-cell">
-          <button @click="updateFeedback(feedback)" class="update-button">Update</button>
-        </div>
+
+      <div class="pagination-jump">
+        <input
+            type="number"
+            v-model.number="inputPage"
+            min="1"
+            :max="totalPages"
+            @keyup.enter="goToPage(inputPage)"
+        />
+        <span>Page</span>
+        <button @click="goToPage(inputPage)">Go</button>
       </div>
     </div>
   </div>
@@ -97,6 +156,11 @@ export default {
   data() {
     return {
       feedbacks: [],
+      filteredFeedbacks: [],
+      currentPage: 1,
+      itemsPerPage: 10,
+      inputPage: 1,
+      searchQuery: '',
       statusOptions: {
         pending: { label: 'Pending', color: '#dc3545' },
         processing: { label: 'Processing', color: '#ffc107' },
@@ -114,79 +178,133 @@ export default {
     filteredFeedbacks() {
       if (!this.selectedStatus) return this.feedbacks;
       return this.feedbacks.filter(f => f.status === this.selectedStatus);
+    },
+    totalPages() {
+      return Math.ceil(this.filteredFeedbacks.length / this.itemsPerPage);
+    },
+    displayedPages() {
+      const pages = [];
+      const total = this.totalPages;
+      const current = this.currentPage;
+
+      // Always show first page
+      pages.push(1);
+
+      // Show pages around current page
+      const start = Math.max(2, current - 2);
+      const end = Math.min(total - 1, current + 2);
+
+      // Add ellipsis if needed
+      if (start > 2) pages.push('ellipsis');
+
+      // Add middle pages
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      // Add ellipsis if needed
+      if (end < total - 1) pages.push('ellipsis');
+
+      // Always show last page if there is more than one page
+      if (total > 1) pages.push(total);
+
+      return pages;
+    },
+    filteredPaginatedFeedbacks() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredFeedbacks.slice(start, end);
     }
   },
   mounted() {
     this.fetchFeedbacks();
   },
   methods: {
-    // async fetchFeedbacks() {
-    //   try {
-    //     const res = await axios.get('http://localhost:8080/api/feedback/all');
-    //     if (res.status === 200) {
-    //       this.feedbacks = res.data;
-    //     } else {
-    //       alert('Failed to load feedbacks');
-    //     }
-    //   } catch (error) {
-    //     alert('Failed to load feedbacks');
-    //   }
-    // },
+    resetSearch() {
+      this.searchQuery = '';
+      this.selectedStatus = '';
+      this.filterFeedbacks();
+    },
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    },
     async fetchFeedbacks() {
       try {
-        // 发送GET请求获取反馈数据
         const res = await axios.get('http://localhost:8080/api/feedback/all');
-
-        // 检查HTTP状态码是否为200
         if (res.status === 200) {
-          // 对返回数据进行标准化处理
           this.feedbacks = res.data.map(item => {
-            // 创建新对象保留原始数据
             const processedItem = { ...item };
-
-            // 处理priority字段（确保转为数字）
             if (typeof processedItem.priority === 'string') {
-              // 显式转换为数字类型
               processedItem.priority = Number(processedItem.priority);
-
-              // 额外验证：如果转换失败（得到NaN）则重置为默认值0
               if (isNaN(processedItem.priority)) {
-                console.warn(`Invalid priority value: ${item.priority}, reset to 0`);
                 processedItem.priority = 0;
               }
             }
-
-            // 处理status字段（统一为小写格式）
             if (typeof processedItem.status === 'string') {
               processedItem.status = processedItem.status.toLowerCase();
-
-              // 有效性检查：如果状态不在预定范围内，设置为pending
               const validStatus = ['pending', 'processing', 'resolved'];
               if (!validStatus.includes(processedItem.status)) {
-                console.warn(`Invalid status: ${processedItem.status}, reset to pending`);
                 processedItem.status = 'pending';
               }
             }
-
             return processedItem;
           });
-
-          console.log('Processed feedback data:', this.feedbacks);
-        } else {
-          // 处理非200状态码
-          alert(`Failed to load feedbacks (HTTP ${res.status})`);
+          this.filteredFeedbacks = [...this.feedbacks];
         }
       } catch (error) {
-        // 错误处理（网络错误或服务器错误）
         console.error('Fetch feedbacks error:', error);
-
-        // 显示具体错误信息
         const errorMsg = error.response
             ? `Server error: ${error.response.data.message || 'Unknown error'}`
             : `Network error: ${error.message}`;
-
         alert(`Failed to load feedbacks: ${errorMsg}`);
       }
+    },
+    handleSearch() {
+      this.filterFeedbacks();
+    },
+    filterFeedbacks() {
+      const query = this.searchQuery.toLowerCase().trim();
+      const statusFilter = this.selectedStatus;
+
+      this.filteredFeedbacks = this.feedbacks.filter(feedback => {
+        // Status filter
+        if (statusFilter && feedback.status !== statusFilter) {
+          return false;
+        }
+
+        // If no search query, return all matching status
+        if (!query) return true;
+
+        // Search in all relevant fields
+        return (
+            feedback.id.toString().includes(query) ||
+            feedback.userId.toString().includes(query) ||
+            feedback.content.toLowerCase().includes(query) ||
+            this.formatDate(feedback.createTime).toLowerCase().includes(query)
+        );
+      });
+
+      this.resetPagination();
+    },
+    resetPagination() {
+      this.currentPage = 1;
+      this.inputPage = 1;
+    },
+    goToPage(page) {
+      page = parseInt(page);
+      if (page < 1) page = 1;
+      if (page > this.totalPages) page = this.totalPages;
+
+      this.currentPage = page;
+      this.inputPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     async updateFeedback(feedback) {
       try {
@@ -197,11 +315,13 @@ export default {
         });
         if (res.status === 200) {
           alert('Feedback updated successfully');
+          this.fetchFeedbacks();
         } else {
           alert('Failed to update feedback');
         }
       } catch (error) {
-        alert('Failed to update feedback');
+        console.error('Error updating feedback:', error.response);
+        alert(`Failed to update feedback: ${error.response?.data?.message || error.message}`);
       }
     },
   },
@@ -209,155 +329,158 @@ export default {
 </script>
 
 <style scoped>
-.title {
-  font-size: 20px;
-  color: #2c3e50;
-  margin-bottom: 25px;
-  font-weight: 600;
-}
-
+/* Header and Filter Container Styles */
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
-  padding: 0 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 24px;
+  color: #2c3e50;
+  font-weight: 600;
 }
 
 .filter-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Search Box Styles */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+  background: white;
+}
+
+.search-box input {
+  padding: 10px 15px;
+  border: none;
+  font-size: 14px;
+  width: 250px;
+  outline: none;
+}
+
+.search-button {
+  background: white;
+  border: none;
+  padding: 0 5px;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  border-left: 1px solid #ddd;
+}
+
+.reset-button {
+  background: white;
+  border: none;
+  padding: 0 15px;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  border-left: 1px solid #ddd;
+  font-size: 14px;
+  color: #666;
+}
+
+.search-button:hover, .reset-button:hover {
+  background: #e0e0e0;
+}
+
+.search-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.reset-icon{
+  width: 20px;
+  height: 20px;
+}
+
+/* Status Filter Styles */
+.status-filter {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.status-filter {
-  padding: 6px 12px;
-  border: 1px solid #e0e3e7;
-  border-radius: 20px;
-  background-color: white;
-  font-size: 14px;
-  color: #495057;
-  cursor: pointer;
-  transition: all 0.3s;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
-  padding-right: 30px;
-}
-
-.status-filter:focus {
-  outline: none;
-  border-color: #4d90fe;
-  box-shadow: 0 0 0 2px rgba(77, 144, 254, 0.15);
-}
-
-.status-filter option {
-  padding: 8px;
-}
-
-.feedback-list {
-  background: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.table-header {
-  display: grid;
-  grid-template-columns: 50px 80px minmax(150px, 1fr) 120px 120px 120px 200px 100px;
-  background: #f8f9fa;
-  padding: 12px 15px;
-  border-bottom: 2px solid #e9ecef;
-  font-size: 13px;
-  color: #6c757d;
-  align-items: center;
-}
-
-.feedback-item {
-  display: grid;
-  grid-template-columns: 50px 80px minmax(150px, 1fr) 120px 120px 120px 200px 100px;
-  padding: 12px 15px;
-  border-bottom: 1px solid #e9ecef;
-  font-size: 13px;
-  color: #495057;
-  transition: background 0.2s;
-}
-
-.feedback-item:hover {
-  background: #f8f9fa;
-}
-
-.table-cell {
-  display: flex;
-  align-items: center;
-  padding: 2px 5px;
-}
-
-/* 状态按钮样式 */
-.status-dropdown {
-  appearance: none;
-  padding: 4px 8px;
-  border-radius: 12px;
-  border: none;
-  font-size: 12px;
+.status-filter label {
   font-weight: 500;
-  cursor: pointer;
-  text-align: center;
-  width: 90px;
-  background-repeat: no-repeat;
-  background-position: right 6px center;
-  background-size: 12px;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  color: #444;
 }
 
-.status-dropdown[value="pending"] { background-color: #ffe3e3; color: #dc3545; }
-.status-dropdown[value="processing"] { background-color: #fff3cd; color: #ffc107; }
-.status-dropdown[value="resolved"] { background-color: #d4edda; color: #28a745; }
-
-/* 优先级按钮样式 */
-.priority-dropdown {
-  appearance: none;
-  padding: 4px 8px;
-  border-radius: 12px;
-  border: none;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  width: 90px;
-  background-repeat: no-repeat;
-  background-position: right 6px center;
-  background-size: 12px;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-}
-
-.priority-dropdown[value="0"] { background-color: #ffe3e3; color: #dc3545; }  /* Low */
-.priority-dropdown[value="1"] { background-color: #fff3cd; color: #ffc107; }  /* Medium */
-.priority-dropdown[value="2"] { background-color: #ffe3e3; color: #dc3545; }  /* High */
-
-
-
-.update-button {
-  background: #009688;
-  color: white;
-  border: none;
-  padding: 6px 12px;
+.status-filter select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 12px;
+  background-color: white;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
-.update-button:hover {
-  background: #0056b3;
-  transform: translateY(-1px);
+.status-filter select:focus {
+  outline: none;
+  border-color: #409eff;
 }
 
+/* Table Styles */
+.table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.feedback-table th,
+.feedback-table td {
+  padding: 18px 15px;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.feedback-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  color: #444;
+  border-top: 1px solid #e0e0e0;
+}
+
+.feedback-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.feedback-table td {
+  color: #666;
+}
+
+/* Status and Priority Button Groups */
 .status-group, .priority-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  align-items: center;
 }
 
 .status-button, .priority-button {
@@ -369,7 +492,8 @@ export default {
   background: white;
   cursor: pointer;
   transition: all 0.2s;
-  width: 100%;
+  width: 80%;
+  justify-content: center;
 }
 
 .status-button:hover, .priority-button:hover {
@@ -388,33 +512,12 @@ export default {
   margin-right: 8px;
 }
 
-.priority-button.active {
-  border-color: #007bff !important;
-  background: #e7f1ff !important;
-}
-
-.priority-button[data-priority="0"] .color-dot { background-color: #28a745 !important; }
-.priority-button[data-priority="1"] .color-dot { background-color: #ffc107 !important; }
-.priority-button[data-priority="2"] .color-dot { background-color: #dc3545 !important; }
-
-
-/* 优先级按钮排序调整 */
-.priority-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* 确保按High(2)->Medium(1)->Low(0)顺序显示 */
+/* Priority button order */
 .priority-group button:nth-child(1) { order: 3; } /* High */
 .priority-group button:nth-child(2) { order: 2; } /* Medium */
 .priority-group button:nth-child(3) { order: 1; } /* Low */
 
-/* 颜色点保持功能不变 */
-.priority-button[data-priority="2"] .color-dot { background-color: #dc3545 !important; }
-.priority-button[data-priority="1"] .color-dot { background-color: #ffc107 !important; }
-.priority-button[data-priority="0"] .color-dot { background-color: #28a745 !important; }
-
+/* Admin Response Textarea */
 .admin-response {
   width: 100%;
   padding: 12px 16px;
@@ -435,6 +538,7 @@ export default {
   outline: none;
   border-color: #4d90fe;
   box-shadow: 0 0 0 3px rgba(77, 144, 254, 0.15);
+  transform: translateY(-1px);
 }
 
 .admin-response::placeholder {
@@ -443,8 +547,175 @@ export default {
   letter-spacing: 0.2px;
 }
 
-/* 添加输入动画效果 */
-.admin-response:focus {
+/* Update Button */
+.update-button {
+  background: #58c4c9;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.update-button:hover {
+  background: #4ab0b5;
   transform: translateY(-1px);
+}
+
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  font-size: 14px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.pagination-info {
+  margin-right: 15px;
+  color: #666;
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pagination-prev,
+.pagination-next,
+.pagination-page {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.pagination-prev:hover:not(:disabled),
+.pagination-next:hover:not(:disabled),
+.pagination-page:hover:not(.pagination-active) {
+  color: #58c4c9;
+  border-color: #58c4c9;
+}
+
+.pagination-prev:disabled,
+.pagination-next:disabled {
+  color: rgba(0, 0, 0, 0.25);
+  background-color: #f5f5f5;
+  border-color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.pagination-active {
+  background-color: #58c4c9;
+  color: #fff !important;
+  border-color: #58c4c9 !important;
+  font-weight: 500;
+}
+
+.pagination-ellipsis {
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.pagination-jump {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.pagination-jump input {
+  width: 50px;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  text-align: center;
+  padding: 0 5px;
+}
+
+.pagination-jump input:focus {
+  outline: none;
+  border-color: #58c4c9;
+}
+
+.pagination-jump button {
+  height: 32px;
+  padding: 0 15px;
+  background-color: #f5f5f5;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination-jump button:hover {
+  background-color: #e6e6e6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .filter-container {
+    width: 100%;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pagination-info {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  .pagination-jump {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .status-group, .priority-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .status-button, .priority-button {
+    width: auto;
+    min-width: 80px;
+  }
 }
 </style>

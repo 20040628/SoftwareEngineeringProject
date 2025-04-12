@@ -47,10 +47,10 @@ const login = async () => {
         });
 
         router.push(response.data.role === 0 ? "/add_scooter" : "/login");
-        ElNotification({ title: "登录成功", message: `欢迎回来，${response.data.username}`, type: "success" });
+        ElNotification({ title: "Login Successfully", message: `Welcome Back，${response.data.username}`, type: "success" });
       }
     } catch (error) {
-      errorMessage.value = error.response?.data?.message || "用户名或密码错误";
+      errorMessage.value = error.response?.data?.message || "User Name or Password Error";
     } finally {
       loading.value = false;
     }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="title">Scooter Management</h2>
+    <h2 class="title">Add Scooter</h2>
     <div class="form">
       <!-- Location row -->
       <div class="form-row">

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import ScooterManagement from './ScooterAdd.vue';
+import AddScooter from './ScooterAdd.vue';
 import UserFeedback from './UserFeedback.vue';
 import AllScooters from './AllScooters.vue';
 import DataAnalysis from './DataAnalysis.vue';
@@ -37,7 +37,7 @@ import Logout from './Logout.vue';
 
 export default {
   components: {
-    ScooterManagement,
+    AddScooter,
     UserFeedback,
     AllScooters,
     DataAnalysis,
@@ -49,10 +49,10 @@ export default {
     return {
       activeMenu: 1, // 默认选中的菜单项
       menus: [ // 菜单数据
-        { id: 1, name: 'Scooter Management', icon: '/static/center/book.png' },
+        { id: 1, name: 'Add Scooter', icon: '/static/center/book.png' },
         { id: 2, name: 'User Feedback', icon: '/static/center/comment.png' },
-        { id: 3, name: 'Show all scooters', icon: '/static/center/share.png' },
-        { id: 4, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
+        { id: 3, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
+        { id: 4, name: 'Scooter Management', icon: '/static/center/share.png' },
         { id: 5, name: 'Order Management', icon: '/static/center/order.png' },
         { id: 6, name: 'User Management', icon: '/static/center/user.png' },
         { id: 7, name: 'Logout', icon: '/static/center/poweroff.png' },
@@ -63,15 +63,15 @@ export default {
   computed: {
     currentComponent() {
       const componentMap = {
-        1: 'ScooterManagement',
+        1: 'AddScooter',
         2: 'UserFeedback',
-        3: 'AllScooters',
-        4: 'DataAnalysis',
+        3: 'DataAnalysis',
+        4: 'AllScooters',
         5: 'BookingManagement',
         6: 'UserManagement',
         7: 'Logout'
       };
-      return componentMap[this.activeMenu] || 'ScooterManagement'; // 默认返回 ScooterManagement
+      return componentMap[this.activeMenu] || 'AddScooter'; // 默认返回 AddScooter
     },
   },
   created() {
@@ -83,8 +83,8 @@ export default {
       const routeToIdMap = {
         '/add_scooter': 1,
         '/user-feedback': 2,
-        '/all-scooters': 3,
-        '/data-analysis': 4,
+        '/data-analysis': 3,
+        '/all-scooters': 4,
         '/order-management': 5,
         '/user-management': 6,
         '/logout': 7
@@ -99,8 +99,8 @@ export default {
       const routeMap = {
         1: '/add_scooter',
         2: '/user-feedback',
-        3: '/all-scooters',
-        4: '/data-analysis',
+        3: '/data-analysis',
+        4: '/all-scooters',
         5: '/order-management',
         6: '/user-management',
         7: '/logout'

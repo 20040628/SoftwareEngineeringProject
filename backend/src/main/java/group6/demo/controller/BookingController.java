@@ -92,6 +92,15 @@ public class BookingController {
         return bookingService.getAllOrders();
     }
 
+    @GetMapping("/getAllUndo/{userId}")
+    public List<Order> getAllUndo(@PathVariable Long userId) {return bookingService.getAllUndo(userId);}
+
+    @GetMapping("/getAllOngoing/{userId}")
+    public List<Order> getAllOngoing(@PathVariable Long userId) {return bookingService.getAllOngoing(userId);}
+
+    @GetMapping("/getAllFinished/{userId}")
+    public List<Order> getAllFinished(@PathVariable Long userId) {return bookingService.getAllFinished(userId);}
+
     @GetMapping("/{orderId}")
     public Optional<Order> getBookingById(@PathVariable Long orderId) {
         return bookingService.getOrderById(orderId);

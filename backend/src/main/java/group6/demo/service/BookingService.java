@@ -17,6 +17,10 @@ public interface BookingService {
     void cancelBooking(Long orderId);
 
     List<Order> getAllOrders();
+    List<Order> getAllUndo(Long userId);
+    List<Order> getAllOngoing(Long userId);
+    List<Order> getAllFinished(Long userId);
+
     Optional<Order> getOrderById(Long id);
 
     Order extendBooking(Long id, ExtendBookingDTO extendBookingDTO);

@@ -614,6 +614,195 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
+#### get Orders that have not been started
+
+- **URL**: `/api/bookings/getAllUndo/{userId}`
+
+- **Method**: `GET`
+
+- **Path Parameters**:
+
+  - `orderId`: ID of the user
+
+- **Success Response** (200 OK):
+
+  1. 用户没有未开始的订单
+
+  ```
+  []
+  ```
+
+  2. 用户有未开始的订单
+
+  ```
+  [
+      {
+          "id": 2,
+          "orderTime": "2025-04-15T03:00:02.000+00:00",
+          "status": 1,
+          "startTime": "2025-04-28T14:01:00.000+00:00",
+          "endTime": "2025-04-29T14:01:00.000+00:00",
+          "hirePeriod": "DAY",
+          "price": 20.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0,
+              "isStudent": 0,
+              "isSenior": 0
+          },
+          "scooter": {
+              "id": 2,
+              "location": "Library",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 1,
+              "longitude": 103.987000,
+              "latitude": 30.764000
+          },
+          "staff": null,
+          "priceBeforeDiscount": 20.00
+      }
+  ]
+  ```
+
+#### get Orders that are ongoing
+
+- **URL**: `/api/bookings/getAllOngoing/{userId}`
+
+- **Method**: `GET`
+
+- **Path Parameters**:
+
+  - `orderId`: ID of the user
+
+- **Success Response** (200 OK):
+
+  1. 用户没有正在进行的订单
+
+  ```
+  []
+  ```
+
+  2. 用户有正在进行的订单
+
+  ```
+  [
+      {
+          "id": 2,
+          "orderTime": "2025-04-15T03:00:02.000+00:00",
+          "status": 1,
+          "startTime": "2025-04-14T14:01:00.000+00:00",
+          "endTime": "2025-04-15T14:01:00.000+00:00",
+          "hirePeriod": "DAY",
+          "price": 20.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0,
+              "isStudent": 0,
+              "isSenior": 0
+          },
+          "scooter": {
+              "id": 2,
+              "location": "Library",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 1,
+              "longitude": 103.987000,
+              "latitude": 30.764000
+          },
+          "staff": null,
+          "priceBeforeDiscount": 20.00
+      }
+  ]
+  ```
+
+#### get Orders that are finished
+
+- **URL**: `/api/bookings/getAllFinished/{userId}`
+
+- **Method**: `GET`
+
+- **Path Parameters**:
+
+  - `orderId`: ID of the user
+
+- **Success Response** (200 OK):
+
+  1. 用户没有已结束的订单
+
+  ```
+  []
+  ```
+
+  2. 用户有已结束的订单
+
+  ```
+  [
+      {
+          "id": 2,
+          "orderTime": "2025-04-15T03:00:02.000+00:00",
+          "status": 1,
+          "startTime": "2025-04-13T14:01:00.000+00:00",
+          "endTime": "2025-04-14T14:01:00.000+00:00",
+          "hirePeriod": "DAY",
+          "price": 20.00,
+          "user": {
+              "id": 2,
+              "username": "user",
+              "password": "$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni",
+              "avatar": "default_avatar.jpg",
+              "birthday": "1995-05-05",
+              "userType": 0,
+              "mobile": "9876543210",
+              "email": "user@example.com",
+              "paymentMethod": "paypal",
+              "status": 1,
+              "role": 1,
+              "isFrequentUser": 0,
+              "isStudent": 0,
+              "isSenior": 0
+          },
+          "scooter": {
+              "id": 2,
+              "location": "Library",
+              "priceHour": 5.00,
+              "priceFourHour": 10.00,
+              "priceDay": 20.00,
+              "priceWeek": 100.00,
+              "status": 1,
+              "longitude": 103.987000,
+              "latitude": 30.764000
+          },
+          "staff": null,
+          "priceBeforeDiscount": 20.00
+      }
+  ]
+  ```
+
 #### Cancel booking
 
 - **URL**: `/api/bookings/cancel/{orderId}`

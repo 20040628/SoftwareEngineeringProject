@@ -394,6 +394,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<Order> getAllUndo(Long userId) {return orderRepository.findAllUndo(userId);}
+    @Override
+    public List<Order> getAllOngoing(Long userId) {return orderRepository.findAllOngoing(userId);}
+    @Override
+    public List<Order> getAllFinished(Long userId) {return orderRepository.findAllFinished(userId);}
+
+    @Override
     public Optional<Order> getOrderById(Long id) {
         return orderRepository.findById(id);
     }

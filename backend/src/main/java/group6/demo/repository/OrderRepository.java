@@ -40,4 +40,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         @Param("startDate") Date startDate,
         @Param("endDate") Date endDate
     );
+
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.startTime > CURRENT_TIMESTAMP AND o.status != 3")
+    List<Order> findAllUndo(@Param("userId") Long userId);
+
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND CURRENT_TIMESTAMP BETWEEN o.startTime AND o.endTime AND o.status != 3")
+    List<Order> findAllOngoing(@Param("userId") Long userId);
+
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.endTime < CURRENT_TIMESTAMP AND o.status != 3")
+    List<Order> findAllFinished(@Param("userId") Long userId);
 } 

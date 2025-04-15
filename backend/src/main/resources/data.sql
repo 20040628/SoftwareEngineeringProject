@@ -20,3 +20,8 @@ VALUES
 ('elderly', 0.80),
 ('frequent', 0.90);
 
+-- 添加订单
+INSERT INTO b_order (id, order_time, status, start_time, end_time, hire_period, price_before_discount, price, user_id, scooter_id, staff_id)
+VALUES
+    (1, '2025-04-15 10:51:16', 1, '2025-04-23 22:01:00', '2025-04-23 23:01:00', 'HOUR', 5.00, 5.00, 2, 1, 1),
+    (2, '2025-04-15 11:00:02', 1, '2025-04-28 22:01:00', '2025-04-29 22:01:00', 'DAY', 20.00,20.00,2,2,NULL);

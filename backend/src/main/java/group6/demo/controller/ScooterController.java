@@ -48,7 +48,6 @@ public class ScooterController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Add successfully");
             response.put("scooterId", scooter.getId());
-            response.put("location", scooter.getLocation());
             response.put("price_hour", scooter.getPriceHour());
             response.put("price_four_hour", scooter.getPriceFourHour());
             response.put("price_day", scooter.getPriceDay());
@@ -56,6 +55,8 @@ public class ScooterController {
             response.put("status", scooter.getStatus());
             response.put("longitude", scooter.getLongitude());
             response.put("latitude", scooter.getLatitude());
+            response.put("battery", scooter.getBattery());
+            response.put("speed", scooter.getSpeed());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             // Handle validation errors
@@ -69,14 +70,14 @@ public class ScooterController {
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllScooters(@RequestParam(required = false) Long userId) {
         try {
-            List<Scooter> scooters = scooterService.getAllScooters();
-            
-            // 如果未提供userId，返回原始滑板车列表
+            // 给管理员的：如果未提供userId，返回原始滑板车列表
             if (userId == null) {
+                List<Scooter> scooters = scooterService.getAllScooters();
                 return ResponseEntity.ok(scooters);
             }
             
-            // 如果提供了userId，计算折扣价格
+            // 给用户的：如果提供了userId，计算折扣价格，排除没电的
+            List<Scooter> scooters = scooterService.getAllScootersUsers();
             List<ScooterWithDiscountDTO> scootersWithDiscount = new ArrayList<>();
             
             for (Scooter scooter : scooters) {

@@ -13,7 +13,6 @@ public class Scooter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String location;
     private BigDecimal priceHour;
     private BigDecimal priceFourHour;
     private BigDecimal priceDay;
@@ -22,4 +21,6 @@ public class Scooter {
     private Integer status;
     private BigDecimal longitude;
     private BigDecimal latitude;
+    private BigDecimal battery;
+    private BigDecimal speed;
 }

@@ -11,7 +11,7 @@ public interface ScooterService {
     Scooter addScooter(ScooterAddDTO scooterAddDTO);
 
     List<Scooter> getAllScooters();
-
+    List<Scooter> getAllScootersUsers();
     Optional<Scooter> getScooterById(Long id);
 
     Optional<Scooter> changeScooterStatus(Long id);

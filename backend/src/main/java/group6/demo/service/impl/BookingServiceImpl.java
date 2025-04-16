@@ -236,7 +236,8 @@ public class BookingServiceImpl implements BookingService {
             "Your e-scooter booking has been confirmed!\n\n" +
             "Booking Details:\n" +
             "Order ID: %d\n" +
-            "Location: %s\n" +
+            "Battery: %s\n" +
+            "Speed: %s\n" +
             "Start Time: %s\n" +
             "End Time: %s\n" +
             "Rental Duration: %s\n" +
@@ -246,7 +247,8 @@ public class BookingServiceImpl implements BookingService {
             "E-Scooter Rental Team",
             order.getUser().getUsername(),
             order.getId(),
-            order.getScooter().getLocation(),
+            order.getScooter().getBattery(),
+            order.getScooter().getSpeed(),
             dateFormat.format(order.getStartTime()),
             dateFormat.format(order.getEndTime()),
             hirePeriodText,
@@ -367,7 +369,8 @@ public class BookingServiceImpl implements BookingService {
                         "Your e-scooter booking has been cancelled!\n\n" +
                         "Booking Details:\n" +
                         "Order ID: %d\n" +
-                        "Location: %s\n" +
+                        "Battery: %s\n" +
+                        "Speed: %s\n" +
                         "Start Time: %s\n" +
                         "End Time: %s\n" +
                         "Rental Duration: %s\n" +
@@ -377,7 +380,8 @@ public class BookingServiceImpl implements BookingService {
                         "E-Scooter Rental Team",
                 order.getUser().getUsername(),
                 order.getId(),
-                order.getScooter().getLocation(),
+                order.getScooter().getBattery(),
+                order.getScooter().getSpeed(),
                 dateFormat.format(order.getStartTime()),
                 dateFormat.format(order.getEndTime()),
                 hirePeriodText,

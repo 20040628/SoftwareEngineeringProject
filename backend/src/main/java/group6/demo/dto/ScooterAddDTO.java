@@ -9,10 +9,6 @@ import java.math.BigDecimal;
 
 @Data
 public class ScooterAddDTO {
-
-    @NotBlank(message = "Location is required")
-    private String location;
-
     @NotNull(message = "The price per hour is required")
     @Digits(integer = 3, fraction = 2,
             message = "Price per hour must be a decimal with up to 3 digits and 2 decimal places")
@@ -42,4 +38,14 @@ public class ScooterAddDTO {
     @Digits(integer = 3, fraction = 6,
             message = "latitude must be a decimal with up to 3 digits and 6 decimal places")
     private BigDecimal latitude;
+
+    @NotNull(message = "The battery of the scooter is required")
+    @Digits(integer = 3, fraction = 2,
+            message = "battery must be a decimal with up to 3 digits and 2 decimal places")
+    private BigDecimal battery;
+
+    @NotNull(message = "The speed of the scooter is required")
+    @Digits(integer = 3, fraction = 2,
+            message = "speed must be a decimal with up to 3 digits and 2 decimal places")
+    private BigDecimal speed;
 }

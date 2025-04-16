@@ -28,7 +28,6 @@ CREATE TABLE `b_user`  (
 -- 创建滑板车表
 CREATE TABLE `b_scooter` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `location` varchar(255) NOT NULL,
   `price_hour` decimal(5, 2) NOT NULL,
   `price_four_hour` decimal(5, 2) NOT NULL,
   `price_day` decimal(5, 2) NOT NULL,
@@ -36,6 +35,8 @@ CREATE TABLE `b_scooter` (
   `status` tinyint(1) NOT NULL DEFAULT 1,
   `longitude` decimal(9, 6) NOT NULL,
   `latitude` decimal(9, 6) NOT NULL,
+  `battery` decimal(5, 2) NOT NULL,
+  `speed` decimal(5, 2) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

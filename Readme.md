@@ -228,14 +228,15 @@ Frontend service will run on http://localhost:5173
           },
           "scooter": {
               "id": 1,
-              "location": "Campus Center",
               "priceHour": 5.00,
               "priceFourHour": 10.00,
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 0,
               "longitude": 103.984500,
-              "latitude": 30.765000
+              "latitude": 30.765000,
+              "battery": 100.00,
+              "speed": 50.00
           }
       }
   ]
@@ -322,14 +323,15 @@ Frontend service will run on http://localhost:5173
 - **Request Body**:
   ```json
   {
-    "location": "string",
     "priceHour": "decimal",
     "priceFourHour": "decimal",
     "priceDay": "decimal",
     "priceWeek": "decimal",
     "status": "int",
     "longitude": "decimal",
-    "latitude": "decimal"
+    "latitude": "decimal"，
+    "battery": "decimal",
+    "speed": "decimal"，
   }
   ```
 
@@ -354,9 +356,64 @@ Frontend service will run on http://localhost:5173
 
 **Method**: `Get`
 
+**Request Body** : 
+
+可选.
+
+如果有userId，是给用户返回滑板车，去掉了没电的，价格也是优惠后的价格。
+
+如果没有userId，是给管理员返回滑板车列表，是数据库中所有滑板车
+
+```
+{
+    "userId": 
+}
+```
+
 **Success Response** (200 OK):
 
-![73970673039](assets/1739706730395.png)
+```
+[
+    {
+        "id": 1,
+        "priceHour": 5.00,
+        "priceFourHour": 10.00,
+        "priceDay": 20.00,
+        "priceWeek": 100.00,
+        "status": 1,
+        "longitude": 103.984500,
+        "latitude": 30.765000,
+        "battery": 100.00,
+        "speed": 100.00
+    },
+    {
+        "id": 2,
+        "priceHour": 5.00,
+        "priceFourHour": 10.00,
+        "priceDay": 20.00,
+        "priceWeek": 100.00,
+        "status": 1,
+        "longitude": 103.987000,
+        "latitude": 30.764000,
+        "battery": 50.00,
+        "speed": 50.00
+    },
+    {
+        "id": 3,
+        "priceHour": 5.00,
+        "priceFourHour": 10.00,
+        "priceDay": 20.00,
+        "priceWeek": 100.00,
+        "status": 1,
+        "longitude": 103.986500,
+        "latitude": 30.766000,
+        "battery": 0.00,
+        "speed": 50.00
+    }
+]
+```
+
+
 
 #### view one scooter
 
@@ -369,13 +426,14 @@ Frontend service will run on http://localhost:5173
 ```
 {
     id:
-    location:
     priceHour:
     priceDay:
     priceWeek:
     statue:
     longitude:
     latitude:
+    battery:
+    speed:
 }
 ```
 
@@ -518,14 +576,15 @@ Frontend service will run on http://localhost:5173
           },
           "scooter": {
               "id": 1,
-              "location": "Campus Center",
               "priceHour": 5.00,
               "priceFourHour": 10.00,
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 0,
               "longitude": 103.984500,
-              "latitude": 30.765000
+              "latitude": 30.765000,
+              "battery": 100.00,
+              "speed": 50.00
           },
           "staff": {
               "id": 1,
@@ -586,14 +645,15 @@ Frontend service will run on http://localhost:5173
       },
       "scooter": {
           "id": 1,
-          "location": "Campus Center",
           "priceHour": 5.00,
           "priceFourHour": 10.00,
           "priceDay": 20.00,
           "priceWeek": 100.00,
           "status": 0,
           "longitude": 103.984500,
-          "latitude": 30.765000
+          "latitude": 30.765000,
+          "battery":100.00,
+          "speed": 50.00
       },
       "staff": {
           "id": 1,
@@ -662,14 +722,15 @@ Frontend service will run on http://localhost:5173
           },
           "scooter": {
               "id": 2,
-              "location": "Library",
               "priceHour": 5.00,
               "priceFourHour": 10.00,
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
               "longitude": 103.987000,
-              "latitude": 30.764000
+              "latitude": 30.764000,
+              "battry": 100.00,
+              "speed": 50.00
           },
           "staff": null,
           "priceBeforeDiscount": 20.00
@@ -725,14 +786,15 @@ Frontend service will run on http://localhost:5173
           },
           "scooter": {
               "id": 2,
-              "location": "Library",
               "priceHour": 5.00,
               "priceFourHour": 10.00,
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
               "longitude": 103.987000,
-              "latitude": 30.764000
+              "latitude": 30.764000,
+              "battery":100.00,
+              "speed": 50.00
           },
           "staff": null,
           "priceBeforeDiscount": 20.00
@@ -788,14 +850,15 @@ Frontend service will run on http://localhost:5173
           },
           "scooter": {
               "id": 2,
-              "location": "Library",
               "priceHour": 5.00,
               "priceFourHour": 10.00,
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
               "longitude": 103.987000,
-              "latitude": 30.764000
+              "latitude": 30.764000,
+              "battery""100.00,
+              "speed":50.00
           },
           "staff": null,
           "priceBeforeDiscount": 20.00
@@ -866,7 +929,7 @@ Frontend service will run on http://localhost:5173
 The system automatically sends email confirmations for successful bookings. The email includes:
 - Booking confirmation message
 - Order ID
-- Location
+- Battery and Speed
 - Start and end times
 - Rental duration
 - Rental fee
@@ -1348,7 +1411,7 @@ b_user
 
 Integers have a maximum of three digits, and decimal places have a maximum of 6 digits
 
-#### price per hour/day/week
+#### price per hour/day/week, battery, speed
 
 - Integers have a maximum of three digits, and decimal places have a maximum of two digits
 
@@ -1390,7 +1453,6 @@ The application provides automatic discount calculation based on user profiles a
   [
     {
       "id": "number",
-      "location": "string",
       "status": "number",
       "longitude": "decimal",
       "latitude": "decimal",
@@ -1419,7 +1481,6 @@ The application provides automatic discount calculation based on user profiles a
   ```json
   {
     "id": "number",
-    "location": "string",
     "status": "number",
     "longitude": "decimal",
     "latitude": "decimal",

@@ -53,6 +53,30 @@ public class ValidationUtil {
         }
     }
 
+    // scooter battery validation: Integers have a maximum of three digits, decimals have a maximum of two digits
+    public static final Pattern BATTERY_PATTERN = Pattern.compile("^(\\d{1,3})(\\.\\d{1,2})?$");
+    public static boolean isValidBattery(BigDecimal battery) {
+        if (battery == null) {
+            return false;
+        }
+        else{
+            String batteryStr = battery.toPlainString();
+            return BATTERY_PATTERN.matcher(batteryStr).matches();
+        }
+    }
+
+    // scooter speed validation: Integers have a maximum of three digits, decimals have a maximum of two digits
+    public static final Pattern SPEED_PATTERN = Pattern.compile("^(\\d{1,3})(\\.\\d{1,2})?$");
+    public static boolean isValidSpeed(BigDecimal speed) {
+        if (speed == null) {
+            return false;
+        }
+        else{
+            String speedStr = speed.toPlainString();
+            return SPEED_PATTERN.matcher(speedStr).matches();
+        }
+    }
+
     // scooter longitude and latitude validation:decimal(9, 6)
     public static final Pattern LOCATION_PATTERN = Pattern.compile("^(\\d{1,3})(\\.\\d{1,6})?$");
     public static boolean isValidLocation(BigDecimal location) {

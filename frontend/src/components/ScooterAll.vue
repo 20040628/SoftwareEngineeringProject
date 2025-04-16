@@ -3,7 +3,6 @@
     <h2>可用滑板车</h2>
     <div v-if="scooters.length > 0" class="scooter-grid">
       <div v-for="scooter in scooters" :key="scooter.id" class="scooter-card">
-        <h3>位置: {{ scooter.location }}</h3>
         <div class="price-info">
           <template v-if="scooter.hasDiscount">
             <p>

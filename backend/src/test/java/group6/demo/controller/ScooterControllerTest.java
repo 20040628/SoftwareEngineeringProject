@@ -54,7 +54,6 @@ class ScooterControllerTest {
         ScooterAddDTO dto = new ScooterAddDTO();
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLocation("Downtown");
 
         // Mocking the behavior of BindingResult and ScooterService
         when(bindingResult.hasErrors()).thenReturn(false);
@@ -104,11 +103,9 @@ class ScooterControllerTest {
     void testGetAllScooters() {
         Scooter scooter1 = new Scooter();
         scooter1.setId(1L);
-        scooter1.setLocation("Location1");
 
         Scooter scooter2 = new Scooter();
         scooter2.setId(2L);
-        scooter2.setLocation("Location2");
 
         // Preparing a list of scooters to be returned by the mock service
         List<Scooter> scooters = Arrays.asList(scooter1, scooter2);
@@ -128,7 +125,6 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLocation("Location1");
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));
@@ -166,7 +162,6 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLocation("Location1");
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));

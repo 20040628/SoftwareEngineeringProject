@@ -2,7 +2,6 @@ package group6.demo.controller;
 
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.entity.Scooter;
-import group6.demo.entity.User;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.ScooterService;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +53,8 @@ class ScooterControllerTest {
         ScooterAddDTO dto = new ScooterAddDTO();
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLocation("Downtown");
+        scooter.setLongitude(new BigDecimal("104.06"));
+        scooter.setLatitude(new BigDecimal("30.67"));
 
         // Mocking the behavior of BindingResult and ScooterService
         when(bindingResult.hasErrors()).thenReturn(false);
@@ -74,13 +74,13 @@ class ScooterControllerTest {
 
         // Mocking the behavior of BindingResult to simulate a validation error
         when(bindingResult.hasErrors()).thenReturn(true);
-        when(bindingResult.getFieldErrors()).thenReturn(Arrays.asList(new FieldError("scooterAddDTO", "location", "Location is required")));
+        when(bindingResult.getFieldErrors()).thenReturn(Arrays.asList(new FieldError("scooterAddDTO", "longitude", "Longitude is required")));
 
         // Calling the method under test
         ResponseEntity<?> response = scooterController.addScooter(dto, bindingResult);
         // Asserting the expected response
         assertEquals(400, response.getStatusCodeValue());
-        assertTrue(((Map<?, ?>) response.getBody()).containsKey("location"));
+        assertTrue(((Map<?, ?>) response.getBody()).containsKey("longitude"));
     }
 
     // Test case for service failure when adding a scooter
@@ -104,11 +104,13 @@ class ScooterControllerTest {
     void testGetAllScooters() {
         Scooter scooter1 = new Scooter();
         scooter1.setId(1L);
-        scooter1.setLocation("Location1");
+        scooter1.setLongitude(new BigDecimal("104.06"));
+        scooter1.setLatitude(new BigDecimal("30.67"));
 
         Scooter scooter2 = new Scooter();
         scooter2.setId(2L);
-        scooter2.setLocation("Location2");
+        scooter2.setLongitude(new BigDecimal("104.07"));
+        scooter2.setLatitude(new BigDecimal("30.68"));
 
         // Preparing a list of scooters to be returned by the mock service
         List<Scooter> scooters = Arrays.asList(scooter1, scooter2);
@@ -128,7 +130,8 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLocation("Location1");
+        scooter.setLongitude(new BigDecimal("104.06"));
+        scooter.setLatitude(new BigDecimal("30.67"));
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));
@@ -166,7 +169,8 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLocation("Location1");
+        scooter.setLongitude(new BigDecimal("104.06"));
+        scooter.setLatitude(new BigDecimal("30.67"));
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));

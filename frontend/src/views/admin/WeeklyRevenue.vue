@@ -43,112 +43,203 @@
         </div>
       </el-card>
 
-      <!-- current week revenue card -->
-      <el-card v-loading="loading" class="current-week-card">
-        <template #header>
-          <div class="card-header">
-            <span>{{ getSelectedWeekLabel() }} Revenue Statistics</span>
-          </div>
-        </template>
-        <div v-if="currentWeekRevenue" class="revenue-details">
-          <div class="revenue-item">
-            <span class="label">Hourly Revenue:</span>
-            <span class="value">¥{{ currentWeekRevenue.hourlyRevenue }}</span>
-          </div>
-          <div class="revenue-item">
-            <span class="label">4-Hour Revenue:</span>
-            <span class="value">¥{{ currentWeekRevenue.fourHoursRevenue }}</span>
-          </div>
-          <div class="revenue-item">
-            <span class="label">Daily Revenue:</span>
-            <span class="value">¥{{ currentWeekRevenue.dailyRevenue }}</span>
-          </div>
-          <div class="revenue-item">
-            <span class="label">Weekly Revenue:</span>
-            <span class="value">¥{{ currentWeekRevenue.weeklyRevenue }}</span>
-          </div>
-          <div class="revenue-item total">
-            <span class="label">Total Revenue:</span>
-            <span class="value">¥{{ currentWeekRevenue.totalRevenue }}</span>
-          </div>
-          <div class="revenue-item">
-            <span class="label">Order Count:</span>
-            <span class="value">{{ currentWeekRevenue.ordersCount }}</span>
-          </div>
-          <!-- Top Performing Revenue Type -->
-          <div class="revenue-item top-performing" v-if="topPerformingType">
-            <span class="label">Top Performing Type:</span>
-            <span class="value">{{ topPerformingType.label }} (¥{{ topPerformingType.value }})</span>
-          </div>
-        </div>
-        <div v-else-if="!loading" class="no-data">
-          <el-empty description="No revenue data" />
-        </div>
-      </el-card>
-
-      <!-- revenue pie chart -->
-      <el-card v-if="currentWeekRevenue" class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <span>{{ getSelectedWeekLabel() }} Revenue Distribution</span>
-          </div>
-        </template>
-        <div class="chart-container">
-          <v-chart :option="pieChartOption" autoresize />
-        </div>
-      </el-card>
-
-      <!-- revenue trend analysis -->
-      <el-card v-if="currentWeekRevenue" class="analysis-card">
-        <template #header>
-          <div class="card-header">
-            <span>Revenue Analysis</span>
-          </div>
-        </template>
-        <div class="analysis-content">
-          <div class="analysis-highlight">
-            <div class="highlight-icon" :class="getTopPerformingClass()">
-              <i :class="getTopPerformingIcon()"></i>
+      <!-- 新增：视图切换选项卡 -->
+      <el-tabs v-model="activeView" class="view-tabs">
+        <el-tab-pane label="Weekly Overview" name="weekly">
+          <!-- 原有的周收入统计内容 -->
+          <el-card v-loading="loading" class="current-week-card">
+            <template #header>
+              <div class="card-header">
+                <span>{{ getSelectedWeekLabel() }} Revenue Statistics</span>
+              </div>
+            </template>
+            <div v-if="currentWeekRevenue" class="revenue-details">
+              <div class="revenue-item">
+                <span class="label">Hourly Revenue:</span>
+                <span class="value">¥{{ currentWeekRevenue.hourlyRevenue }}</span>
+              </div>
+              <div class="revenue-item">
+                <span class="label">4-Hour Revenue:</span>
+                <span class="value">¥{{ currentWeekRevenue.fourHoursRevenue }}</span>
+              </div>
+              <div class="revenue-item">
+                <span class="label">Daily Revenue:</span>
+                <span class="value">¥{{ currentWeekRevenue.dailyRevenue }}</span>
+              </div>
+              <div class="revenue-item">
+                <span class="label">Weekly Revenue:</span>
+                <span class="value">¥{{ currentWeekRevenue.weeklyRevenue }}</span>
+              </div>
+              <div class="revenue-item total">
+                <span class="label">Total Revenue:</span>
+                <span class="value">¥{{ currentWeekRevenue.totalRevenue }}</span>
+              </div>
+              <div class="revenue-item">
+                <span class="label">Order Count:</span>
+                <span class="value">{{ currentWeekRevenue.ordersCount }}</span>
+              </div>
+              <!-- Top Performing Revenue Type -->
+              <div class="revenue-item top-performing" v-if="topPerformingType">
+                <span class="label">Top Performing Type:</span>
+                <span class="value">{{ topPerformingType.label }} (¥{{ topPerformingType.value }})</span>
+              </div>
             </div>
-            <div class="highlight-text">
-              <h3>{{ topPerformingType ? topPerformingType.label : 'No data' }} rental generates the most revenue</h3>
-              <p>Making up {{ topPerformingType ? getPercentage(topPerformingType.value, currentWeekRevenue.totalRevenue) : '0' }}% of total weekly revenue</p>
+            <div v-else-if="!loading" class="no-data">
+              <el-empty description="No revenue data" />
             </div>
-          </div>
-          
-          <div class="analysis-details">
-            <el-progress 
-              :percentage="getPercentage(currentWeekRevenue.hourlyRevenue, currentWeekRevenue.totalRevenue)" 
-              :stroke-width="15" 
-              :format="() => `Hourly: ¥${currentWeekRevenue.hourlyRevenue}`" 
-              color="#409EFF">
-            </el-progress>
-            <el-progress 
-              :percentage="getPercentage(currentWeekRevenue.fourHoursRevenue, currentWeekRevenue.totalRevenue)" 
-              :stroke-width="15" 
-              :format="() => `4-Hour: ¥${currentWeekRevenue.fourHoursRevenue}`" 
-              color="#67C23A">
-            </el-progress>
-            <el-progress 
-              :percentage="getPercentage(currentWeekRevenue.dailyRevenue, currentWeekRevenue.totalRevenue)" 
-              :stroke-width="15" 
-              :format="() => `Daily: ¥${currentWeekRevenue.dailyRevenue}`" 
-              color="#E6A23C">
-            </el-progress>
-            <el-progress 
-              :percentage="getPercentage(currentWeekRevenue.weeklyRevenue, currentWeekRevenue.totalRevenue)" 
-              :stroke-width="15" 
-              :format="() => `Weekly: ¥${currentWeekRevenue.weeklyRevenue}`" 
-              color="#F56C6C">
-            </el-progress>
-          </div>
+          </el-card>
 
-          <div class="analysis-recommendation">
-            <h4>Revenue Optimization Suggestions:</h4>
-            <p>{{ getRevenueRecommendation() }}</p>
-          </div>
-        </div>
-      </el-card>
+          <!-- revenue pie chart -->
+          <el-card v-if="currentWeekRevenue" class="chart-card">
+            <template #header>
+              <div class="card-header">
+                <span>{{ getSelectedWeekLabel() }} Revenue Distribution</span>
+              </div>
+            </template>
+            <div class="chart-container">
+              <v-chart :option="pieChartOption" autoresize />
+            </div>
+          </el-card>
+
+          <!-- revenue trend analysis -->
+          <el-card v-if="currentWeekRevenue" class="analysis-card">
+            <template #header>
+              <div class="card-header">
+                <span>Revenue Analysis</span>
+              </div>
+            </template>
+            <div class="analysis-content">
+              <div class="analysis-highlight">
+                <div class="highlight-icon" :class="getTopPerformingClass()">
+                  <i :class="getTopPerformingIcon()"></i>
+                </div>
+                <div class="highlight-text">
+                  <h3>{{ topPerformingType ? topPerformingType.label : 'No data' }} rental generates the most revenue</h3>
+                  <p>Making up {{ topPerformingType ? getPercentage(topPerformingType.value, currentWeekRevenue.totalRevenue) : '0' }}% of total weekly revenue</p>
+                </div>
+              </div>
+              
+              <div class="analysis-details">
+                <el-progress 
+                  :percentage="getPercentage(currentWeekRevenue.hourlyRevenue, currentWeekRevenue.totalRevenue)" 
+                  :stroke-width="15" 
+                  :format="() => `Hourly: ¥${currentWeekRevenue.hourlyRevenue}`" 
+                  color="#409EFF">
+                </el-progress>
+                <el-progress 
+                  :percentage="getPercentage(currentWeekRevenue.fourHoursRevenue, currentWeekRevenue.totalRevenue)" 
+                  :stroke-width="15" 
+                  :format="() => `4-Hour: ¥${currentWeekRevenue.fourHoursRevenue}`" 
+                  color="#67C23A">
+                </el-progress>
+                <el-progress 
+                  :percentage="getPercentage(currentWeekRevenue.dailyRevenue, currentWeekRevenue.totalRevenue)" 
+                  :stroke-width="15" 
+                  :format="() => `Daily: ¥${currentWeekRevenue.dailyRevenue}`" 
+                  color="#E6A23C">
+                </el-progress>
+                <el-progress 
+                  :percentage="getPercentage(currentWeekRevenue.weeklyRevenue, currentWeekRevenue.totalRevenue)" 
+                  :stroke-width="15" 
+                  :format="() => `Weekly: ¥${currentWeekRevenue.weeklyRevenue}`" 
+                  color="#F56C6C">
+                </el-progress>
+              </div>
+
+              <div class="analysis-recommendation">
+                <h4>Revenue Optimization Suggestions:</h4>
+                <p>{{ getRevenueRecommendation() }}</p>
+              </div>
+            </div>
+          </el-card>
+        </el-tab-pane>
+        
+        <!-- 新增：每日收入视图选项卡 -->
+        <el-tab-pane label="Daily Breakdown" name="daily">
+          <!-- 每日收入统计卡片 -->
+          <el-card v-loading="dailyLoading" class="daily-revenue-card">
+            <template #header>
+              <div class="card-header">
+                <span>{{ getSelectedWeekLabel() }} Daily Revenue Breakdown</span>
+                <el-button type="primary" size="small" @click="exportDailyRevenue">
+                  Export Report
+                </el-button>
+              </div>
+            </template>
+            
+            <div v-if="dailyRevenues.length" class="daily-revenue-content">
+              <!-- 每日收入柱状图 -->
+              <div class="chart-container">
+                <v-chart :option="dailyChartOption" autoresize />
+              </div>
+              
+              <!-- 流行租赁日分析 -->
+              <div class="popular-days-analysis">
+                <h3>Popular Hire Days Analysis</h3>
+                <div v-if="popularDay" class="analysis-highlight">
+                  <div class="highlight-icon" :class="'day-' + popularDay.dayOfWeek">
+                    <i class="el-icon-date"></i>
+                  </div>
+                  <div class="highlight-text">
+                    <h3>{{ popularDay.dayOfWeekName }} is the most popular day</h3>
+                    <p>With {{ popularDay.ordersCount }} orders and ¥{{ popularDay.totalRevenue }} revenue</p>
+                  </div>
+                </div>
+                
+                <!-- 折扣信息 -->
+                <div class="discount-analysis">
+                  <h4>Discount Impact</h4>
+                  <p>Total discount amount this week: ¥{{ getTotalDiscountAmount() }}</p>
+                  <p>Most discounts given on: {{ getMostDiscountedDay() }}</p>
+                </div>
+              </div>
+              
+              <!-- 每日收入详情表格 -->
+              <el-table :data="dailyRevenues" stripe style="width: 100%" class="daily-table">
+                <el-table-column prop="dayOfWeekName" label="Day" width="100" />
+                <el-table-column prop="hourlyRevenue" label="1hr Revenue" width="120">
+                  <template #default="scope">
+                    ¥{{ scope.row.hourlyRevenue }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="fourHoursRevenue" label="4hr Revenue" width="120">
+                  <template #default="scope">
+                    ¥{{ scope.row.fourHoursRevenue }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="dailyRevenue" label="Day Revenue" width="120">
+                  <template #default="scope">
+                    ¥{{ scope.row.dailyRevenue }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="weeklyRevenue" label="Week Revenue" width="120">
+                  <template #default="scope">
+                    ¥{{ scope.row.weeklyRevenue }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="totalRevenue" label="Total Revenue" width="120">
+                  <template #default="scope">
+                    <span :class="{ 'highlight-revenue': isPopularDay(scope.row) }">
+                      ¥{{ scope.row.totalRevenue }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="ordersCount" label="Orders" width="100" />
+                <el-table-column prop="totalDiscount" label="Discount" width="120">
+                  <template #default="scope">
+                    ¥{{ scope.row.totalDiscount }}
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            
+            <div v-else-if="!dailyLoading" class="no-data">
+              <el-empty description="No daily revenue data" />
+            </div>
+          </el-card>
+        </el-tab-pane>
+      </el-tabs>
+
     </div>
   </div>
 </template>
@@ -157,7 +248,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { PieChart } from 'echarts/charts'
+import { PieChart, BarChart, LineChart } from 'echarts/charts'
 import {
   GridComponent,
   TooltipComponent,
@@ -174,6 +265,8 @@ import { useRouter } from 'vue-router'
 use([
   CanvasRenderer,
   PieChart,
+  BarChart,
+  LineChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,
@@ -194,65 +287,73 @@ export default {
     const hasError = ref(false)
     const errorMessage = ref('')
     const topPerformingType = ref(null)
+    const activeView = ref('weekly')
+    const dailyLoading = ref(false)
+    const dailyRevenues = ref([])
+    const popularDay = ref(null)
 
     // 获取当前日期（格式：YYYY-MM-DD）
     const getCurrentDate = () => {
       const date = new Date()
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      return date.toISOString().split('T')[0]
     }
 
-    // 初始化选择当前周
-    selectedDate.value = getCurrentDate()
+    // 验证是否有管理员权限
+    const checkAdminPermission = () => {
+      const token = store.getters.token
+      const role = store.getters.user?.role
+      
+      if (!token) {
+        errorMessage.value = '请先登录'
+        hasError.value = true
+        return false
+      }
+      
+      if (role !== 0) {
+        errorMessage.value = '权限不足，需要管理员权限'
+        hasError.value = true
+        return false
+      }
+      
+      return true
+    }
 
-    // 登出并重定向到登录页面
+    // 重新登录并重定向
     const logoutAndRedirect = () => {
       store.dispatch('logout')
-      router.push('/login')
+      router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath))
     }
 
-    // 计算top performing revenue type
+    // 分析最佳表现的租赁类型
     const analyzeTopPerformingType = () => {
-      if (!currentWeekRevenue.value) {
-        topPerformingType.value = null
-        return
-      }
+      if (!currentWeekRevenue.value) return null
       
       const types = [
-        { type: 'hourly', label: 'Hourly', value: parseFloat(currentWeekRevenue.value.hourlyRevenue) },
-        { type: 'fourHours', label: '4-Hour', value: parseFloat(currentWeekRevenue.value.fourHoursRevenue) },
-        { type: 'daily', label: 'Daily', value: parseFloat(currentWeekRevenue.value.dailyRevenue) },
-        { type: 'weekly', label: 'Weekly', value: parseFloat(currentWeekRevenue.value.weeklyRevenue) }
+        { label: 'Hourly', value: parseFloat(currentWeekRevenue.value.hourlyRevenue), icon: 'el-icon-time', class: 'hourly' },
+        { label: '4-Hour', value: parseFloat(currentWeekRevenue.value.fourHoursRevenue), icon: 'el-icon-tickets', class: 'four-hours' },
+        { label: 'Daily', value: parseFloat(currentWeekRevenue.value.dailyRevenue), icon: 'el-icon-date', class: 'daily' },
+        { label: 'Weekly', value: parseFloat(currentWeekRevenue.value.weeklyRevenue), icon: 'el-icon-calendar', class: 'weekly' }
       ]
       
-      // Find the type with the highest revenue
-      topPerformingType.value = types.reduce((max, current) => 
-        (current.value > max.value) ? current : max, types[0])
-    }
-
-    // 获取top performing type的图标
-    const getTopPerformingIcon = () => {
-      if (!topPerformingType.value) return 'el-icon-data-analysis'
+      topPerformingType.value = types.reduce((max, type) => type.value > max.value ? type : max, { value: 0 })
       
-      switch (topPerformingType.value.type) {
-        case 'hourly': return 'el-icon-time'
-        case 'fourHours': return 'el-icon-alarm-clock'
-        case 'daily': return 'el-icon-date'
-        case 'weekly': return 'el-icon-calendar'
-        default: return 'el-icon-data-analysis'
+      if (topPerformingType.value.value === 0) {
+        topPerformingType.value = { label: 'None', value: 0, icon: 'el-icon-warning', class: 'default' }
       }
+      
+      return topPerformingType.value
     }
 
-    // 获取top performing type的CSS类
+    // 获取顶级表现类型的图标
+    const getTopPerformingIcon = () => {
+      if (!topPerformingType.value) return 'el-icon-warning'
+      return topPerformingType.value.icon
+    }
+
+    // 获取顶级表现类型的CSS类
     const getTopPerformingClass = () => {
       if (!topPerformingType.value) return 'default'
-      
-      switch (topPerformingType.value.type) {
-        case 'hourly': return 'hourly'
-        case 'fourHours': return 'four-hours'
-        case 'daily': return 'daily'
-        case 'weekly': return 'weekly'
-        default: return 'default'
-      }
+      return topPerformingType.value.class
     }
 
     // 计算百分比
@@ -261,40 +362,21 @@ export default {
       return Math.round((parseFloat(value) / parseFloat(total)) * 100)
     }
 
-    // 获取收入优化建议
+    // 获取收入建议
     const getRevenueRecommendation = () => {
-      if (!currentWeekRevenue.value || !topPerformingType.value) return 'No data available for recommendations.'
+      if (!currentWeekRevenue.value || !topPerformingType.value) return '数据不足，无法提供建议。'
       
-      switch (topPerformingType.value.type) {
-        case 'hourly':
-          return 'Hourly rentals are performing well. Consider increasing hourly rates during peak hours or offering special hourly packages for frequent users.'
-        case 'fourHours':
-          return '4-Hour rentals are your top performers. Market this option more prominently and consider enhancing the value proposition of these mid-duration rentals.'
-        case 'daily':
-          return 'Daily rentals are generating the most revenue. Consider creating day passes or bundled day offers with additional benefits to increase sales.'
-        case 'weekly':
-          return 'Weekly rentals are your highest revenue generators. Focus marketing on long-term rental benefits and consider loyalty discounts for repeat weekly renters.'
-        default:
-          return 'Review your pricing strategy across all rental durations to optimize revenue.'
-      }
-    }
-
-    // 检查用户权限
-    const checkAdminPermission = () => {
-      const user = store.getters.user
-      if (!user) {
-        errorMessage.value = '未登录，请先登录系统'
-        hasError.value = true
-        return false
-      }
+      const highValue = topPerformingType.value.value
+      const totalRevenue = parseFloat(currentWeekRevenue.value.totalRevenue)
+      const percentage = getPercentage(highValue, totalRevenue)
       
-      if (user.role !== 0) {
-        errorMessage.value = '您没有访问此页面的权限，需要管理员权限'
-        hasError.value = true
-        return false
+      if (percentage >= 70) {
+        return `您的${topPerformingType.value.label}租赁非常受欢迎，占总收入的${percentage}%。考虑增加此类型滑板车的数量并优化定价策略。`
+      } else if (percentage >= 40) {
+        return `${topPerformingType.value.label}租赁表现良好，占总收入的${percentage}%。可以考虑针对此类型进行更多促销活动。`
+      } else {
+        return `您的收入分布相对均衡。考虑分析客户偏好，优化所有租赁类型的体验和价格。`
       }
-      
-      return true
     }
 
     // 根据日期获取周收入
@@ -313,6 +395,11 @@ export default {
         })
         currentWeekRevenue.value = response.data
         analyzeTopPerformingType()
+        
+        // 在获取周收入后，也获取每日收入
+        if (activeView.value === 'daily') {
+          await fetchDailyRevenuesInWeek(date || selectedDate.value)
+        }
       } catch (error) {
         console.error('API错误详情:', error.response || error)
         
@@ -347,6 +434,11 @@ export default {
         // 更新selectedDate为当前周
         selectedDate.value = getCurrentDate()
         analyzeTopPerformingType()
+        
+        // 在获取周收入后，也获取每日收入
+        if (activeView.value === 'daily') {
+          await fetchDailyRevenuesInWeek(selectedDate.value)
+        }
       } catch (error) {
         console.error('API错误详情:', error.response || error)
         
@@ -383,6 +475,11 @@ export default {
           await fetchCurrentWeekRevenue()
         } else {
           await fetchWeeklyRevenueByDate()
+        }
+        
+        // 如果是每日视图，也刷新每日数据
+        if (activeView.value === 'daily') {
+          await fetchDailyRevenuesInWeek(selectedDate.value)
         }
       } catch (error) {
         console.error('API错误详情:', error.response || error)
@@ -506,11 +603,268 @@ export default {
         ]
       }
     })
+    
+    // 新增：获取每日收入数据
+    const fetchDailyRevenuesInWeek = async (date) => {
+      if (!checkAdminPermission()) return
+      
+      try {
+        dailyLoading.value = true
+        const response = await axios.get('/api/weekly-revenue/daily', {
+          params: {
+            weekStartDate: date
+          },
+          headers: {
+            Authorization: `Bearer ${store.getters.token}`
+          }
+        })
+        
+        dailyRevenues.value = response.data
+        analyzePopularDay()
+      } catch (error) {
+        console.error('API错误详情:', error.response || error)
+        
+        if (error.response?.status === 401) {
+          errorMessage.value = '身份验证失败，请重新登录'
+          hasError.value = true
+        } else if (error.response?.status === 403) {
+          errorMessage.value = '权限不足，需要管理员权限'
+          hasError.value = true
+        } else {
+          ElMessage.error('获取每日收入统计失败：' + (error.response?.data || error.message))
+          dailyRevenues.value = []
+        }
+      } finally {
+        dailyLoading.value = false
+      }
+    }
+    
+    // 新增：分析最受欢迎的日期
+    const analyzePopularDay = () => {
+      if (!dailyRevenues.value || dailyRevenues.value.length === 0) {
+        popularDay.value = null
+        return
+      }
+      
+      // 找出收入最高的日期
+      popularDay.value = dailyRevenues.value.reduce((max, day) => 
+        parseFloat(day.totalRevenue) > parseFloat(max.totalRevenue) ? day : max, 
+        dailyRevenues.value[0]
+      )
+    }
+    
+    // 新增：日收入柱状图配置
+    const dailyChartOption = computed(() => {
+      if (!dailyRevenues.value || dailyRevenues.value.length === 0) return {}
+      
+      const days = dailyRevenues.value.map(day => day.dayOfWeekName)
+      const hourlyData = dailyRevenues.value.map(day => parseFloat(day.hourlyRevenue))
+      const fourHoursData = dailyRevenues.value.map(day => parseFloat(day.fourHoursRevenue))
+      const dailyData = dailyRevenues.value.map(day => parseFloat(day.dailyRevenue))
+      const weeklyData = dailyRevenues.value.map(day => parseFloat(day.weeklyRevenue))
+      const ordersData = dailyRevenues.value.map(day => day.ordersCount)
+      
+      return {
+        title: {
+          text: '每日收入细分',
+          subtext: '按租赁类型显示'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          },
+          formatter: function(params) {
+            let tooltip = params[0].name + '<br/>';
+            let total = 0;
+            
+            params.forEach(param => {
+              tooltip += param.seriesName + ': ¥' + param.value.toFixed(2) + '<br/>';
+              if (param.seriesIndex < 4) { // 不包括订单数量
+                total += param.value;
+              }
+            });
+            
+            tooltip += '<br/>总收入: ¥' + total.toFixed(2);
+            return tooltip;
+          }
+        },
+        legend: {
+          data: ['按小时收入', '按4小时收入', '按天收入', '按周收入', '订单数量']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: [
+          {
+            type: 'category',
+            data: days
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            name: '收入 (¥)',
+            position: 'left',
+            axisLabel: {
+              formatter: '¥{value}'
+            }
+          },
+          {
+            type: 'value',
+            name: '订单数量',
+            position: 'right',
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: '#5470C6'
+              }
+            },
+            axisLabel: {
+              formatter: '{value}'
+            }
+          }
+        ],
+        series: [
+          {
+            name: '按小时收入',
+            type: 'bar',
+            stack: '收入',
+            emphasis: {
+              focus: 'series'
+            },
+            data: hourlyData,
+            itemStyle: {
+              color: '#409EFF'
+            }
+          },
+          {
+            name: '按4小时收入',
+            type: 'bar',
+            stack: '收入',
+            emphasis: {
+              focus: 'series'
+            },
+            data: fourHoursData,
+            itemStyle: {
+              color: '#67C23A'
+            }
+          },
+          {
+            name: '按天收入',
+            type: 'bar',
+            stack: '收入',
+            emphasis: {
+              focus: 'series'
+            },
+            data: dailyData,
+            itemStyle: {
+              color: '#E6A23C'
+            }
+          },
+          {
+            name: '按周收入',
+            type: 'bar',
+            stack: '收入',
+            emphasis: {
+              focus: 'series'
+            },
+            data: weeklyData,
+            itemStyle: {
+              color: '#F56C6C'
+            }
+          },
+          {
+            name: '订单数量',
+            type: 'line',
+            yAxisIndex: 1,
+            data: ordersData,
+            itemStyle: {
+              color: '#5470C6'
+            },
+            symbolSize: 8,
+            lineStyle: {
+              width: 2
+            }
+          }
+        ]
+      }
+    });
+    
+    // 新增：判断是否为热门日
+    const isPopularDay = (day) => {
+      if (!popularDay.value) return false;
+      return day.dayOfWeek === popularDay.value.dayOfWeek;
+    }
+    
+    // 新增：获取总折扣金额
+    const getTotalDiscountAmount = () => {
+      if (!dailyRevenues.value || dailyRevenues.value.length === 0) return '0.00';
+      
+      const total = dailyRevenues.value.reduce((sum, day) => 
+        sum + parseFloat(day.totalDiscount || 0), 0
+      );
+      
+      return total.toFixed(2);
+    }
+    
+    // 新增：获取最多折扣的日期
+    const getMostDiscountedDay = () => {
+      if (!dailyRevenues.value || dailyRevenues.value.length === 0) return 'None';
+      
+      const mostDiscountDay = dailyRevenues.value.reduce((max, day) => 
+        parseFloat(day.totalDiscount || 0) > parseFloat(max.totalDiscount || 0) ? day : max, 
+        dailyRevenues.value[0]
+      );
+      
+      return mostDiscountDay.dayOfWeekName;
+    }
+    
+    // 新增：导出收入报表
+    const exportDailyRevenue = () => {
+      if (!dailyRevenues.value || dailyRevenues.value.length === 0) {
+        ElMessage.warning('没有可导出的数据');
+        return;
+      }
+      
+      // 构建CSV内容
+      let csvContent = "日期,星期几,小时收入,4小时收入,日收入,周收入,总收入,订单数量,折扣总额\n";
+      
+      dailyRevenues.value.forEach(day => {
+        const date = new Date(day.date);
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
+        csvContent += `${dateStr},${day.dayOfWeekName},${day.hourlyRevenue},${day.fourHoursRevenue},${day.dailyRevenue},${day.weeklyRevenue},${day.totalRevenue},${day.ordersCount},${day.totalDiscount}\n`;
+      });
+      
+      // 创建下载链接
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `daily-revenue-${selectedDate.value}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      ElMessage.success('报表导出成功');
+    }
 
     // Watch for changes in currentWeekRevenue and update top performing type
     watch(currentWeekRevenue, (newValue) => {
       if (newValue) {
         analyzeTopPerformingType()
+      }
+    })
+    
+    // 监听选项卡变化，当切换到每日视图时加载数据
+    watch(activeView, (newTab) => {
+      if (newTab === 'daily' && (!dailyRevenues.value || dailyRevenues.value.length === 0)) {
+        fetchDailyRevenuesInWeek(selectedDate.value)
       }
     })
 
@@ -529,6 +883,11 @@ export default {
       errorMessage,
       topPerformingType,
       pieChartOption,
+      activeView,
+      dailyRevenues,
+      dailyLoading,
+      popularDay,
+      dailyChartOption,
       logoutAndRedirect,
       fetchCurrentWeekRevenue,
       fetchWeeklyRevenueByDate,
@@ -540,7 +899,12 @@ export default {
       getTopPerformingIcon,
       getTopPerformingClass,
       getPercentage,
-      getRevenueRecommendation
+      getRevenueRecommendation,
+      fetchDailyRevenuesInWeek,
+      isPopularDay,
+      getTotalDiscountAmount,
+      getMostDiscountedDay,
+      exportDailyRevenue
     }
   }
 }

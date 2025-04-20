@@ -99,4 +99,23 @@ CREATE TABLE `b_weekly_revenue` (
     `updated_at` datetime NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `idx_week_start_date` (`week_start_date`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- 创建每日收入统计表
+CREATE TABLE IF NOT EXISTS `b_daily_revenue` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `revenue_date` date NOT NULL,
+    `day_of_week` int NOT NULL,
+    `day_of_week_name` varchar(10) NOT NULL,
+    `hourly_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `four_hours_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `daily_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `weekly_revenue` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `total_revenue` decimal(12, 2) NOT NULL DEFAULT 0.00,
+    `orders_count` int NOT NULL DEFAULT 0,
+    `total_discount` decimal(10, 2) NOT NULL DEFAULT 0.00,
+    `created_at` datetime NOT NULL,
+    `updated_at` datetime NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `idx_revenue_date` (`revenue_date`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci; 

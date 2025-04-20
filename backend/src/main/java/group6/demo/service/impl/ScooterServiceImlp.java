@@ -1,7 +1,10 @@
 package group6.demo.service.impl;
 
+import group6.demo.dto.AvailableScooterDTO;
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.entity.Scooter;
+import group6.demo.entity.Order;
+import group6.demo.repository.OrderRepository;
 import group6.demo.repository.ScooterRepository;
 import group6.demo.service.ScooterService;
 import group6.demo.util.ValidationUtil;
@@ -9,13 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class ScooterServiceImlp implements ScooterService {
     @Autowired
     private ScooterRepository scooterRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Override
     public Scooter addScooter(ScooterAddDTO scooterAddDTO){
@@ -66,10 +72,58 @@ public class ScooterServiceImlp implements ScooterService {
         return scooterRepository.findAll();
     }
 
+    // A list of scooters has battery and without conflicting orders
     @Override
-    public List<Scooter> getAllScootersUsers() {
-        return scooterRepository.findByBatteryNot(BigDecimal.ZERO);
+    public List<Scooter> getScootersAvailable(AvailableScooterDTO availableDTO) {
+        // 获取所有电量大于0的滑板车
+        List<Scooter> allChargedScooters = scooterRepository.findByBatteryNot(BigDecimal.ZERO);
+
+        // Check start time
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date startTime;
+        try {
+            startTime = dateFormat.parse(availableDTO.getStartTime());
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid date format");
+        }
+        // Validate if start time is after current time
+        if (startTime.before(new Date())) {
+            throw new IllegalArgumentException("Start time cannot be earlier than current time");
+        }
+
+        // Calculate end time
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startTime);
+        switch (availableDTO.getHireType()) {
+            case "HOUR":
+                calendar.add(Calendar.HOUR, 1);
+                break;
+            case "FOUR_HOURS":
+                calendar.add(Calendar.HOUR, 4);
+                break;
+            case "DAY":
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                break;
+            case "WEEK":
+                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid hire type");
+        }
+        Date endTime = calendar.getTime();
+
+        // get scooter with no conflict orders
+        List<Scooter> availableScooters = new ArrayList<>();
+        for (Scooter scooter : allChargedScooters) {
+            List<Order> conflictingOrders = orderRepository.findConflictingOrders(scooter.getId(), startTime, endTime);
+            if (conflictingOrders.isEmpty()) {
+                availableScooters.add(scooter);
+            }
+        }
+
+        return availableScooters;
     }
+
     @Override
     public Optional<Scooter> getScooterById(Long id) {
         return scooterRepository.findById(id);

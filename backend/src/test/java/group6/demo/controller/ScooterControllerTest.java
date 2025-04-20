@@ -1,5 +1,6 @@
 package group6.demo.controller;
 
+import group6.demo.dto.AvailableScooterDTO;
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.entity.Scooter;
 import group6.demo.service.PriceDiscountService;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +119,7 @@ class ScooterControllerTest {
         when(scooterService.getAllScooters()).thenReturn(scooters);
 
         // Calling the method under test - without userId
-        ResponseEntity<?> response = scooterController.getAllScooters(null);
+        ResponseEntity<?> response = scooterController.getAllScooters();
         // Asserting the expected response
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof List);
@@ -138,7 +140,13 @@ class ScooterControllerTest {
         scooter.setPriceWeek(new BigDecimal("1000.00"));
         
         List<Scooter> scooters = Arrays.asList(scooter);
-        when(scooterService.getAllScooters()).thenReturn(scooters);
+
+        // 设置 AvailableScooterDTO（模拟用户传来的租车时间）
+        AvailableScooterDTO dto = new AvailableScooterDTO();
+        dto.setStartTime("2025-08-21 10:00:00.756000");
+        dto.setHireType("HOUR"); // 模拟租用方式
+
+        when(scooterService.getScootersAvailable(dto)).thenReturn(scooters);
         
         // 设置折扣计算结果
         when(priceDiscountService.calculateDiscountedPrice(new BigDecimal("50.00"), 1L)).thenReturn(new BigDecimal("42.50"));
@@ -147,7 +155,7 @@ class ScooterControllerTest {
         when(priceDiscountService.calculateDiscountedPrice(new BigDecimal("1000.00"), 1L)).thenReturn(new BigDecimal("850.00"));
         
         // 调用方法 - 使用userId
-        ResponseEntity<?> response = scooterController.getAllScooters(1L);
+        ResponseEntity<?> response = scooterController.getScootersAvailable(1L,dto);
         
         // 验证结果
         assertEquals(200, response.getStatusCodeValue());

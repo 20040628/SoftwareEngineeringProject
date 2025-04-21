@@ -456,7 +456,7 @@ Frontend service will run on http://localhost:5173
 
 **URL**: `/api/scooters/getScootersAvailable/{userId}`
 
-**method**: `Get`
+**method**: `POST`
 
 **Request Body** : 
 

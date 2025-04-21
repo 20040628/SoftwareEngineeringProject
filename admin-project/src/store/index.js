@@ -6,24 +6,34 @@ export default createStore({
     auth: {
       token: localStorage.getItem('token') || null,
       user: JSON.parse(localStorage.getItem('user')) || null,
-      isAuthenticated: !!localStorage.getItem('token')
+      isAuthenticated: !!localStorage.getItem('token'),
+      admin: localStorage.getItem('admin') || null
     }
   },
   getters: {
     isAuthenticated: state => state.auth.isAuthenticated,
     user: state => state.auth.user,
-    token: state => state.auth.token
+    token: state => state.auth.token,
+    isAdmin: state => {
+      return state.auth.user && state.auth.user.role === 0;
+    },
+    admin: state => state.auth.admin
   },
   mutations: {
     SET_AUTH(state, { token, user }) {
       console.log('SET_AUTH mutation called with token:', token);
+      console.log('SET_AUTH mutation called with user:', user);
+      console.log('SET_AUTH mutation called with user:', user.userId);
       state.auth.token = token;
       state.auth.user = user;
       state.auth.isAuthenticated = !!token;
+      state.auth.admin = user.userId;
+
 
       // 存储到 localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('admin', user.userId);
 
       console.log('State after SET_AUTH:', state.auth);
     },
@@ -35,6 +45,7 @@ export default createStore({
       // 清除 localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('admin');
     }
   },
   actions: {

@@ -1,49 +1,49 @@
 <template>
   <div>
-    <div class="header-container">
-      <h2 class="title">Scooter Management</h2>
-      <div class="filter-container">
-        <div class="search-box">
-          <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Search scooters..."
-              @keyup.enter="handleSearch"
-          >
-          <button class="reset-button" @click="resetSearch">
-            <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
-          </button>
-          <button class="search-button" @click="handleSearch">
-            <img src="/static/center/search.svg" alt="Search" class="search-icon">
-          </button>
-        </div>
-        <div class="status-filter">
-          <label for="status-select">Filter by Status:</label>
-          <select id="status-select" v-model="statusFilter" @change="filterScooters">
-            <option value="all">All</option>
-            <option value="1">Available</option>
-            <option value="0">Unavailable</option>
-          </select>
-        </div>
+    <h2 class="title">Scooter Management</h2>
+    <div class="filter-container">
+      <div class="status-filter">
+        <label for="status-select">Filter by Status:</label>
+        <select id="status-select" v-model="statusFilter" @change="filterScooters">
+          <option value="all">All</option>
+          <option value="1">Available</option>
+          <option value="0">Unavailable</option>
+        </select>
       </div>
+      <div class="search-box">
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search scooters..."
+            @keyup.enter="handleSearch"
+        >
+        <button class="reset-button" @click="resetSearch">
+          <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
+        </button>
+        <button class="search-button" @click="handleSearch">
+          <img src="/static/center/search.svg" alt="Search" class="search-icon">
+        </button>
+      </div>
+
     </div>
+
 
     <div class="table-container">
       <table class="scooter-table">
         <thead>
         <tr>
           <th>ID</th>
-          <th>Location</th>
           <th>Status</th>
           <th>Pricing</th>
           <th>Coordinates</th>
+          <th>Battery</th>
+          <th>Speed</th>
           <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="scooter in filteredPaginatedScooters" :key="scooter.id">
           <td>{{ scooter.id }}</td>
-          <td>{{ scooter.location }}</td>
           <td>
               <span :class="['status-label', getStatusClass(scooter.status)]">
                 {{ getStatusText(scooter.status) }}
@@ -55,6 +55,8 @@
             <div><strong>Week:</strong> £{{ scooter.priceWeek }}</div>
           </td>
           <td>({{ scooter.longitude }}, {{ scooter.latitude }})</td>
+          <td>{{ scooter.battery}}</td>
+          <td>{{ scooter.speed }}</td>
           <td>
             <button class="status-btn" @click="changeScooterStatus(scooter.id)">
               Change Status
@@ -210,12 +212,13 @@ export default {
         // Search in all relevant fields
         return (
             scooter.id.toString().includes(query) ||
-            scooter.location.toLowerCase().includes(query) ||
             scooter.priceHour.toString().includes(query) ||
             scooter.priceDay.toString().includes(query) ||
             scooter.priceWeek.toString().includes(query) ||
             scooter.longitude.toString().includes(query) ||
-            scooter.latitude.toString().includes(query)
+            scooter.latitude.toString().includes(query) ||
+            scooter.battery.toString().includes(query) ||
+            scooter.speed.toString().includes(query)
         );
       });
 
@@ -266,20 +269,25 @@ export default {
 </script>
 
 <style scoped>
-/* Header and Filter Container Styles */
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  border-bottom: 2px solid #58c4c9;
 }
+/* Header and Filter Container Styles */
 
 .filter-container {
   display: flex;
   gap: 20px;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  margin-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 /* Search Box Styles */
@@ -291,6 +299,7 @@ export default {
   border-radius: 20px;
   overflow: hidden;
   background: white;
+
 }
 
 .search-box input {

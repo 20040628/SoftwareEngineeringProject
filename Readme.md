@@ -310,7 +310,41 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
-  ​
+#### Update Bank Card Information
+
+- **URL**: `/api/users/updateBankCard/{userId}`
+
+- **Method**: `POST`
+
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+
+- **Request Body**:
+  ```json
+  {
+    "bankCard": "string"    // 13-19 digits
+  }
+  ```
+
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "银行卡信息更新成功",
+    "userId": "number",
+    "bankCard": "string"
+  }
+  ```
+
+- **Error Response** (400 Bad Request):
+  ```json
+  "User not found with id: {userId}"
+  ```
+  或
+  ```json
+  "更新银行卡信息失败: error message"
+  ```
 
 ### Scooter API
 
@@ -1548,3 +1582,157 @@ The application provides automatic discount calculation based on user profiles a
     "isFrequentUser": "number"  // 1: yes, 0: no
   }
   ```
+
+### Daily Revenue API
+
+#### Get Daily Revenues in Week
+
+- **URL**: `/api/weekly-revenue/daily`
+- **Method**: `GET`
+- **Auth Required**: Yes (Admin only)
+- **Parameters**:
+  - `weekStartDate`: Date in format YYYY-MM-DD (The start date of the week)
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "date": "2025-04-14",
+      "dayOfWeek": 1,
+      "dayOfWeekName": "周一",
+      "hourlyRevenue": 10.00,
+      "fourHoursRevenue": 25.00,
+      "dailyRevenue": 20.00,
+      "weeklyRevenue": 0.00,
+      "totalRevenue": 55.00,
+      "ordersCount": 3,
+      "totalDiscount": 5.00
+    },
+    // ... other days of the week
+  ]
+  ```
+- **Error Response** (401 Unauthorized):
+  ```
+  "未授权: 请提供有效的令牌"
+  ```
+  或
+  ```
+  "无效的令牌: error message"
+  ```
+- **Error Response** (403 Forbidden):
+  ```
+  "权限不足: 需要管理员权限"
+  ```
+- **Error Response** (400 Bad Request):
+  ```
+  "获取每日收入统计失败: error message"
+  ```
+
+#### Get Daily Revenues by Date Range
+
+- **URL**: `/api/weekly-revenue/daily-range`
+- **Method**: `GET`
+- **Auth Required**: Yes (Admin only)
+- **Parameters**:
+  - `startDate`: Date in format YYYY-MM-DD
+  - `endDate`: Date in format YYYY-MM-DD
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "date": "2025-04-15",
+      "dayOfWeek": 2,
+      "dayOfWeekName": "周二",
+      "hourlyRevenue": 15.00,
+      "fourHoursRevenue": 30.00,
+      "dailyRevenue": 25.00,
+      "weeklyRevenue": 0.00,
+      "totalRevenue": 70.00,
+      "ordersCount": 4,
+      "totalDiscount": 7.50
+    },
+    // ... other days in range
+  ]
+  ```
+- **Error Responses**: Same as above
+
+#### Get Recent Daily Revenues
+
+- **URL**: `/api/weekly-revenue/daily-recent`
+- **Method**: `GET`
+- **Auth Required**: Yes (Admin only)
+- **Parameters**:
+  - `days`: Number of days (default: 7)
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  [
+    {
+      "date": "2025-04-19",
+      "dayOfWeek": 6,
+      "dayOfWeekName": "周六",
+      "hourlyRevenue": 25.00,
+      "fourHoursRevenue": 45.00,
+      "dailyRevenue": 30.00,
+      "weeklyRevenue": 100.00,
+      "totalRevenue": 200.00,
+      "ordersCount": 10,
+      "totalDiscount": 15.00
+    },
+    // ... other recent days
+  ]
+  ```
+- **Error Responses**: Same as above
+
+#### Update Daily Revenue
+
+- **URL**: `/api/weekly-revenue/update-daily`
+- **Method**: `POST`
+- **Auth Required**: Yes (Admin only)
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```
+  "每日收入统计更新成功"
+  ```
+- **Error Responses**: Same as above
+
+#### Generate Daily Revenue for Specific Date
+
+- **URL**: `/api/weekly-revenue/generate-daily`
+- **Method**: `POST`
+- **Auth Required**: Yes (Admin only)
+- **Parameters**:
+  - `date`: Date in format YYYY-MM-DD
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "date": "2025-04-20",
+    "dayOfWeek": 7,
+    "dayOfWeekName": "周日",
+    "hourlyRevenue": 20.00,
+    "fourHoursRevenue": 40.00,
+    "dailyRevenue": 25.00,
+    "weeklyRevenue": 100.00,
+    "totalRevenue": 185.00,
+    "ordersCount": 8,
+    "totalDiscount": 12.00
+  }
+  ```
+- **Error Responses**: Same as above

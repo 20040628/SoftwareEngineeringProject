@@ -1,5 +1,6 @@
 package group6.demo.controller;
 
+import group6.demo.dto.UpdateBankCardDTO;
 import group6.demo.entity.Order;
 import group6.demo.entity.User;
 import group6.demo.repository.OrderRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -146,5 +148,32 @@ public class UserController {
     @GetMapping("/changeStatus/{id}")
     public Optional<User> changeUserStatus(@PathVariable Long id) {
         return userService.changeUserStatus(id);
+    }
+    
+    /**
+     * 更新用户银行卡信息
+     * @param userId 用户ID
+     * @param updateBankCardDTO 银行卡信息DTO
+     * @return 更新结果
+     */
+    @PostMapping("/updateBankCard/{userId}")
+    public ResponseEntity<?> updateBankCard(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateBankCardDTO updateBankCardDTO) {
+        
+        try {
+            User updatedUser = userService.updateBankCard(userId, updateBankCardDTO);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "银行卡信息更新成功");
+            response.put("userId", updatedUser.getId());
+            response.put("bankCard", updatedUser.getBankCard());
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("更新银行卡信息失败: " + e.getMessage());
+        }
     }
 }

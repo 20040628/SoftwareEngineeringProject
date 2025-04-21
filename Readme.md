@@ -350,25 +350,11 @@ Frontend service will run on http://localhost:5173
   ```
 
 
-#### view all
+#### get all scooters in database
 
 **URL**: `/api/scooters/getAll`
 
 **Method**: `Get`
-
-**Request Body** : 
-
-可选.
-
-如果有userId，是给用户返回滑板车，去掉了没电的，价格也是优惠后的价格。
-
-如果没有userId，是给管理员返回滑板车列表，是数据库中所有滑板车
-
-```
-{
-    "userId": 
-}
-```
 
 **Success Response** (200 OK):
 
@@ -413,7 +399,42 @@ Frontend service will run on http://localhost:5173
 ]
 ```
 
+#### get all available scooters (has battery and no conflict order)
 
+**URL**: `/api/scooters/getScootersAvailable/{userId}`
+
+**method**: `Get`
+
+**Request Body** : 
+
+```
+{
+    "hireType": "string",     // One of: "HOUR", "FOUR_HOURS", "DAY", "WEEK"
+  	"startTime": "string"     // Format: "YYYY-MM-DD HH:mm:ss"
+}
+```
+
+**Success Response** (200 OK):
+
+```
+[
+    {
+        "id": 2,
+        "status": 1,
+        "longitude": 103.987000,
+        "latitude": 30.764000,
+        "priceHour": 5.00,
+        "priceFourHour": 10.00,
+        "priceDay": 20.00,
+        "priceWeek": 100.00,
+        "discountedPriceHour": 4.50,
+        "discountedPriceFourHour": 9.00,
+        "discountedPriceDay": 18.00,
+        "discountedPriceWeek": 90.00,
+        "hasDiscount": true
+    }
+]
+```
 
 #### view one scooter
 

@@ -39,13 +39,13 @@
 
     <p class="discount-info">
       注册后，系统将根据您的出生日期自动判断折扣资格:
-      <ul>
-        <li>18-25岁的用户享受学生折扣 (15%)</li>
-        <li>60岁以上的用户享受老年人折扣 (20%)</li>
-        <li>每周租赁8小时以上的用户享受常客折扣 (10%)</li>
-        <li>折扣可叠加使用，为您提供更多优惠!</li>
-      </ul>
     </p>
+    <ul class="discount-list">
+      <li>18-25岁的用户享受学生折扣 (15%)</li>
+      <li>60岁以上的用户享受老年人折扣 (20%)</li>
+      <li>每周租赁8小时以上的用户享受常客折扣 (10%)</li>
+      <li>折扣可叠加使用，为您提供更多优惠!</li>
+    </ul>
 
     <div class="form-group">
       <button @click="register" :disabled="loading">
@@ -212,5 +212,15 @@ button:disabled {
   font-size: 0.8em;
   margin-top: 5px;
   display: block;
+}
+
+.discount-list {
+  margin-top: 0;
+  margin-bottom: 15px;
+  padding-left: 30px;
+}
+
+.discount-info {
+  margin-bottom: 5px;
 }
 </style> 

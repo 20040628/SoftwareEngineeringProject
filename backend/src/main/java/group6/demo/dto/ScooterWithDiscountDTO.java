@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 @Data
 public class ScooterWithDiscountDTO {
     private Long id;
-    private String location;
     private Integer status;
     private BigDecimal longitude;
     private BigDecimal latitude;

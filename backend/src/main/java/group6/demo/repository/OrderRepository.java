@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Date;
+import java.math.BigDecimal;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.scooter.id = :scooterId AND o.status = 1 AND o.startTime >= :startDate ORDER BY o.startTime")
@@ -49,4 +50,74 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.endTime < CURRENT_TIMESTAMP AND o.status != 3")
     List<Order> findAllFinished(@Param("userId") Long userId);
+    
+    /**
+     * 根据日期和租赁类型统计收入（按小时租赁）
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天小时租赁总收入
+     */
+    @Query("SELECT SUM(o.price) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.hirePeriod = 'HOUR' AND o.status = 2")
+    BigDecimal getHourlyRevenueByDate(@Param("date") Date date);
+    
+    /**
+     * 根据日期和租赁类型统计收入（按4小时租赁）
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天4小时租赁总收入
+     */
+    @Query("SELECT SUM(o.price) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.hirePeriod = 'FOUR_HOURS' AND o.status = 2")
+    BigDecimal getFourHoursRevenueByDate(@Param("date") Date date);
+    
+    /**
+     * 根据日期和租赁类型统计收入（按天租赁）
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天日租赁总收入
+     */
+    @Query("SELECT SUM(o.price) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.hirePeriod = 'DAY' AND o.status = 2")
+    BigDecimal getDailyRevenueByDate(@Param("date") Date date);
+    
+    /**
+     * 根据日期和租赁类型统计收入（按周租赁）
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天周租赁总收入
+     */
+    @Query("SELECT SUM(o.price) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.hirePeriod = 'WEEK' AND o.status = 2")
+    BigDecimal getWeeklyRevenueByDate(@Param("date") Date date);
+    
+    /**
+     * 根据日期统计总收入
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天总收入
+     */
+    @Query("SELECT SUM(o.price) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.status = 2")
+    BigDecimal getTotalRevenueByDate(@Param("date") Date date);
+    
+    /**
+     * 根据日期统计总折扣金额（原价-折扣价）
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天总折扣金额
+     */
+    @Query("SELECT SUM(o.PriceBeforeDiscount - o.price) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.status = 2")
+    BigDecimal getTotalDiscountByDate(@Param("date") Date date);
+    
+    /**
+     * 根据日期统计订单数量
+     * 只计算已完成的订单（status = 2）
+     * @param date 日期
+     * @return 当天订单数量
+     */
+    @Query("SELECT COUNT(o) FROM Order o " +
+           "WHERE DATE(o.startTime) = DATE(:date) AND o.status = 2")
+    Integer getOrdersCountByDate(@Param("date") Date date);
 } 

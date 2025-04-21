@@ -23,6 +23,7 @@ public class User {
     private String mobile;
     private String email;
     private String paymentMethod;
+    private String bankCard;
     private Integer status;
     private Integer role;
     private Integer isFrequentUser;

@@ -92,6 +92,13 @@
             <artifactId>alipay-sdk-java</artifactId>
             <version>4.22.113.ALL</version>
         </dependency>
+        
+        <!-- EasyCaptcha for verification code -->
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+            <version>1.6.2</version>
+        </dependency>
     </dependencies>
     
     <build>

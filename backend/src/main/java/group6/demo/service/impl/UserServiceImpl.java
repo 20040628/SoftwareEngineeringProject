@@ -2,6 +2,7 @@ package group6.demo.service.impl;
 
 import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
+import group6.demo.dto.UpdateBankCardDTO;
 import group6.demo.entity.User;
 import group6.demo.repository.UserRepository;
 import group6.demo.service.UserService;
@@ -115,6 +116,18 @@ public class UserServiceImpl implements UserService {
             return Optional.of(userRepository.save(user));
         }
         return User;
+    }
+    
+    @Override
+    public User updateBankCard(Long userId, UpdateBankCardDTO updateBankCardDTO) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new IllegalArgumentException("User not found with id: " + userId);
+        }
+        
+        User user = optionalUser.get();
+        user.setBankCard(updateBankCardDTO.getBankCard());
+        return userRepository.save(user);
     }
 }
 

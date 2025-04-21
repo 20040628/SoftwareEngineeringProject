@@ -1,5 +1,6 @@
 package group6.demo.controller;
 
+import group6.demo.dto.AvailableScooterDTO;
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.dto.ScooterWithDiscountDTO;
 import group6.demo.entity.Scooter;
@@ -67,24 +68,28 @@ public class ScooterController {
         }
     }
 
+    // 给管理员的：返回原始滑板车列表
     @GetMapping("/getAll")
-    public ResponseEntity<?> getAllScooters(@RequestParam(required = false) Long userId) {
+    public ResponseEntity<?> getAllScooters() {
         try {
-            // 给管理员的：如果未提供userId，返回原始滑板车列表
-            if (userId == null) {
-                List<Scooter> scooters = scooterService.getAllScooters();
-                return ResponseEntity.ok(scooters);
-            }
-            
-            // 给用户的：如果提供了userId，计算折扣价格，排除没电的
-            List<Scooter> scooters = scooterService.getAllScootersUsers();
+            List<Scooter> scooters = scooterService.getAllScooters();
+            return ResponseEntity.ok(scooters);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to get scooters: " + e.getMessage());
+        }
+    }
+
+    // 给用户的：返回有电且没有冲突订单的全部滑板车
+    @GetMapping("/getScootersAvailable/{userId}")
+    public ResponseEntity<?> getScootersAvailable(@PathVariable Long userId, @Valid @RequestBody AvailableScooterDTO availableDTO){
+        try {
+            List<Scooter> scooters = scooterService.getScootersAvailable(availableDTO);
             List<ScooterWithDiscountDTO> scootersWithDiscount = new ArrayList<>();
-            
+
             for (Scooter scooter : scooters) {
                 ScooterWithDiscountDTO dto = getScooterWithDiscount(scooter, userId);
                 scootersWithDiscount.add(dto);
             }
-            
             return ResponseEntity.ok(scootersWithDiscount);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Failed to get scooters: " + e.getMessage());

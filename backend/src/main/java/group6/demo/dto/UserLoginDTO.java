@@ -10,4 +10,10 @@ public class UserLoginDTO {
 
     @NotBlank(message = "Password is required")
     private String password;
+    
+    @NotBlank(message = "Captcha is required")
+    private String captcha;
+    
+    @NotBlank(message = "Captcha key is required")
+    private String captchaKey;
 } 

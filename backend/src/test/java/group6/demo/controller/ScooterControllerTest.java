@@ -1,8 +1,8 @@
 package group6.demo.controller;
 
+import group6.demo.dto.AvailableScooterDTO;
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.entity.Scooter;
-import group6.demo.entity.User;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.ScooterService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,8 @@ class ScooterControllerTest {
         ScooterAddDTO dto = new ScooterAddDTO();
         Scooter scooter = new Scooter();
         scooter.setId(1L);
+        scooter.setLongitude(new BigDecimal("104.06"));
+        scooter.setLatitude(new BigDecimal("30.67"));
 
         // Mocking the behavior of BindingResult and ScooterService
         when(bindingResult.hasErrors()).thenReturn(false);
@@ -73,13 +76,13 @@ class ScooterControllerTest {
 
         // Mocking the behavior of BindingResult to simulate a validation error
         when(bindingResult.hasErrors()).thenReturn(true);
-        when(bindingResult.getFieldErrors()).thenReturn(Arrays.asList(new FieldError("scooterAddDTO", "location", "Location is required")));
+        when(bindingResult.getFieldErrors()).thenReturn(Arrays.asList(new FieldError("scooterAddDTO", "longitude", "Longitude is required")));
 
         // Calling the method under test
         ResponseEntity<?> response = scooterController.addScooter(dto, bindingResult);
         // Asserting the expected response
         assertEquals(400, response.getStatusCodeValue());
-        assertTrue(((Map<?, ?>) response.getBody()).containsKey("location"));
+        assertTrue(((Map<?, ?>) response.getBody()).containsKey("longitude"));
     }
 
     // Test case for service failure when adding a scooter
@@ -103,16 +106,20 @@ class ScooterControllerTest {
     void testGetAllScooters() {
         Scooter scooter1 = new Scooter();
         scooter1.setId(1L);
+        scooter1.setLongitude(new BigDecimal("104.06"));
+        scooter1.setLatitude(new BigDecimal("30.67"));
 
         Scooter scooter2 = new Scooter();
         scooter2.setId(2L);
+        scooter2.setLongitude(new BigDecimal("104.07"));
+        scooter2.setLatitude(new BigDecimal("30.68"));
 
         // Preparing a list of scooters to be returned by the mock service
         List<Scooter> scooters = Arrays.asList(scooter1, scooter2);
         when(scooterService.getAllScooters()).thenReturn(scooters);
 
         // Calling the method under test - without userId
-        ResponseEntity<?> response = scooterController.getAllScooters(null);
+        ResponseEntity<?> response = scooterController.getAllScooters();
         // Asserting the expected response
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof List);
@@ -125,13 +132,21 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
+        scooter.setLongitude(new BigDecimal("104.06"));
+        scooter.setLatitude(new BigDecimal("30.67"));
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));
         scooter.setPriceWeek(new BigDecimal("1000.00"));
         
         List<Scooter> scooters = Arrays.asList(scooter);
-        when(scooterService.getAllScooters()).thenReturn(scooters);
+
+        // 设置 AvailableScooterDTO（模拟用户传来的租车时间）
+        AvailableScooterDTO dto = new AvailableScooterDTO();
+        dto.setStartTime("2025-08-21 10:00:00.756000");
+        dto.setHireType("HOUR"); // 模拟租用方式
+
+        when(scooterService.getScootersAvailable(dto)).thenReturn(scooters);
         
         // 设置折扣计算结果
         when(priceDiscountService.calculateDiscountedPrice(new BigDecimal("50.00"), 1L)).thenReturn(new BigDecimal("42.50"));
@@ -140,7 +155,7 @@ class ScooterControllerTest {
         when(priceDiscountService.calculateDiscountedPrice(new BigDecimal("1000.00"), 1L)).thenReturn(new BigDecimal("850.00"));
         
         // 调用方法 - 使用userId
-        ResponseEntity<?> response = scooterController.getAllScooters(1L);
+        ResponseEntity<?> response = scooterController.getScootersAvailable(1L,dto);
         
         // 验证结果
         assertEquals(200, response.getStatusCodeValue());
@@ -162,6 +177,8 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
+        scooter.setLongitude(new BigDecimal("104.06"));
+        scooter.setLatitude(new BigDecimal("30.67"));
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));

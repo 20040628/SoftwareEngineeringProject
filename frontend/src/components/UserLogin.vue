@@ -30,6 +30,24 @@
           />
         </div>
         
+        <div class="form-group captcha-group">
+          <label for="captcha">验证码</label>
+          <div class="captcha-container">
+            <input 
+              type="text" 
+              id="captcha" 
+              v-model="loginForm.captcha" 
+              class="form-control captcha-input" 
+              required
+              placeholder="请输入验证码"
+            />
+            <div class="captcha-image" @click="refreshCaptcha">
+              <img v-if="captchaImage" :src="captchaImage" alt="验证码" />
+              <div v-else class="captcha-loading">加载中...</div>
+            </div>
+          </div>
+        </div>
+        
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">登录</button>
           <router-link to="/register" class="btn btn-link">注册新账号</router-link>
@@ -43,7 +61,7 @@
 import axios from 'axios'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 export default {
   name: 'UserLogin',
@@ -52,14 +70,47 @@ export default {
     const router = useRouter()
     
     const errorMessage = ref('')
+    const captchaImage = ref('')
+    const captchaKey = ref('')
+    
     const loginForm = reactive({
       username: '',
-      password: ''
+      password: '',
+      captcha: '',
+      captchaKey: ''
     })
     
+    // 获取验证码
+    const getCaptcha = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/auth/captcha')
+        captchaImage.value = response.data.captchaImageBase64
+        captchaKey.value = response.data.captchaKey
+        loginForm.captchaKey = response.data.captchaKey
+      } catch (error) {
+        console.error('获取验证码失败:', error)
+        errorMessage.value = '获取验证码失败，请刷新页面重试'
+      }
+    }
+    
+    // 刷新验证码
+    const refreshCaptcha = () => {
+      captchaImage.value = ''
+      loginForm.captcha = ''
+      getCaptcha()
+    }
+    
+    // 登录
     const login = async () => {
       try {
         errorMessage.value = ''
+        
+        // 确保验证码已经加载
+        if (!loginForm.captchaKey) {
+          errorMessage.value = '验证码未加载，请刷新验证码'
+          return
+        }
+        
         const response = await axios.post('http://localhost:8080/api/auth/login', loginForm)
         
         if (response.data && response.data.token) {
@@ -90,18 +141,33 @@ export default {
           }
         }
       } catch (error) {
+        // 刷新验证码
+        refreshCaptcha()
+        
         if (error.response) {
-          errorMessage.value = error.response.data.message || '登录失败，请检查用户名和密码'
+          // 处理验证码错误
+          if (error.response.data.captcha) {
+            errorMessage.value = error.response.data.captcha
+          } else {
+            errorMessage.value = error.response.data.message || '登录失败，请检查用户名和密码'
+          }
         } else {
           errorMessage.value = '无法连接到服务器，请稍后再试'
         }
       }
     }
     
+    // 组件挂载时获取验证码
+    onMounted(() => {
+      getCaptcha()
+    })
+    
     return {
       loginForm,
       errorMessage,
-      login
+      captchaImage,
+      login,
+      refreshCaptcha
     }
   }
 }
@@ -167,6 +233,39 @@ label {
   background-color: #ffebee;
   color: #d32f2f;
   border: 1px solid #ffcdd2;
+}
+
+.captcha-container {
+  display: flex;
+  align-items: center;
+}
+
+.captcha-input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.captcha-image {
+  width: 130px;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.captcha-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.captcha-loading {
+  font-size: 12px;
+  color: #999;
 }
 
 .form-actions {

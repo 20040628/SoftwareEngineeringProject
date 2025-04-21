@@ -14,6 +14,16 @@
 				<view class="form-group">
 					<input type="password" v-model="password" placeholder="Please enter your password" class="input-field" />
 				</view>
+				
+				<!-- 验证码区域 -->
+				<view class="form-group captcha-group">
+					<input type="text" v-model="captcha" placeholder="Enter captcha" class="input-field captcha-input" />
+					<view class="captcha-image" @click="refreshCaptcha">
+						<image v-if="captchaImage" :src="captchaImage" mode="aspectFit"></image>
+						<view v-else class="loading">Loading...</view>
+					</view>
+				</view>
+				
 				<view class="login-btn" @click="handleSubmit()">Login</view>
 			</form>
 			<view class="form-group terms">
@@ -29,24 +39,75 @@ export default {
     return {
       username: '',
       password: '',
-      code: '',
+      captcha: '',
+      captchaKey: '',
+      captchaImage: '',
       token: null, // 存储登录后获取的 token
       errorMessage: ''
     };
   },
+  onLoad() {
+    // 页面加载时获取验证码
+    this.getCaptcha();
+  },
   methods: {
+    // 获取验证码
+    async getCaptcha() {
+      try {
+        const [err, res] = await uni.request({
+          url: 'http://localhost:8080/api/auth/captcha',
+          method: 'GET',
+          header: { 'Content-Type': 'application/json' }
+        }).then(res => [null, res]).catch(err => [err, null]);
+        
+        if (err || res.statusCode !== 200) {
+          uni.showToast({
+            title: 'Failed to get captcha',
+            icon: 'none',
+            duration: 2000
+          });
+          return;
+        }
+        
+        this.captchaKey = res.data.captchaKey;
+        this.captchaImage = res.data.captchaImageBase64;
+      } catch (error) {
+        console.error('Error getting captcha:', error);
+      }
+    },
+    
+    // 刷新验证码
+    refreshCaptcha() {
+      this.captchaImage = '';
+      this.captcha = '';
+      this.getCaptcha();
+    },
+    
     handleSubmit() {
       if (!this.username) {
         this.toast('Please enter your username');
         return;
       }
-      if (!this.isCodeLogin && !this.password) {
+      if (!this.password) {
         this.toast('Please enter your password');
+        return;
+      }
+      if (!this.captcha) {
+        this.toast('Please enter captcha');
         return;
       }
       // 密码登录
       this.loginWithPassword();
     },
+    
+    toast(message) {
+      uni.showToast({
+        title: message,
+        icon: 'none',
+        duration: 2000
+      });
+    },
+    
     async loginWithPassword() {
       this.loading = true;
       this.message = '';
@@ -58,11 +119,16 @@ export default {
           method: 'POST',
           data: {
             username: this.username,
-            password: this.password
+            password: this.password,
+            captcha: this.captcha,
+            captchaKey: this.captchaKey
           },
           header: { 'Content-Type': 'application/json' }
-        }).then(res => [null, res]).catch(err => [err, null]); // 兼容 `try-catch`
+        }).then(res => [null, res]).catch(err => [err, null]);
     
+        // 无论成功失败，都刷新验证码
+        this.refreshCaptcha();
+        
         if (err || res.statusCode !== 200) {
           // 处理后端错误
           let errorMessage = 'Login failed';
@@ -71,9 +137,13 @@ export default {
             if (typeof res.data === 'string') {
               // 后端直接返回字符串
               errorMessage = res.data;
-            } else if (typeof res.data === 'object' && res.data.message) {
-              // 后端返回 JSON 对象
-              errorMessage = res.data.message;
+            } else if (typeof res.data === 'object') {
+              // 处理验证码错误
+              if (res.data.captcha) {
+                errorMessage = res.data.captcha;
+              } else if (res.data.message) {
+                errorMessage = res.data.message;
+              }
             }
           } else if (err) {
             errorMessage = err.message || 'Network error, please try again';
@@ -114,6 +184,7 @@ export default {
         this.loading = false;
       }
     },
+    
     goToRegister() {
       uni.navigateTo({
         url: '/pages/UserRegister/UserRegister' // 跳转到注册页面
@@ -123,9 +194,36 @@ export default {
 };
 </script>
 
-
-
-
 <style scoped lang="scss">
 	@import '../index.scss';
+	
+	.captcha-group {
+		display: flex;
+		align-items: center;
+	}
+	
+	.captcha-input {
+		flex: 1;
+		margin-right: 10px;
+	}
+	
+	.captcha-image {
+		width: 130px;
+		height: 48px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #f5f5f5;
+		border-radius: 4px;
+	}
+	
+	.captcha-image image {
+		width: 100%;
+		height: 100%;
+	}
+	
+	.loading {
+		font-size: 12px;
+		color: #999;
+	}
 </style>

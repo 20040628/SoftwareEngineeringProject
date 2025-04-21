@@ -1,8 +1,10 @@
 package group6.demo.controller;
 
+import group6.demo.dto.CaptchaResponseDTO;
 import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
 import group6.demo.entity.User;
+import group6.demo.service.CaptchaService;
 import group6.demo.util.JwtUtil;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.UserService;
@@ -30,6 +32,28 @@ public class AuthController {
 
     @Autowired
     private PriceDiscountService priceDiscountService;
+    
+    @Autowired
+    private CaptchaService captchaService;
+    
+    /**
+     * 获取验证码
+     */
+    @GetMapping("/captcha")
+    public ResponseEntity<CaptchaResponseDTO> getCaptcha() {
+        try {
+            String captchaKey = captchaService.generateCaptchaKey();
+            String captchaBase64 = captchaService.generateCaptchaBase64(captchaKey);
+            
+            CaptchaResponseDTO responseDTO = new CaptchaResponseDTO();
+            responseDTO.setCaptchaKey(captchaKey);
+            responseDTO.setCaptchaImageBase64(captchaBase64);
+            
+            return ResponseEntity.ok(responseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginDTO loginDTO,
@@ -40,6 +64,13 @@ public class AuthController {
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
+            return ResponseEntity.badRequest().body(errors);
+        }
+        
+        // 验证验证码
+        if (!captchaService.validateCaptcha(loginDTO.getCaptchaKey(), loginDTO.getCaptcha())) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("captcha", "验证码错误或已过期");
             return ResponseEntity.badRequest().body(errors);
         }
 

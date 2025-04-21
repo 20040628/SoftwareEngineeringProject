@@ -125,7 +125,9 @@ Frontend service will run on http://localhost:5173
   ```json
   {
     "username": "string",
-    "password": "string"
+    "password": "string",
+    "captchaKey": "string",
+    "captcha": "string"
   }
   ```
 
@@ -145,12 +147,17 @@ Frontend service will run on http://localhost:5173
   ```json
   {
     "username": "error message",
-    "password": "error message"
+    "password": "error message",
+    "captcha": "error message"
   }
   ```
   或
   ```json
   "Login failed: error message"
+  ```
+  或
+  ```json
+  "验证码错误"
   ```
 
 - **Error Response** (403Forbidden): [When user.status==0]
@@ -160,6 +167,18 @@ Frontend service will run on http://localhost:5173
   ```
 
   ​
+
+#### Get Captcha
+
+- **URL**: `/api/auth/captcha`
+- **Method**: `GET`
+- **Success Response** (200 OK):
+  ```json
+  {
+    "captchaKey": "string",
+    "captchaImageBase64": "string"
+  }
+  ```
 
 #### Validate Token
 

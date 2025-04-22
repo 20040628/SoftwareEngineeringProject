@@ -210,6 +210,68 @@ Frontend service will run on http://localhost:5173
   "Token validation failed: error message"
   ```
 
+#### Forgot Password
+
+- **URL**: `/api/auth/forgot-password`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "email": "string"
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "重置验证码已发送到您的邮箱"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "error": "邮箱不存在"
+  }
+  ```
+  或
+  ```json
+  {
+    "email": "error message"
+  }
+  ```
+
+#### Reset Password
+
+- **URL**: `/api/auth/reset-password`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
+  {
+    "email": "string",
+    "resetCode": "string",
+    "newPassword": "string"
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "密码重置成功"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "error": "验证码错误或已过期"
+  }
+  ```
+  或
+  ```json
+  {
+    "email": "error message",
+    "resetCode": "error message",
+    "newPassword": "error message"
+  }
+  ```
+
 ###User API
 
 #### view my own bookings

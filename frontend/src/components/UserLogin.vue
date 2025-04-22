@@ -50,7 +50,10 @@
         
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">登录</button>
-          <router-link to="/register" class="btn btn-link">注册新账号</router-link>
+          <div>
+            <router-link to="/register" class="btn btn-link">注册新账号</router-link>
+            <router-link to="/forgot-password" class="btn btn-link">忘记密码</router-link>
+          </div>
         </div>
       </form>
     </div>

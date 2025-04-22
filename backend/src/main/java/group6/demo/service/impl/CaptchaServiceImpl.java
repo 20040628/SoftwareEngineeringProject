@@ -2,7 +2,7 @@ package group6.demo.service.impl;
 
 import group6.demo.service.CaptchaService;
 import com.wf.captcha.base.Captcha;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wf.captcha.SpecCaptcha;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,9 +13,6 @@ import java.io.IOException;
 
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
-
-    @Autowired
-    private Captcha captcha;
 
     // 使用内存存储验证码信息（生产环境可考虑使用Redis）
     private final Map<String, CaptchaInfo> captchaStore = new ConcurrentHashMap<>();
@@ -28,6 +25,13 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Override
     public String generateCaptchaBase64(String captchaKey) {
         try {
+            // 每次创建新的验证码实例
+            SpecCaptcha captcha = new SpecCaptcha(130, 48, 4);
+            // 设置字体
+            captcha.setFont(Captcha.FONT_1);
+            // 设置类型，纯数字或字母数字混合
+            captcha.setCharType(Captcha.TYPE_DEFAULT);
+            
             // 生成验证码
             String captchaText = captcha.text();
             String captchaBase64 = captcha.toBase64();

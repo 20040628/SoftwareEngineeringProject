@@ -4,6 +4,7 @@ import store from '../store'
 // 延迟加载组件
 const UserLogin = () => import('../components/UserLogin.vue')
 const UserRegister = () => import('../components/UserRegister.vue')
+const ForgotPassword = () => import('../components/ForgotPassword.vue')
 const ScooterAll = () => import('../components/ScooterAll.vue')
 const ScooterAdd = () => import('../components/ScooterAdd.vue')
 const UserProfile = () => import('../components/UserProfile.vue')
@@ -26,6 +27,14 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: UserRegister,
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword,
     meta: {
       requiresAuth: false
     }

@@ -1,10 +1,13 @@
 package group6.demo.controller;
 
 import group6.demo.dto.CaptchaResponseDTO;
+import group6.demo.dto.ForgotPasswordDTO;
+import group6.demo.dto.ResetPasswordDTO;
 import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
 import group6.demo.entity.User;
 import group6.demo.service.CaptchaService;
+import group6.demo.service.PasswordResetService;
 import group6.demo.util.JwtUtil;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.UserService;
@@ -35,6 +38,9 @@ public class AuthController {
     
     @Autowired
     private CaptchaService captchaService;
+    
+    @Autowired
+    private PasswordResetService passwordResetService;
     
     /**
      * 获取验证码
@@ -172,6 +178,55 @@ public class AuthController {
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Token validation failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 发送密码重置验证码
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+        
+        boolean sent = passwordResetService.sendResetCode(forgotPasswordDTO.getEmail());
+        if (sent) {
+            return ResponseEntity.ok().body(Map.of("message", "重置验证码已发送到您的邮箱"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "邮箱不存在"));
+        }
+    }
+    
+    /**
+     * 重置密码
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO,
+                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+        
+        boolean reset = passwordResetService.resetPassword(
+            resetPasswordDTO.getEmail(),
+            resetPasswordDTO.getResetCode(),
+            resetPasswordDTO.getNewPassword()
+        );
+        
+        if (reset) {
+            return ResponseEntity.ok().body(Map.of("message", "密码重置成功"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "验证码错误或已过期"));
         }
     }
 } 

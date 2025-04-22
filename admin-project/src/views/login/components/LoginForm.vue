@@ -1,9 +1,9 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { ElNotification } from "element-plus";
-import { User, Lock } from "@element-plus/icons-vue";
+import { User, Lock, Refresh } from "@element-plus/icons-vue";
 import axios from "axios";
 
 const router = useRouter();
@@ -12,17 +12,37 @@ const store = useStore();
 const loginForm = reactive({
   username: "",
   password: "",
+  captcha: "",    // 新增验证码输入
+  captchaKey: ""  // 新增验证码Key
 });
 
-// 表单校验规则
+// 新增验证码图片数据
+const captchaImage = ref("");
+
+// 表单校验规则（新增验证码校验）
 const loginRules = reactive({
   username: [{ required: true, message: "Please enter username", trigger: "blur" }],
   password: [{ required: true, message: "Please enter password", trigger: "blur" }],
+  captcha: [{ required: true, message: "Please enter captcha", trigger: "blur" }]
 });
 
 const loginFormRef = ref();
 const errorMessage = ref("");
 const loading = ref(false);
+
+// 新增：获取验证码方法
+const fetchCaptcha = async () => {
+  try {
+    const response = await axios.get("http://localhost:8080/api/auth/captcha");
+    captchaImage.value = response.data.captchaImageBase64;
+    loginForm.captchaKey = response.data.captchaKey;
+  } catch (error) {
+    ElNotification({ title: "Error", message: "Failed to load captcha", type: "error" });
+  }
+};
+
+// 组件挂载时获取验证码
+onMounted(fetchCaptcha);
 
 const login = async () => {
   if (!loginFormRef.value) return;
@@ -34,7 +54,11 @@ const login = async () => {
     errorMessage.value = "";
 
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", loginForm);
+      const response = await axios.post("http://localhost:8080/api/auth/login", {
+        ...loginForm,
+        captcha: loginForm.captcha.trim() // 发送验证码和captchaKey
+      });
+
       if (response.data && response.data.token) {
         await store.dispatch("login", {
           token: response.data.token,
@@ -47,10 +71,16 @@ const login = async () => {
         });
 
         router.push(response.data.role === 0 ? "/add_scooter" : "/login");
-        ElNotification({ title: "Login Successfully", message: `Welcome Back，${response.data.username}`, type: "success" });
+        ElNotification({
+          title: "Login Successfully",
+          message: `Welcome Back，${response.data.username}`,
+          type: "success"
+        });
       }
     } catch (error) {
-      errorMessage.value = error.response?.data?.message || "User Name or Password Error";
+      errorMessage.value = error.response?.data?.message || "Login failed";
+      fetchCaptcha(); // 登录失败时刷新验证码
+      loginForm.captcha = ""; // 清空验证码输入
     } finally {
       loading.value = false;
     }
@@ -83,6 +113,22 @@ const login = async () => {
       </el-input>
     </el-form-item>
 
+    <!-- 新增验证码 -->
+    <el-form-item prop="captcha">
+      <div class="captcha-container">
+        <el-input
+            v-model.trim="loginForm.captcha"
+            placeholder="Captcha"
+            class="captcha-input"
+            style="width: 60%"
+        />
+        <div class="captcha-image" @click="fetchCaptcha">
+          <img :src="captchaImage" alt="captcha" v-if="captchaImage" />
+          <el-icon v-else class="refresh-icon"><Refresh /></el-icon>
+        </div>
+      </div>
+    </el-form-item>
+
     <!-- 按钮 -->
     <el-form-item>
       <el-button type="primary" :loading="loading" native-type="submit" @click="login">Login</el-button>
@@ -93,6 +139,42 @@ const login = async () => {
 
 
 <style scoped>
+
+/* 新增验证码样式 */
+.captcha-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.captcha-image {
+  cursor: pointer;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  padding: 2px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+
+  img {
+    height: 100%;
+    width: auto;
+  }
+}
+
+.refresh-icon {
+  font-size: 20px;
+  color: #606266;
+}
+
+/* 调整原有按钮间距 */
+.el-form-item:last-child {
+  margin-top: 20px;
+}
+
 .login-container {
   display: flex;
   justify-content: center;

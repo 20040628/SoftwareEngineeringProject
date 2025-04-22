@@ -1,6 +1,6 @@
 <template>
   <div class="weekly-revenue">
-    <h2>Weekly Revenue Statistics</h2>
+    <h2 class="title">Weekly Revenue Statistics</h2>
 
     <!-- error alert -->
     <el-alert
@@ -611,22 +611,29 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.weekly-revenue {
-  padding: 20px;
-}
 
-h2 {
-  margin-bottom: 20px;
-  color: #303133;
-  font-size: 24px;
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  border-bottom: 2px solid #58c4c9;
 }
-
 .card-header {
   display: flex;
   justify-content: center;
+  background-color: #ffffff;
+  border-bottom: 0px solid #58c4c9;
   align-items: center;
   font-weight: bold;
   font-size: 1.2em;
+}
+
+.card-header span{
+  padding: 6px 26px;
+  border: 3px solid #008187;
+  border-radius: 30px;
 }
 
 .week-selector-container {
@@ -822,6 +829,10 @@ h2 {
   margin-bottom: 20px;
 }
 
+.week-selector-card{
+  margin-top: 30px;
+}
+
 .error-actions {
   margin-top: 10px;
 }
@@ -838,11 +849,16 @@ h2 {
   border-radius: 4px;
   margin-bottom: 20px;
   margin-top: 10%;
+
+  min-height: 80px;
 }
 
 .highlight-icon {
+  flex: 0 0 50px;
   width: 50px;
-  height: 45px;
+  height: 50px;
+  min-width: 50px;
+  min-height: 50px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -870,6 +886,11 @@ h2 {
   &.default {
     background-color: #909399;
   }
+}
+
+.highlight-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .highlight-text h3 {
@@ -905,6 +926,75 @@ h2 {
     color: #606266;
     font-size: 18px;
     line-height: 1.6;
+  }
+}
+
+@media (max-width: 1200px) {
+  .revenue-content-container {
+    flex-direction: column;
+  }
+
+  .analysis-recommendation {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-analysis-container {
+    flex-direction: column;
+  }
+
+  .revenue-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .revenue-item {
+    min-width: auto;
+  }
+
+  .week-navigation {
+    flex-wrap: wrap;
+
+    .nav-button {
+      min-width: calc(50% - 6px);
+      margin-bottom: 12px;
+    }
+  }
+
+}
+
+@media (max-width: 480px) {
+  .week-navigation {
+    .nav-button {
+      min-width: 100%;
+    }
+  }
+
+  .title {
+    font-size: 22px;
+    padding: 15px 10px;
+  }
+
+  .card-header {
+    font-size: 1em;
+  }
+
+  .week-selector-container .custom-date-picker {
+    width: 100%;
+  }
+
+  .analysis-recommendation {
+    padding: 15px;
+
+    h4 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 16px;
+    }
   }
 }
 </style>

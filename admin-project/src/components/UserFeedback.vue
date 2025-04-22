@@ -1,33 +1,31 @@
 <template>
   <div>
-    <div class="header-container">
-      <h2 class="title">User Feedback</h2>
-      <div class="filter-container">
-        <div class="search-box">
-          <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Search feedback..."
-              @keyup.enter="handleSearch"
-          >
-          <button class="reset-button" @click="resetSearch">
-            <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
-          </button>
-          <button class="search-button" @click="handleSearch">
-            <img src="/static/center/search.svg" alt="Search" class="search-icon">
-          </button>
-        </div>
-        <div class="status-filter">
-          <label for="status-select">Filter by Status:</label>
-          <select id="status-select" v-model="selectedStatus" @change="filterFeedbacks">
-            <option value="">All</option>
-            <option v-for="(status, key) in statusOptions"
-                    :key="key"
-                    :value="key">
-              {{ status.label }}
-            </option>
-          </select>
-        </div>
+    <h2 class="title">User Feedback</h2>
+    <div class="filter-container">
+      <div class="status-filter">
+        <label for="status-select">Filter by Status:</label>
+        <select id="status-select" v-model="selectedStatus" @change="filterFeedbacks">
+          <option value="">All</option>
+          <option v-for="(status, key) in statusOptions"
+                  :key="key"
+                  :value="key">
+            {{ status.label }}
+          </option>
+        </select>
+      </div>
+      <div class="search-box">
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search feedback..."
+            @keyup.enter="handleSearch"
+        >
+        <button class="reset-button" @click="resetSearch">
+          <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
+        </button>
+        <button class="search-button" @click="handleSearch">
+          <img src="/static/center/search.svg" alt="Search" class="search-icon">
+        </button>
       </div>
     </div>
 
@@ -50,7 +48,7 @@
           <td>{{ feedback.id }}</td>
           <td>{{ feedback.userId }}</td>
           <td>{{ feedback.content }}</td>
-          <td>{{ formatDate(feedback.createTime) }}</td>
+          <td style="white-space: pre-line">{{ formatDate(feedback.createTime) }}</td>
           <td>
             <div class="status-group">
               <button
@@ -233,7 +231,7 @@ export default {
       const day = String(date.getDate()).padStart(2, '0');
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
+      return `${year}-${month}-${day}\n${hours}:${minutes}`;
     },
     async fetchFeedbacks() {
       try {
@@ -329,19 +327,24 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  border-bottom: 2px solid #58c4c9;
+}
 /* Header and Filter Container Styles */
-.header-container {
+.filter-container {
   display: flex;
+  gap: 20px;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
   flex-wrap: wrap;
-}
-
-.title {
-  font-size: 24px;
-  color: #2c3e50;
-  font-weight: 600;
+  margin-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .filter-container {
@@ -472,6 +475,7 @@ export default {
 }
 
 .feedback-table td {
+  max-width: 250px;
   color: #666;
 }
 
@@ -519,27 +523,27 @@ export default {
 
 /* Admin Response Textarea */
 .admin-response {
-  width: 100%;
   padding: 12px 16px;
   border: 2px solid #e0e3e7;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px; /* Slightly increased font size */
   color: #495057;
   line-height: 1.5;
   min-height: 100px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slightly darker shadow */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   resize: vertical;
+
 }
 
 .admin-response:focus {
-  outline: none;
-  border-color: #4d90fe;
-  box-shadow: 0 0 0 3px rgba(77, 144, 254, 0.15);
-  transform: translateY(-1px);
+  border-color: #58c4c9; /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(88, 196, 201, 0.5); /* Add focus shadow */
+  outline: none; /* Remove default outline */
 }
+
 
 .admin-response::placeholder {
   color: #9aa1a9;
@@ -554,7 +558,8 @@ export default {
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
 }

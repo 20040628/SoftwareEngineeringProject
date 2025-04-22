@@ -1,37 +1,37 @@
 <template>
   <div>
-    <div class="header-container">
-      <h2 class="title">All Users</h2>
-      <div class="filter-container">
-        <div class="search-box">
-          <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Search users..."
-              @keyup.enter="handleSearch"
-          >
-          <button class="reset-button" @click="resetSearch">
-            <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
-          </button>
-          <button class="search-button" @click="handleSearch">
-            <img src="/static/center/search.svg" alt="Search" class="search-icon">
-          </button>
-        </div>
-        <div class="role-filter">
-          <label for="role-select">Filter by Role:</label>
-          <select id="role-select" v-model="roleFilter" @change="filterUsers">
-            <option value="0">Admin</option>
-            <option value="1">User</option>
-          </select>
-        </div>
-        <div class="status-filter" v-if="roleFilter === '1'">
-          <label for="status-select">Filter by Status:</label>
-          <select id="status-select" v-model="statusFilter" @change="filterUsers">
-            <option value="1">Active</option>
-            <option value="0">Inactive</option>
-          </select>
-        </div>
+
+    <h2 class="title">All Users</h2>
+    <div class="filter-container">
+      <div class="role-filter">
+        <label for="role-select">Filter by Role:</label>
+        <select id="role-select" v-model="roleFilter" @change="filterUsers">
+          <option value="0">Admin</option>
+          <option value="1">User</option>
+        </select>
       </div>
+      <div class="status-filter" v-if="roleFilter === '1'">
+        <label for="status-select">Filter by Status:</label>
+        <select id="status-select" v-model="statusFilter" @change="filterUsers">
+          <option value="1">Active</option>
+          <option value="0">Inactive</option>
+        </select>
+      </div>
+      <div class="search-box">
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search users..."
+            @keyup.enter="handleSearch"
+        >
+        <button class="reset-button" @click="resetSearch">
+          <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
+        </button>
+        <button class="search-button" @click="handleSearch">
+          <img src="/static/center/search.svg" alt="Search" class="search-icon">
+        </button>
+      </div>
+
     </div>
 
     <div class="table-container">
@@ -74,7 +74,7 @@
             </span>
           </td>
           <td>
-            <button class="action-btn delete-btn" @click="toggleUserStatus(user.id, user.status)">
+            <button class="action-btn delete-btn" @click="disableUser(user.id)">
               <img :src="user.status ? '/static/center/disable.png' : '/static/center/enable.png'"
                    :alt="user.status ? 'Disable' : 'Enable'"
                    class="action-icon">
@@ -225,6 +225,43 @@ export default {
         alert('Failed to load users');
       }
     },
+    async disableUser(userId) {
+      if (!confirm('Are you sure you want to change this user\'s status?')) return;
+
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+        // 检查token是否存在
+        if (!token) {
+          alert('Please login first');
+          this.$router.push('/login');
+          return;
+        }
+
+        const res = await axios.get(
+            `http://localhost:8080/api/users/changeStatus/${userId}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              }
+            }
+        );
+
+        if (res.status === 200) {
+          alert('User status changed successfully');
+          this.fetchUsers();
+        }
+      } catch (error) {
+        console.error('Error changing user status:', error.response);
+        if (error.response?.status === 401) {
+          alert('Session expired, please login again');
+          this.$router.push('/login');
+        } else {
+          alert(`Failed to change user status: ${error.response?.data?.message || error.message}`);
+        }
+      }
+    },
     handleSearch() {
       this.filterUsers();
     },
@@ -273,37 +310,7 @@ export default {
       this.inputPage = page;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    async toggleUserStatus(userId, currentStatus) {
-      const newStatus = currentStatus ? 0 : 1;
-      const action = currentStatus ? 'disable' : 'enable';
 
-      if (!confirm(`Are you sure you want to ${action} this user?`)) return;
-
-      try {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        const res = await axios.post(
-            `http://localhost:8080/api/users/updateStatus/${userId}`,
-            { status: newStatus },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              }
-            }
-        );
-        if (res.status === 200) {
-          alert(`User ${action}d successfully`);
-          this.fetchUsers();
-        }
-      } catch (error) {
-        console.error(`Error ${action}ing user:`, error.response);
-        alert(`Failed to ${action} user: ${error.response?.data?.message || error.message}`);
-      }
-    },
-    editUser(userId) {
-      // Implement edit functionality
-      this.$router.push(`/admin/users/edit/${userId}`);
-    },
     getStatusLabel(status) {
       return status ? 'Active' : 'Inactive';
     },
@@ -321,19 +328,24 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  border-bottom: 2px solid #58c4c9;
+}
 /* Header and Filter Container Styles */
-.header-container {
+.filter-container {
   display: flex;
+  gap: 20px;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
   flex-wrap: wrap;
-}
-
-.title {
-  color: #333;
-  font-size: 24px;
-  margin: 0;
+  margin-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .filter-container {

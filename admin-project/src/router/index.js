@@ -4,7 +4,7 @@ import store from '../store'
 // 延迟加载组件
 const UserLogin = () => import('../views/login/index.vue')
 // const UserRegister = () => import('../components/UserRegister.vue')
-const ScooterAdd = () => import('@/components/ScooterAdd.vue')
+// const ScooterAdd = () => import('@/components/ScooterAdd.vue')
 // const ScooterAdd = () => import('../components/ScooterAdd.vue')
 const MainLayout = () => import('@/components/MainLayout.vue')
 
@@ -34,6 +34,8 @@ const routes = [
       { path: '/order-management', component: () => import('@/components/BookingManagement.vue') },
       { path: '/user-management', component: () => import('@/components/UserManagement.vue') },
       { path: '/logout', component: () => import('@/components/Logout.vue') },
+      { path: '/add_user', component: () => import('@/components/AddUser.vue') },
+      { path: '/add_order', component: () => import('@/components/AddOrder.vue') },
     ],
   },
   {

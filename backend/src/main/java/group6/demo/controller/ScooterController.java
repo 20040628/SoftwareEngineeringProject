@@ -80,7 +80,7 @@ public class ScooterController {
     }
 
     // 给用户的：返回有电且没有冲突订单的全部滑板车
-    @GetMapping("/getScootersAvailable/{userId}")
+    @PostMapping("/getScootersAvailable/{userId}")
     public ResponseEntity<?> getScootersAvailable(@PathVariable Long userId, @Valid @RequestBody AvailableScooterDTO availableDTO){
         try {
             List<Scooter> scooters = scooterService.getScootersAvailable(availableDTO);

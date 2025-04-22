@@ -1,33 +1,38 @@
 <template>
   <div>
-    <div class="header-container">
-      <h2 class="title">All Bookings</h2>
-      <div class="filter-container">
-        <div class="search-box">
-          <input
-              type="text"
-              v-model="searchQuery"
-              placeholder="Search bookings..."
-              @keyup.enter="handleSearch"
-          >
-          <button class="reset-button" @click="resetSearch">
-            <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
-          </button>
-          <button class="search-button" @click="handleSearch">
-            <img src="/static/center/search.svg" alt="Search" class="search-icon">
-          </button>
-        </div>
-        <div class="status-filter">
-          <label for="status-select">Filter by Status:</label>
-          <select id="status-select" v-model="statusFilter" @change="filterBookings">
-            <option value="1">Active</option>
-            <option value="2">Completed</option>
-            <option value="3">Cancelled</option>
-          </select>
-        </div>
+    <h2 class="title">All Bookings</h2>
+    <div class="filter-container">
+      <div class="status-filter">
+        <label for="status-select">Filter by Status:</label>
+        <select id="status-select" v-model="statusFilter" @change="filterBookings">
+          <option value="1">Active</option>
+          <option value="2">Completed</option>
+          <option value="3">Cancelled</option>
+        </select>
+      </div>
+      <div class="search-box">
+        <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search bookings..."
+            @keyup.enter="handleSearch"
+        >
+        <button class="reset-button" @click="resetSearch">
+          <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
+        </button>
+        <button class="search-button" @click="handleSearch">
+          <img src="/static/center/search.svg" alt="Search" class="search-icon">
+        </button>
       </div>
     </div>
 
+    <div v-if="bookings.length === 0" style="color: red; padding: 10px;">
+      <p>Debug Info:</p>
+      <p>isAdmin: {{ isAdmin }}</p>
+      <p>Token: {{ $store.getters.token ? 'Exists' : 'Missing' }}</p>
+      <p>Bookings count: {{ bookings.length }}</p>
+      <p>Error: {{ error || 'None' }}</p>
+    </div>
     <div class="table-container">
       <table class="booking-table">
         <thead>
@@ -56,14 +61,14 @@
           <td>{{ booking.hirePeriod }}</td>
           <td style="white-space: pre-line">{{ formatDate(booking.startTime) }}</td>
           <td style="white-space: pre-line">{{ formatDate(booking.endTime) }}</td>
-          <td>${{ booking.price.toFixed(2) }}</td>
+          <td>£{{ booking.price.toFixed(2) }}</td>
           <td>
             <div><strong>Username:</strong> {{ booking.user.username }}</div>
             <div><strong>Email:</strong> {{ booking.user.email }}</div>
           </td>
           <td>
             <div><strong>Location:</strong> {{ booking.scooter.location }}</div>
-            <div><strong>Price/Hour:</strong> ${{ booking.scooter.priceHour.toFixed(2) }}</div>
+            <div><strong>Price/Hour:</strong> £{{ booking.scooter.priceHour.toFixed(2) }}</div>
           </td>
           <td v-if="booking.status === 1">
             <button class="delete-btn" @click="cancelBooking(booking.id)">
@@ -140,14 +145,19 @@ export default {
       bookings: [],
       filteredBookings: [],
       currentPage: 1,
-      itemsPerPage: 10, // Changed to 10 per your image
+      itemsPerPage: 10,
       inputPage: 1,
       searchQuery: '',
       statusFilter: '1',
-      showActionsColumn: true
+      showActionsColumn: true,
+      error: null
     };
   },
+
   computed: {
+    isAdmin() {
+      return this.$store.getters.isAdmin;
+    },
     totalPages() {
       return Math.ceil(this.filteredBookings.length / this.itemsPerPage);
     },
@@ -156,25 +166,13 @@ export default {
       const total = this.totalPages;
       const current = this.currentPage;
 
-      // Always show first page
       pages.push(1);
-
-      // Show pages around current page
       const start = Math.max(2, current - 2);
       const end = Math.min(total - 1, current + 2);
 
-      // Add ellipsis if needed
       if (start > 2) pages.push('ellipsis');
-
-      // Add middle pages
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      // Add ellipsis if needed
+      for (let i = start; i <= end; i++) pages.push(i);
       if (end < total - 1) pages.push('ellipsis');
-
-      // Always show last page if there is more than one page
       if (total > 1) pages.push(total);
 
       return pages;
@@ -185,16 +183,22 @@ export default {
       return this.filteredBookings.slice(start, end);
     }
   },
+
   mounted() {
+    console.log("Current token:", this.$store.getters.token);
+    console.log("Current user:", this.$store.getters.user);
     this.fetchBookings();
   },
+
   methods: {
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = '1';
       this.filterBookings();
     },
+
     formatDate(dateString) {
+      console.log(dateString);
       const date = new Date(dateString);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -204,35 +208,82 @@ export default {
       return `${year}-${month}-${day}\n${hours}:${minutes}`;
     },
     async fetchBookings() {
+      if (!this.isAdmin) {
+        this.error = 'Only Administrator can get all bookings';
+        alert(this.error);
+        return;
+      }
+
       try {
-        const res = await axios.get('http://localhost:8080/api/bookings/getAll');
-        if (res.status === 200) {
-          this.bookings = res.data;
-          this.filteredBookings = [...res.data];
-          this.filterBookings();
+        const token = this.$store.getters.token;
+        console.log("Token is :", token); // Log the token for debugging
+        if (!token) {
+          this.error = 'Not authenticated';
+          alert(this.error);
+          this.$router.push('/add_scooter'); // Redirect to login page
+          return;
         }
+
+        const config = {
+          headers: { Authorization: `Bearer ${token}` }
+        };
+
+        console.log("Sending request to /api/bookings/getAll..."); // Request start
+        const res = await axios.get('http://localhost:8080/api/bookings/getAll', config);
+        console.log("API response:", res); // Full response object
+
+        // Print key data
+        console.log("Response data:", res.data); // Actual returned data
+        if (Array.isArray(res.data)) {
+          this.bookings = res.data;
+        } else {
+          console.warn('Unexpected data format:', res.data); // Format warning
+          this.bookings = [];
+        }
+        this.filteredBookings = [...this.bookings];
+        this.error = null;
+
+        // Print processed data
+        console.log("Processed bookings:", this.bookings);
+
+        // Default disable filter
+        this.statusFilter = 'all';
+        this.searchQuery = '';
+        this.filterBookings();
       } catch (error) {
-        console.error('Failed to load bookings:', error);
-        alert('Failed to load bookings');
+        // More comprehensive error handling
+        if (error.response) {
+          // Server returned an error response
+          console.error('Server responded with an error:', error.response);
+          this.error = error.response.data?.message || `Error: ${error.response.status}`;
+        } else if (error.request) {
+          // Request sent but no response received
+          console.error('No response received:', error.request);
+          this.error = 'No response received from server';
+        } else {
+          // Other errors during request creation
+          console.error('Error creating request:', error.message);
+          this.error = `Request error: ${error.message}`;
+        }
+        alert(this.error); // Notify user of error
       }
     },
+
     handleSearch() {
       this.filterBookings();
     },
+
     filterBookings() {
       const query = this.searchQuery.toLowerCase().trim();
       const statusFilter = this.statusFilter;
 
       this.filteredBookings = this.bookings.filter(booking => {
-        // Status filter
         if (statusFilter !== 'all' && booking.status.toString() !== statusFilter) {
           return false;
         }
 
-        // If no search query, return all matching status
         if (!query) return true;
 
-        // Search in all relevant fields
         return (
             booking.id.toString().includes(query) ||
             this.formatDateForSearch(booking.orderTime).toLowerCase().includes(query) ||
@@ -249,19 +300,23 @@ export default {
 
       this.resetPagination();
     },
+
     formatDateForSearch(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
       return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
     },
+
     resetPagination() {
       this.currentPage = 1;
       this.inputPage = 1;
       this.updateActionsColumnVisibility();
     },
+
     updateActionsColumnVisibility() {
       this.showActionsColumn = this.filteredBookings.some(booking => booking.status === 1);
     },
+
     goToPage(page) {
       page = parseInt(page);
       if (page < 1) page = 1;
@@ -271,10 +326,11 @@ export default {
       this.inputPage = page;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+
     async cancelBooking(orderId) {
       if (!confirm('Are you sure you want to cancel this booking?')) return;
       try {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const token = this.$store.getters.token;
         const res = await axios.post(
             `http://localhost:8080/api/bookings/cancel/${orderId}`,
             {},
@@ -294,10 +350,12 @@ export default {
         alert(`Failed to cancel booking: ${error.response?.data?.message || error.message}`);
       }
     },
+
     getStatusLabel(status) {
       const statusMap = { 1: 'Active', 2: 'Completed', 3: 'Cancelled' };
       return statusMap[status] || 'Unknown';
     },
+
     getStatusClass(status) {
       const statusClassMap = {
         1: 'status-active',
@@ -311,20 +369,24 @@ export default {
 </script>
 
 <style scoped>
-/* Header and Filter Container Styles */
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  border-bottom: 2px solid #58c4c9;
 }
-
+/* Header and Filter Container Styles */
 .filter-container {
   display: flex;
   gap: 20px;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  margin-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 /* Search Box Styles */

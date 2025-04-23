@@ -242,6 +242,7 @@ public class BookingServiceImpl implements BookingService {
             "End Time: %s\n" +
             "Rental Duration: %s\n" +
             "Rental Fee: $%.2f\n\n" +
+            "Rental Store Id: %s\n" +
             "Thank you for using our service!\n\n" +
             "Best regards,\n" +
             "E-Scooter Rental Team",
@@ -252,7 +253,8 @@ public class BookingServiceImpl implements BookingService {
             dateFormat.format(order.getStartTime()),
             dateFormat.format(order.getEndTime()),
             hirePeriodText,
-            order.getPrice()
+            order.getPrice(),
+            order.getScooter().getStore().getId()
         );
         
         message.setText(emailContent);
@@ -375,6 +377,7 @@ public class BookingServiceImpl implements BookingService {
                         "End Time: %s\n" +
                         "Rental Duration: %s\n" +
                         "Rental Fee: $%.2f\n\n" +
+                        "Rental Store Id: %s\n" +
                         "If you have any questions, please contact our customer service.\n\n" +
                         "Best regards,\n" +
                         "E-Scooter Rental Team",
@@ -385,7 +388,8 @@ public class BookingServiceImpl implements BookingService {
                 dateFormat.format(order.getStartTime()),
                 dateFormat.format(order.getEndTime()),
                 hirePeriodText,
-                order.getPrice()
+                order.getPrice(),
+                order.getScooter().getStore().getId()
         );
 
         message.setText(emailContent);

@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 public class ScooterWithDiscountDTO {
     private Long id;
     private Integer status;
-    private BigDecimal longitude;
-    private BigDecimal latitude;
-    
     // 原始价格
     private BigDecimal priceHour;
     private BigDecimal priceFourHour;

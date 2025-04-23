@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS `b_order`;
 DROP TABLE IF EXISTS `b_discount_rule`;
 DROP TABLE IF EXISTS `b_scooter`;
 DROP TABLE IF EXISTS `b_user`;
+DROP TABLE IF EXISTS `b_store`;
 DROP TABLE IF EXISTS `b_weekly_revenue`;
 
 -- 创建用户表
@@ -26,6 +27,14 @@ CREATE TABLE `b_user`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+-- 创建店铺表
+CREATE TABLE `b_store` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `longitude` decimal(9, 6) NOT NULL,
+    `latitude` decimal(9, 6) NOT NULL,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
 -- 创建滑板车表
 CREATE TABLE `b_scooter` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -34,11 +43,11 @@ CREATE TABLE `b_scooter` (
   `price_day` decimal(5, 2) NOT NULL,
   `price_week` decimal(5, 2) NOT NULL, 
   `status` tinyint(1) NOT NULL DEFAULT 1,
-  `longitude` decimal(9, 6) NOT NULL,
-  `latitude` decimal(9, 6) NOT NULL,
   `battery` decimal(5, 2) NOT NULL,
   `speed` decimal(5, 2) NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  `store_id` bigint NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  FOREIGN KEY (`store_id`) REFERENCES `b_store` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- 创建订单表

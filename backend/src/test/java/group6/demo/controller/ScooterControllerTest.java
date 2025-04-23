@@ -3,6 +3,7 @@ package group6.demo.controller;
 import group6.demo.dto.AvailableScooterDTO;
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.entity.Scooter;
+import group6.demo.entity.Store;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.ScooterService;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,8 +56,8 @@ class ScooterControllerTest {
         ScooterAddDTO dto = new ScooterAddDTO();
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLongitude(new BigDecimal("104.06"));
-        scooter.setLatitude(new BigDecimal("30.67"));
+//        scooter.setLongitude(new BigDecimal("104.06"));
+//        scooter.setLatitude(new BigDecimal("30.67"));
 
         // Mocking the behavior of BindingResult and ScooterService
         when(bindingResult.hasErrors()).thenReturn(false);
@@ -106,13 +107,13 @@ class ScooterControllerTest {
     void testGetAllScooters() {
         Scooter scooter1 = new Scooter();
         scooter1.setId(1L);
-        scooter1.setLongitude(new BigDecimal("104.06"));
-        scooter1.setLatitude(new BigDecimal("30.67"));
+//        scooter1.setLongitude(new BigDecimal("104.06"));
+//        scooter1.setLatitude(new BigDecimal("30.67"));
 
         Scooter scooter2 = new Scooter();
         scooter2.setId(2L);
-        scooter2.setLongitude(new BigDecimal("104.07"));
-        scooter2.setLatitude(new BigDecimal("30.68"));
+//        scooter2.setLongitude(new BigDecimal("104.07"));
+//        scooter2.setLatitude(new BigDecimal("30.68"));
 
         // Preparing a list of scooters to be returned by the mock service
         List<Scooter> scooters = Arrays.asList(scooter1, scooter2);
@@ -132,8 +133,8 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLongitude(new BigDecimal("104.06"));
-        scooter.setLatitude(new BigDecimal("30.67"));
+//        scooter.setLongitude(new BigDecimal("104.06"));
+//        scooter.setLatitude(new BigDecimal("30.67"));
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));
@@ -146,7 +147,7 @@ class ScooterControllerTest {
         dto.setStartTime("2025-08-21 10:00:00.756000");
         dto.setHireType("HOUR"); // 模拟租用方式
 
-        when(scooterService.getScootersAvailable(dto)).thenReturn(scooters);
+        when(scooterService.getScootersAvailable(dto, 1L)).thenReturn(scooters);
         
         // 设置折扣计算结果
         when(priceDiscountService.calculateDiscountedPrice(new BigDecimal("50.00"), 1L)).thenReturn(new BigDecimal("42.50"));
@@ -155,7 +156,7 @@ class ScooterControllerTest {
         when(priceDiscountService.calculateDiscountedPrice(new BigDecimal("1000.00"), 1L)).thenReturn(new BigDecimal("850.00"));
         
         // 调用方法 - 使用userId
-        ResponseEntity<?> response = scooterController.getScootersAvailable(1L,dto);
+        ResponseEntity<?> response = scooterController.getScootersAvailable(1L,2L, dto);
         
         // 验证结果
         assertEquals(200, response.getStatusCodeValue());
@@ -177,8 +178,8 @@ class ScooterControllerTest {
         // 设置测试数据
         Scooter scooter = new Scooter();
         scooter.setId(1L);
-        scooter.setLongitude(new BigDecimal("104.06"));
-        scooter.setLatitude(new BigDecimal("30.67"));
+//        scooter.setLongitude(new BigDecimal("104.06"));
+//        scooter.setLatitude(new BigDecimal("30.67"));
         scooter.setPriceHour(new BigDecimal("50.00"));
         scooter.setPriceFourHour(new BigDecimal("160.00"));
         scooter.setPriceDay(new BigDecimal("300.00"));

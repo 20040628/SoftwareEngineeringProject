@@ -4,8 +4,10 @@ import group6.demo.dto.AvailableScooterDTO;
 import group6.demo.dto.ScooterAddDTO;
 import group6.demo.entity.Scooter;
 import group6.demo.entity.Order;
+import group6.demo.entity.Store;
 import group6.demo.repository.OrderRepository;
 import group6.demo.repository.ScooterRepository;
+import group6.demo.repository.StoreRepository;
 import group6.demo.service.ScooterService;
 import group6.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class ScooterServiceImlp implements ScooterService {
     private ScooterRepository scooterRepository;
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private StoreRepository storeRepository;
 
     @Override
     public Scooter addScooter(ScooterAddDTO scooterAddDTO){
@@ -39,31 +43,27 @@ public class ScooterServiceImlp implements ScooterService {
             throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
         }
 
-        if (!ValidationUtil.isValidLocation(scooterAddDTO.getLongitude())) {
-            throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 6 decimal places");
-        }
-        if (!ValidationUtil.isValidLocation(scooterAddDTO.getLatitude())) {
-            throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 6 decimal places");
-        }
         if (!ValidationUtil.isValidBattery(scooterAddDTO.getBattery())) {
             throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
         }
         if (!ValidationUtil.isValidSpeed(scooterAddDTO.getSpeed())) {
             throw new IllegalArgumentException("Invalid format. Must be a decimal with up to 3 digits and 2 decimal places");
         }
+        // check if store exists
+        Store store = storeRepository.findById(scooterAddDTO.getStoreId())
+                .orElseThrow(() -> new IllegalArgumentException("Store not found"));
+
         // Create new scooter entity
         Scooter scooter = new Scooter();
         scooter.setPriceHour(scooterAddDTO.getPriceHour());
         scooter.setPriceFourHour(scooterAddDTO.getPriceFourHour());
         scooter.setPriceDay(scooterAddDTO.getPriceDay());
         scooter.setPriceWeek(scooterAddDTO.getPriceWeek());
-        scooter.setLongitude(scooterAddDTO.getLongitude());
-        scooter.setLatitude(scooterAddDTO.getLatitude());
         scooter.setBattery(scooterAddDTO.getBattery());
         scooter.setSpeed(scooterAddDTO.getSpeed());
+        scooter.setStore(store);
         // Set default values(1:available;0:unavailable)
         scooter.setStatus(1);
-
         return scooterRepository.save(scooter);
     }
 
@@ -74,9 +74,17 @@ public class ScooterServiceImlp implements ScooterService {
 
     // A list of scooters has battery and without conflicting orders
     @Override
-    public List<Scooter> getScootersAvailable(AvailableScooterDTO availableDTO) {
-        // 获取所有电量大于0的滑板车
-        List<Scooter> allChargedScooters = scooterRepository.findByBatteryNot(BigDecimal.ZERO);
+    public List<Scooter> getScootersAvailable(AvailableScooterDTO availableDTO, Long storeId) {
+        // 首先调用 getScooterByStoreId 方法获取指定 storeId 的滑板车列表
+        List<Scooter> scootersByStore = getScooterByStoreId(storeId);
+
+        // 获取所有电量大于0的滑板车（这里改为从指定 storeId 的滑板车中筛选）
+        List<Scooter> allChargedScooters = new ArrayList<>();
+        for (Scooter scooter : scootersByStore) {
+            if (scooter.getBattery().compareTo(BigDecimal.ZERO) > 0) {
+                allChargedScooters.add(scooter);
+            }
+        }
 
         // Check start time
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -122,6 +130,11 @@ public class ScooterServiceImlp implements ScooterService {
         }
 
         return availableScooters;
+    }
+
+    @Override
+    public List<Scooter> getScooterByStoreId(Long storeId) {
+        return scooterRepository.findByStoreId(storeId);
     }
 
     @Override

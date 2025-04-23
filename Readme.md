@@ -314,10 +314,13 @@ Frontend service will run on http://localhost:5173
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 0,
-              "longitude": 103.984500,
-              "latitude": 30.765000,
               "battery": 100.00,
-              "speed": 50.00
+              "speed": 50.00,
+              "store": {
+                  "id": 1,
+                  "longitude": 103.984500,
+                  "latitude": 30.765000
+              }
           }
       }
   ]
@@ -427,7 +430,87 @@ Frontend service will run on http://localhost:5173
   "更新银行卡信息失败: error message"
   ```
 
-### Scooter API
+### Store API
+
+#### add store
+
+- **URL**: `/api/stores/add`
+
+- **Method**: `POST`
+
+- **Request Body**:
+
+  ```
+  {
+      "longitude": 100.000000,
+      "latitude": 20.765000
+  }
+  ```
+
+- **Success Response(200 OK)** 
+
+  ```
+  {
+      "latitude": 20.765000,
+      "message": "Add successfully",
+      "storeId": 4,
+      "longitude": 100.000000
+  }
+  ```
+
+- **Error(400Bad Request)**
+
+  ```
+  {
+      "latitude": "The latitude of the location is required"
+  }
+  ```
+
+#### get all
+
+- **URL**: `/api/stores/getAll`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  ```
+  [
+      {
+          "id": 1,
+          "longitude": 103.984500,
+          "latitude": 30.765000
+      },
+      {
+          "id": 2,
+          "longitude": 103.987000,
+          "latitude": 30.764000
+      },
+      {
+          "id": 3,
+          "longitude": 103.986500,
+          "latitude": 30.766000
+      }
+  ]
+  ```
+
+#### get one
+
+- **URL**: `/api/stores/1`
+- **Method**: `GET`
+- **Success Response** (200 OK):
+
+```
+{
+    "id": 1,
+    "longitude": 103.984500,
+    "latitude": 30.765000
+}
+```
+
+
+
+###  Scooter API
 
 #### Add scooter
 
@@ -443,10 +526,9 @@ Frontend service will run on http://localhost:5173
     "priceDay": "decimal",
     "priceWeek": "decimal",
     "status": "int",
-    "longitude": "decimal",
-    "latitude": "decimal",
     "battery": "decimal",
     "speed": "decimal",
+    "storeId": "int",
   }
   ```
 
@@ -482,10 +564,13 @@ Frontend service will run on http://localhost:5173
         "priceDay": 20.00,
         "priceWeek": 100.00,
         "status": 1,
-        "longitude": 103.984500,
-        "latitude": 30.765000,
         "battery": 100.00,
-        "speed": 100.00
+        "speed": 100.00,
+        "store": {
+            "id": 1,
+            "longitude": 103.984500,
+            "latitude": 30.765000
+        }
     },
     {
         "id": 2,
@@ -494,29 +579,20 @@ Frontend service will run on http://localhost:5173
         "priceDay": 20.00,
         "priceWeek": 100.00,
         "status": 1,
-        "longitude": 103.987000,
-        "latitude": 30.764000,
         "battery": 50.00,
-        "speed": 50.00
-    },
-    {
-        "id": 3,
-        "priceHour": 5.00,
-        "priceFourHour": 10.00,
-        "priceDay": 20.00,
-        "priceWeek": 100.00,
-        "status": 1,
-        "longitude": 103.986500,
-        "latitude": 30.766000,
-        "battery": 0.00,
-        "speed": 50.00
+        "speed": 50.00,
+        "store": {
+            "id": 2,
+            "longitude": 103.984500,
+            "latitude": 30.765000
+        }
     }
 ]
 ```
 
-#### get all available scooters (has battery and no conflict order)
+#### get available scooters in a store with discount (has battery and no conflict order)
 
-**URL**: `/api/scooters/getScootersAvailable/{userId}`
+**URL**: `/api/scooters/getScootersAvailable/{userId}/{storeId}`
 
 **method**: `POST`
 
@@ -536,16 +612,14 @@ Frontend service will run on http://localhost:5173
     {
         "id": 2,
         "status": 1,
-        "longitude": 103.987000,
-        "latitude": 30.764000,
         "priceHour": 5.00,
         "priceFourHour": 10.00,
         "priceDay": 20.00,
         "priceWeek": 100.00,
-        "discountedPriceHour": 4.50,
-        "discountedPriceFourHour": 9.00,
-        "discountedPriceDay": 18.00,
-        "discountedPriceWeek": 90.00,
+        "discountedPriceHour": 5.00,
+        "discountedPriceFourHour": 10.00,
+        "discountedPriceDay": 20.00,
+        "discountedPriceWeek": 100.00,
         "hasDiscount": true
     }
 ]
@@ -561,15 +635,19 @@ Frontend service will run on http://localhost:5173
 
 ```
 {
-    id:
-    priceHour:
-    priceDay:
-    priceWeek:
-    statue:
-    longitude:
-    latitude:
-    battery:
-    speed:
+    "id": 1,
+    "priceHour": 5.00,
+    "priceFourHour": 10.00,
+    "priceDay": 20.00,
+    "priceWeek": 100.00,
+    "status": 1,
+    "battery": 100.00,
+    "speed": 100.00,
+    "store": {
+        "id": 1,
+        "longitude": 103.984500,
+        "latitude": 30.765000
+    }
 }
 ```
 
@@ -717,10 +795,13 @@ Frontend service will run on http://localhost:5173
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 0,
-              "longitude": 103.984500,
-              "latitude": 30.765000,
               "battery": 100.00,
-              "speed": 50.00
+              "speed": 50.00,
+              "store": {
+                  "id": 1,
+                  "longitude": 103.984500,
+                  "latitude": 30.765000
+              }
           },
           "staff": {
               "id": 1,
@@ -786,10 +867,13 @@ Frontend service will run on http://localhost:5173
           "priceDay": 20.00,
           "priceWeek": 100.00,
           "status": 0,
-          "longitude": 103.984500,
-          "latitude": 30.765000,
           "battery":100.00,
-          "speed": 50.00
+          "speed": 50.00,
+          "store": {
+              "id": 1,
+              "longitude": 103.984500,
+              "latitude": 30.765000
+          }
       },
       "staff": {
           "id": 1,
@@ -863,10 +947,13 @@ Frontend service will run on http://localhost:5173
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
-              "longitude": 103.987000,
-              "latitude": 30.764000,
               "battry": 100.00,
-              "speed": 50.00
+              "speed": 50.00,
+              "store": {
+                  "id": 1,
+                  "longitude": 103.984500,
+                  "latitude": 30.765000
+              }
           },
           "staff": null,
           "priceBeforeDiscount": 20.00
@@ -927,10 +1014,13 @@ Frontend service will run on http://localhost:5173
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
-              "longitude": 103.987000,
-              "latitude": 30.764000,
               "battery":100.00,
-              "speed": 50.00
+              "speed": 50.00,
+              "store": {
+                  "id": 1,
+                  "longitude": 103.984500,
+                  "latitude": 30.765000
+              }
           },
           "staff": null,
           "priceBeforeDiscount": 20.00
@@ -991,10 +1081,13 @@ Frontend service will run on http://localhost:5173
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
-              "longitude": 103.987000,
-              "latitude": 30.764000,
               "battery""100.00,
-              "speed":50.00
+              "speed":50.00,
+              "store": {
+                  "id": 1,
+                  "longitude": 103.984500,
+                  "latitude": 30.765000
+              }
           },
           "staff": null,
           "priceBeforeDiscount": 20.00
@@ -1617,13 +1710,15 @@ b_user
 
 ### b_scooter table
 
-#### longitude and latitude
-
-Integers have a maximum of three digits, and decimal places have a maximum of 6 digits
-
 #### price per hour/day/week, battery, speed
 
 - Integers have a maximum of three digits, and decimal places have a maximum of two digits
+
+### b_store table
+
+#### longitude and latitude
+
+- Integers have a maximum of three digits, and decimal places have a maximum of 6 digits
 
 ## Discount System
 
@@ -1652,33 +1747,6 @@ The application provides automatic discount calculation based on user profiles a
 
 ### API for Scooters with Discounts
 
-#### Get All Scooters with Discounts
-
-- **URL**: `/api/scooters/getAll?userId={userId}`
-- **Method**: `GET`
-- **Query Parameters**:
-  - `userId`: ID of the current user (optional)
-- **Success Response** (200 OK):
-  ```json
-  [
-    {
-      "id": "number",
-      "status": "number",
-      "longitude": "decimal",
-      "latitude": "decimal",
-      "priceHour": "decimal",
-      "priceFourHour": "decimal",
-      "priceDay": "decimal",
-      "priceWeek": "decimal",
-      "discountedPriceHour": "decimal",
-      "discountedPriceFourHour": "decimal",
-      "discountedPriceDay": "decimal",
-      "discountedPriceWeek": "decimal",
-      "hasDiscount": "boolean"
-    }
-  ]
-  ```
-
 #### Get Single Scooter with Discounts
 
 - **URL**: `/api/scooters/{id}?userId={userId}`
@@ -1692,8 +1760,6 @@ The application provides automatic discount calculation based on user profiles a
   {
     "id": "number",
     "status": "number",
-    "longitude": "decimal",
-    "latitude": "decimal",
     "priceHour": "decimal",
     "priceFourHour": "decimal",
     "priceDay": "decimal",

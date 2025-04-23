@@ -7,5 +7,5 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface ScooterRepository extends JpaRepository<Scooter, Long> {
-    List<Scooter> findByBatteryNot(BigDecimal battery);
+    List<Scooter> findByStoreId(Long storeId);
 }

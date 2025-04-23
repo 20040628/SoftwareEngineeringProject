@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/changeStatus/{id}").hasRole("ADMIN")
                 .requestMatchers("/api/users/**").authenticated()
                 .requestMatchers("/api/alipay/**").authenticated()
+                .requestMatchers("/api/stores/**").authenticated()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -19,8 +19,10 @@ public class Scooter {
     private BigDecimal priceWeek;
     // status: 1: valid 0:invalid
     private Integer status;
-    private BigDecimal longitude;
-    private BigDecimal latitude;
     private BigDecimal battery;
     private BigDecimal speed;
+
+    @ManyToOne
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 }

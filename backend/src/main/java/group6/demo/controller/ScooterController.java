@@ -54,10 +54,9 @@ public class ScooterController {
             response.put("price_day", scooter.getPriceDay());
             response.put("price_week", scooter.getPriceWeek());
             response.put("status", scooter.getStatus());
-            response.put("longitude", scooter.getLongitude());
-            response.put("latitude", scooter.getLatitude());
             response.put("battery", scooter.getBattery());
             response.put("speed", scooter.getSpeed());
+            response.put("store_id", scooter.getStore().getId());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             // Handle validation errors
@@ -68,7 +67,7 @@ public class ScooterController {
         }
     }
 
-    // 给管理员的：返回原始滑板车列表
+    // 给管理员的：返回所有店铺的所有车子
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllScooters() {
         try {
@@ -79,11 +78,22 @@ public class ScooterController {
         }
     }
 
-    // 给用户的：返回有电且没有冲突订单的全部滑板车
-    @PostMapping("/getScootersAvailable/{userId}")
-    public ResponseEntity<?> getScootersAvailable(@PathVariable Long userId, @Valid @RequestBody AvailableScooterDTO availableDTO){
+    // 给管理员的：返回某个店铺的所有车子
+    @GetMapping("/{storeId}")
+    public ResponseEntity<?> getScooterByStoreId(@PathVariable Long storeId) {
         try {
-            List<Scooter> scooters = scooterService.getScootersAvailable(availableDTO);
+            List<Scooter> scooters = scooterService.getScooterByStoreId(storeId);
+            return ResponseEntity.ok(scooters);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to get scooters: " + e.getMessage());
+        }
+    }
+
+    // 给用户的：返回指定店铺中有电且没有冲突订单的全部滑板车
+    @PostMapping("/getScootersAvailable/{userId}/{storeId}")
+    public ResponseEntity<?> getScootersAvailable(@PathVariable Long userId, @PathVariable Long storeId, @Valid @RequestBody AvailableScooterDTO availableDTO){
+        try {
+            List<Scooter> scooters = scooterService.getScootersAvailable(availableDTO, storeId);
             List<ScooterWithDiscountDTO> scootersWithDiscount = new ArrayList<>();
 
             for (Scooter scooter : scooters) {

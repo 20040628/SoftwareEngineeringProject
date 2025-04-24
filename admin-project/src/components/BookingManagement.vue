@@ -243,11 +243,11 @@ export default {
         this.filteredBookings = [...this.bookings];
         this.error = null;
 
-        // Print processed data
+        // Print processed datastatus-filter
         console.log("Processed bookings:", this.bookings);
 
         // Default disable filter
-        this.statusFilter = 'all';
+        this.statusFilter = '1';
         this.searchQuery = '';
         this.filterBookings();
       } catch (error) {
@@ -394,7 +394,7 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 20px;
   overflow: hidden;
   background: white;
@@ -403,7 +403,7 @@ export default {
 .search-box input {
   padding: 10px 15px;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   width: 250px;
   outline: none;
 }
@@ -411,28 +411,28 @@ export default {
 .search-button {
   background: white;
   border: none;
-  padding: 0 5px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
+  padding-left: 5px;
+  padding-right: 10px;
 }
 
 .reset-button {
   background: white;
   border: none;
-  padding: 0 15px;
+  padding: 0 10px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
-  font-size: 14px;
+  border-left: 2px solid #ddd;
+  border-right: 2px solid #ddd;
   color: #666;
 }
 
@@ -464,7 +464,7 @@ export default {
 
 .status-filter select {
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
@@ -472,7 +472,7 @@ export default {
 
 .status-filter select:focus {
   outline: none;
-  border-color: #409eff;
+  border-color: #58c4c9;
 }
 
 /* Table Styles */

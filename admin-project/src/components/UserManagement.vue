@@ -360,7 +360,7 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 20px;
   overflow: hidden;
   background: white;
@@ -369,7 +369,7 @@ export default {
 .search-box input {
   padding: 10px 15px;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   width: 250px;
   outline: none;
 }
@@ -377,28 +377,28 @@ export default {
 .search-button {
   background: white;
   border: none;
-  padding: 0 5px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
+  padding-left: 5px;
+  padding-right: 10px;
 }
 
 .reset-button {
   background: white;
   border: none;
-  padding: 0 15px;
+  padding: 0 10px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
-  font-size: 14px;
+  border-left: 2px solid #ddd;
+  border-right: 2px solid #ddd;
   color: #666;
 }
 
@@ -430,7 +430,7 @@ export default {
 
 .status-filter select, .role-filter select {
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
@@ -438,7 +438,7 @@ export default {
 
 .status-filter select:focus, .role-filter select:focus {
   outline: none;
-  border-color: #409eff;
+  border-color: #58c4c9;
 }
 
 /* Table Styles */
@@ -478,14 +478,15 @@ export default {
 
 .user-table td {
   color: #666;
+  font-size: 16px;
 }
 
 /* Status Label Styles */
 .status-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 20px;
+  font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -504,8 +505,8 @@ export default {
 .role-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 20px;
+  font-size: 16px;
   font-weight: bold;
 }
 
@@ -523,8 +524,8 @@ export default {
 .frequent-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 20px;
+  font-size: 16px;
 }
 
 .frequent-yes {
@@ -544,7 +545,7 @@ export default {
   cursor: pointer;
   margin: 0 5px;
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 20px;
   transition: background-color 0.2s;
 }
 

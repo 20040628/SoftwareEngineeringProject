@@ -60,10 +60,12 @@ import DataAnalysis from './DataAnalysis.vue';
 import BookingManagement from './BookingManagement.vue';
 import UserManagement from './UserManagement.vue';
 import Logout from './Logout.vue';
+import AddStore from "@/components/AddStore.vue";
 
 export default {
   components: {
     AddScooter,
+    AddStore,
     AddUser,
     AddOrder,
     UserFeedback,
@@ -78,14 +80,15 @@ export default {
       activeMenu: 1, // 默认选中的菜单项
       menus: [
         { id: 1, name: 'Add Scooter', icon: '/static/center/book.png' },
-        { id: 2, name: 'Add User', icon: '/static/center/adduser.png' },
-        { id: 3, name: 'Add Order', icon: '/static/center/addorder.png' },
-        { id: 4, name: 'User Feedback', icon: '/static/center/comment.png' },
-        { id: 5, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
-        { id: 6, name: 'Scooter Management', icon: '/static/center/share.png' },
-        { id: 7, name: 'Order Management', icon: '/static/center/order.png' },
-        { id: 8, name: 'User Management', icon: '/static/center/user.png' },
-        { id: 9, name: 'Logout', icon: '/static/center/poweroff.png' },
+        { id: 2, name: 'Add Store', icon: '/static/center/store.svg' },
+        { id: 3, name: 'Add User', icon: '/static/center/adduser.png' },
+        { id: 4, name: 'Add Order', icon: '/static/center/addorder.png' },
+        { id: 5, name: 'User Feedback', icon: '/static/center/comment.png' },
+        { id: 6, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
+        { id: 7, name: 'Scooter Management', icon: '/static/center/share.png' },
+        { id: 8, name: 'Order Management', icon: '/static/center/order.png' },
+        { id: 9, name: 'User Management', icon: '/static/center/user.png' },
+        { id: 10, name: 'Logout', icon: '/static/center/poweroff.png' },
       ],
     };
   },
@@ -93,14 +96,15 @@ export default {
     currentComponent() {
       const componentMap = {
         1: 'AddScooter',
-        2: 'AddUser',
-        3: 'AddOrder',
-        4: 'UserFeedback',
-        5: 'DataAnalysis',
-        6: 'AllScooters',
-        7: 'BookingManagement',
-        8: 'UserManagement',
-        9: 'Logout',
+        2: 'AddStore',
+        3: 'AddUser',
+        4: 'AddOrder',
+        5: 'UserFeedback',
+        6: 'DataAnalysis',
+        7: 'AllScooters',
+        8: 'BookingManagement',
+        9: 'UserManagement',
+        10: 'Logout',
       };
       return componentMap[this.activeMenu] || 'AddScooter'; // 默认返回 AddScooter
     },
@@ -113,14 +117,15 @@ export default {
     setActiveMenuFromRoute() {
       const routeToIdMap = {
         '/add_scooter': 1,
-        '/add_user': 2,
-        '/add_order':3,
-        '/user-feedback': 4,
-        '/data-analysis': 5,
-        '/all-scooters': 6,
-        '/order-management': 7,
-        '/user-management': 8,
-        '/logout': 9,
+        '/add_store': 2,
+        '/add_user': 3,
+        '/add_order':4,
+        '/user-feedback': 5,
+        '/data-analysis': 6,
+        '/all-scooters': 7,
+        '/order-management': 8,
+        '/user-management': 9,
+        '/logout': 10,
       };
 
       const currentRoute = this.$route.path;
@@ -131,14 +136,15 @@ export default {
       this.activeMenu = id;
       const routeMap = {
         1: '/add_scooter',
-        2: '/add_user',
-        3: '/add_order',
-        4: '/user-feedback',
-        5: '/data-analysis',
-        6: '/all-scooters',
-        7: '/order-management',
-        8: '/user-management',
-        9: '/logout',
+        2: '/add_store',
+        3: '/add_user',
+        4: '/add_order',
+        5: '/user-feedback',
+        6: '/data-analysis',
+        7: '/all-scooters',
+        8: '/order-management',
+        9: '/user-management',
+        10: '/logout',
       };
       const route = routeMap[id];
       if (route) {

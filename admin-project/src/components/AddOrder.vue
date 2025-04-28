@@ -9,6 +9,7 @@
           <input
               v-model="bookingData.userId"
               type="number"
+              min="1"
               placeholder="Enter user ID"
               class="input"
           />
@@ -23,6 +24,7 @@
           <input
               v-model="bookingData.scooterId"
               type="number"
+              min="1"
               placeholder="Enter scooter ID"
               class="input"
           />
@@ -193,9 +195,8 @@ export default {
           switch(error.response.status) {
             case 400:
               this.errors = error.response.data || {};
-              console.log("bookingdata is", this.bookingData);
+              alert('Error response: ' + JSON.stringify(error.response.data));
               console.error('Error response:', error.response.data);
-              alert('Validation error: Please check your input');
               break;
             case 401:
               // token可能已过期，清除并重定向

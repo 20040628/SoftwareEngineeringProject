@@ -35,7 +35,6 @@
           <th>ID</th>
           <th>Status</th>
           <th>Pricing</th>
-          <th>Coordinates</th>
           <th>Battery</th>
           <th>Speed</th>
           <th>Actions</th>
@@ -54,7 +53,6 @@
             <div><strong>Day:</strong> £{{ scooter.priceDay }}</div>
             <div><strong>Week:</strong> £{{ scooter.priceWeek }}</div>
           </td>
-          <td>({{ scooter.longitude }}, {{ scooter.latitude }})</td>
           <td>{{ scooter.battery}}</td>
           <td>{{ scooter.speed }}</td>
           <td>
@@ -215,8 +213,6 @@ export default {
             scooter.priceHour.toString().includes(query) ||
             scooter.priceDay.toString().includes(query) ||
             scooter.priceWeek.toString().includes(query) ||
-            scooter.longitude.toString().includes(query) ||
-            scooter.latitude.toString().includes(query) ||
             scooter.battery.toString().includes(query) ||
             scooter.speed.toString().includes(query)
         );
@@ -454,16 +450,22 @@ export default {
 .pagination-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* 添加这行 */
   margin-top: 30px;
-  font-size: 14px;
+  font-size: 16px;
   flex-wrap: wrap;
   gap: 15px;
+  padding: 0 2%;
 }
 
 .pagination-info {
-  margin-right: 15px;
-  color: #666;
+  font-size: 18px;
+  font-weight: bold;
+  color: #444444;
+  padding: 1px 10px;
+  border: 3px solid #58c4c9;
+  border-radius: 20px;
+  box-shadow:  1px 1px 2px #58c4c9;
 }
 
 .pagination-buttons {
@@ -475,8 +477,8 @@ export default {
 .pagination-prev,
 .pagination-next,
 .pagination-page {
-  min-width: 32px;
-  height: 32px;
+  min-width: 36px;
+  height: 36px;
   padding: 0 8px;
   border: 1px solid #d9d9d9;
   background-color: #fff;
@@ -512,8 +514,8 @@ export default {
 }
 
 .pagination-ellipsis {
-  min-width: 32px;
-  height: 32px;
+  min-width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -529,11 +531,12 @@ export default {
 
 .pagination-jump input {
   width: 50px;
-  height: 32px;
-  border: 1px solid #d9d9d9;
+  height: 36px;
+  border: 2px solid #d9d9d9;
   border-radius: 4px;
   text-align: center;
   padding: 0 5px;
+
 }
 
 .pagination-jump input:focus {
@@ -542,17 +545,16 @@ export default {
 }
 
 .pagination-jump button {
-  height: 32px;
+  height: 36px;
   padding: 0 15px;
-  background-color: #f5f5f5;
+  margin-left: 10%;
+  border-radius: 20px;
+  background-color: #58c4c9;
+  color: white;
+  font-weight: bold;
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
-}
-
-.pagination-jump button:hover {
-  background-color: #e6e6e6;
 }
 
 /* Responsive adjustments */

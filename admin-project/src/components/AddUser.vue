@@ -8,6 +8,8 @@
           <label>Username</label>
           <input
               v-model="newUser.username"
+              minlength="3"
+              maxlength="20"
               placeholder="3-20 characters (letters, numbers, underscore)"
               class="input"
           />
@@ -21,6 +23,7 @@
           <input
               v-model="newUser.password"
               type="password"
+              minlength="8"
               placeholder="Min 8 chars (uppercase, lowercase, number)"
               class="input"
           />
@@ -47,6 +50,8 @@
           <input
               v-model="newUser.mobile"
               type="tel"
+              minlength="10"
+              maxlength="13"
               placeholder="10-13 digits"
               class="input"
           />

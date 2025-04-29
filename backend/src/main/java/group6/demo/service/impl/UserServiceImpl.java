@@ -3,15 +3,20 @@ package group6.demo.service.impl;
 import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
 import group6.demo.dto.UpdateBankCardDTO;
+import group6.demo.dto.ChangePasswordDTO;
+import group6.demo.dto.UserProfileDTO;
 import group6.demo.entity.User;
 import group6.demo.repository.UserRepository;
 import group6.demo.service.UserService;
 import group6.demo.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,6 +26,9 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
 
     @Override
     public User registerUser(UserRegistrationDTO registrationDTO) {
@@ -127,7 +135,118 @@ public class UserServiceImpl implements UserService {
         
         User user = optionalUser.get();
         user.setBankCard(updateBankCardDTO.getBankCard());
+        
+        // 随机生成银行卡余额 (1000-10000元之间)
+        Random random = new Random();
+        double balance = 1000 + random.nextDouble() * 9000;
+        // 四舍五入保留两位小数
+        BigDecimal bankBalance = new BigDecimal(balance).setScale(2, BigDecimal.ROUND_HALF_UP);
+        user.setBankBalance(bankBalance);
+        
         return userRepository.save(user);
+    }
+    
+    // 实现新增的方法
+    
+    @Override
+    public boolean changePassword(Long userId, ChangePasswordDTO changePasswordDTO) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            return false;
+        }
+        
+        User user = optionalUser.get();
+        
+        // 验证旧密码
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            return false;
+        }
+        
+        // 验证新密码和确认密码是否一致
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            return false;
+        }
+        
+        // 设置新密码
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+        userRepository.save(user);
+        
+        return true;
+    }
+    
+    @Override
+    public UserProfileDTO getUserProfile(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            return null;
+        }
+        
+        User user = optionalUser.get();
+        UserProfileDTO profileDTO = new UserProfileDTO();
+        
+        // 设置基本信息
+        profileDTO.setId(user.getId());
+        profileDTO.setUsername(user.getUsername());
+        profileDTO.setEmail(user.getEmail());
+        profileDTO.setMobile(user.getMobile());
+        profileDTO.setAvatar(user.getAvatar());
+        profileDTO.setBirthday(user.getBirthday());
+        profileDTO.setUserType(user.getUserType());
+        profileDTO.setStatus(user.getStatus());
+        profileDTO.setRole(user.getRole());
+        
+        // 设置折扣信息
+        profileDTO.setIsStudent(user.getIsStudent());
+        profileDTO.setIsSenior(user.getIsSenior());
+        profileDTO.setIsFrequentUser(user.getIsFrequentUser());
+        
+        // 设置银行卡信息
+        String bankCard = user.getBankCard();
+        if (bankCard != null && !bankCard.isEmpty()) {
+            profileDTO.setHasBankCard(true);
+            // 只显示后4位，其余用*遮盖
+            String maskedCard = "**** **** **** " + bankCard.substring(bankCard.length() - 4);
+            profileDTO.setMaskedBankCard(maskedCard);
+            profileDTO.setBankBalance(user.getBankBalance());
+        } else {
+            profileDTO.setHasBankCard(false);
+        }
+        
+        // 设置头像URL
+        if ("default_avatar.jpg".equals(user.getAvatar())) {
+            profileDTO.setAvatarUrl("/uploads/avatars/default_avatar.jpg");
+        } else {
+            profileDTO.setAvatarUrl("/uploads/avatars/" + user.getAvatar());
+        }
+        
+        return profileDTO;
+    }
+    
+    @Override
+    public User updateAvatar(Long userId, String filename) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new IllegalArgumentException("User not found with id: " + userId);
+        }
+        
+        User user = optionalUser.get();
+        user.setAvatar(filename);
+        return userRepository.save(user);
+    }
+    
+    @Override
+    public boolean unbindBankCard(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            return false;
+        }
+        
+        User user = optionalUser.get();
+        user.setBankCard(null);
+        user.setBankBalance(null);
+        userRepository.save(user);
+        
+        return true;
     }
 }
 

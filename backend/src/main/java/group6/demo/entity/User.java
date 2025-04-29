@@ -2,6 +2,7 @@ package group6.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -24,6 +25,10 @@ public class User {
     private String email;
     private String paymentMethod;
     private String bankCard;
+    
+    // 银行卡余额
+    private BigDecimal bankBalance;
+    
     private Integer status;
     private Integer role;
     private Integer isFrequentUser;

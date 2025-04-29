@@ -2,6 +2,7 @@ package group6.demo.service.impl;
 
 import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
+import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
 import group6.demo.entity.Order;
 import group6.demo.entity.Scooter;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -485,5 +487,81 @@ public class BookingServiceImpl implements BookingService {
         sendConfirmationEmail(newOrder);
 
         return newOrder;
+    }
+
+    @Override
+    @Transactional
+    public Order returnScooter(ReturnScooterDTO returnScooterDTO) {
+        // 查找订单
+        Order order = orderRepository.findById(returnScooterDTO.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+
+        // 验证订单状态必须为活跃状态(1)才能还车
+        if (order.getStatus() != 1) {
+            throw new IllegalArgumentException("只有活跃订单才能进行还车操作");
+        }
+
+        // 获取用户和电动车信息
+        User user = order.getUser();
+        Scooter scooter = order.getScooter();
+
+        // 记录还车时间
+        Date returnTime = new Date();
+        order.setReturnTime(returnTime);
+        
+        // 更新订单状态为已完成(2)
+        order.setStatus(2);
+
+        // 如果是银行卡支付且电量大于90%，退还押金
+        if ("BANK_CARD".equals(order.getPaymentMethod()) && order.getDepositPaid()) {
+            BigDecimal batteryLevel = scooter.getBattery();
+            
+            // 如果电量大于90，退还押金
+            if (batteryLevel != null && batteryLevel.compareTo(new BigDecimal("90")) > 0) {
+                // 标记押金已退还
+                order.setDepositRefunded(true);
+                
+                // 退还押金到用户银行卡余额
+                if (user.getBankBalance() != null) {
+                    BigDecimal newBalance = user.getBankBalance().add(order.getDepositAmount());
+                    user.setBankBalance(newBalance);
+                    userRepository.save(user);
+                }
+                
+                // 发送邮件通知押金退还
+                sendDepositRefundEmail(order);
+            }
+        }
+
+        // 保存更新后的订单
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * 发送押金退还邮件通知
+     * @param order 订单信息
+     */
+    private void sendDepositRefundEmail(Order order) {
+        try {
+            User user = order.getUser();
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                return;
+            }
+            
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(user.getEmail());
+            message.setSubject("押金退还通知");
+            message.setText("尊敬的 " + user.getUsername() + ",\n\n" +
+                    "您好！您的订单 #" + order.getId() + " 已完成，由于归还电动车时电量大于90%，" +
+                    "我们已将押金 ¥" + order.getDepositAmount() + " 退还至您的银行卡账户。\n\n" +
+                    "感谢您使用我们的服务！\n\n" +
+                    "祝您出行愉快，\n" +
+                    "电动车租赁平台团队");
+            
+            emailSender.send(message);
+        } catch (Exception e) {
+            // 记录邮件发送失败，但不影响主要业务流程
+            System.err.println("发送押金退还邮件失败: " + e.getMessage());
+        }
     }
 } 

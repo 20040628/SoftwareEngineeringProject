@@ -2,6 +2,7 @@ package group6.demo.service;
 
 import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
+import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
 import group6.demo.entity.Order;
 import java.util.List;
@@ -24,4 +25,11 @@ public interface BookingService {
     Optional<Order> getOrderById(Long id);
 
     Order extendBooking(Long id, ExtendBookingDTO extendBookingDTO);
+    
+    /**
+     * 还车功能
+     * @param returnScooterDTO 还车信息
+     * @return 更新后的订单
+     */
+    Order returnScooter(ReturnScooterDTO returnScooterDTO);
 } 

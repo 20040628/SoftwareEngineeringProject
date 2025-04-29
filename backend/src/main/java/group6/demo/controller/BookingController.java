@@ -2,6 +2,7 @@ package group6.demo.controller;
 
 import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
+import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
 import group6.demo.entity.Order;
 import group6.demo.service.BookingService;
@@ -125,6 +126,30 @@ public class BookingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Extend Booking failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/return")
+    public ResponseEntity<?> returnScooter(@Valid @RequestBody ReturnScooterDTO returnScooterDTO) {
+        try {
+            Order order = bookingService.returnScooter(returnScooterDTO);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "电动车归还成功");
+            response.put("orderId", order.getId());
+            response.put("returnTime", order.getReturnTime());
+            response.put("depositRefunded", order.getDepositRefunded());
+            
+            if (order.getDepositRefunded()) {
+                response.put("depositAmount", order.getDepositAmount());
+                response.put("depositMessage", "您已成功归还电动车，并且电量大于90%，押金已退还。");
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("归还电动车失败: " + e.getMessage());
         }
     }
 }

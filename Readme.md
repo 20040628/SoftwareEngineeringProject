@@ -430,6 +430,127 @@ Frontend service will run on http://localhost:5173
   "更新银行卡信息失败: error message"
   ```
 
+#### Check Bank Card
+
+- **URL**: `/api/bank-payment/check-card/{userId}`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Path Parameters**:
+  - `userId`: User ID
+- **Success Response** (200 OK):
+  ```json
+  {
+    "hasBankCard": true,
+    "maskedCard": "**** **** **** 1234",
+    "bankBalance": 5000.00
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "User not found"
+  }
+  ```
+
+#### Bank Card Payment (with Deposit)
+
+- **URL**: `/api/bank-payment/{orderId}`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  Content-Type: application/json
+  ```
+- **Path Parameters**:
+  - `orderId`: Order ID
+- **Request Body**:
+  ```json
+  {
+    "securityCode": "string"  // 3-4 digits security code
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "success": true,
+    "message": "支付成功",
+    "orderId": "number",
+    "bankCardLast4": "string",
+    "amount": "number",       // Total amount including deposit (50 yuan)
+    "paymentTime": "datetime"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "银行卡余额不足，无法完成支付"
+  }
+  ```
+
+#### Alipay Payment (without Deposit)
+
+- **URL**: `/api/alipay-payment/{orderId}`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Path Parameters**:
+  - `orderId`: Order ID
+- **Success Response** (200 OK):
+  ```json
+  {
+    "success": true,
+    "message": "支付宝支付成功",
+    "orderId": "number",
+    "amount": "number",       // Only order price, no deposit
+    "paymentTime": "datetime"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "订单状态不正确，无法支付"
+  }
+  ```
+
+#### Return Scooter
+
+- **URL**: `/api/bookings/return`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  Content-Type: application/json
+  ```
+- **Request Body**:
+  ```json
+  {
+    "orderId": "number",
+    "remarks": "string"       // Optional remarks
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "电动车归还成功",
+    "orderId": "number",
+    "returnTime": "datetime",
+    "depositRefunded": "boolean",
+    "depositAmount": "number",      // Included if depositRefunded is true
+    "depositMessage": "string"      // Included if depositRefunded is true
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "message": "只有活跃订单才能进行还车操作"
+  }
+  ```
+
 ### Store API
 
 #### add store
@@ -675,85 +796,18 @@ Frontend service will run on http://localhost:5173
   }
   ```
 - **Success Response** (200 OK):
-  ```json
-  {
-    "message": "Booking successful",
-    "orderId": "number",
-    "startTime": "string",
-    "endTime": "string",
-    "priceBeforeDiscount": "decimal",
-    "price": "decimal"
-  }
   ```
-- **Error Response** (400 Bad Request):
-  ```json
   {
-    "message": "error message"  // e.g., "User not found", "Scooter not found", 
-                               // "Invalid date format", "Booking time cannot be earlier than current time",
-                               // "Selected time period is already booked", "Invalid hire type"
+    "orderId": 1,
+    "priceBeforeDiscount": 5.00,
+    "price": 5.00,
+    "startTime": "2025-04-21T16:00:00.000+00:00",
+    "endTime": "2025-04-21T17:00:00.000+00:00",
+    "message": "Booking successful"
   }
   ```
 
-#### Get Booking Timeline
-
-- **URL**: `/api/bookings/timeline/{scooterId}`
-- **Method**: `GET`
-- **Path Parameters**:
-  - `scooterId`: ID of the scooter
-- **Success Response** (200 OK):
-  ```json
-  [
-    {
-      "startTime": "datetime",
-      "endTime": "datetime",
-      "status": "string",     // "booked" or "available"
-      "hirePeriod": "string"  // Only present when status is "booked"
-    }
-  ]
-  ```
-- **Error Response** (400 Bad Request):
-  ```json
-  {
-    "message": "Failed to get timeline: error message"
-  }
-  ```
-
-#### Create booking for unregistered users （only admin）
-
-1. register the user, see 7.1.1
-
-2. create book
-
-   - **URL**: `/api/bookings/forUnregistered`
-
-   - **Method**: `GET`
-
-   - **Request Body**:
-
-     ```
-     {
-       "userId": "number",       // User ID
-       "scooterId": "number",    // Scooter ID
-       "hireType": "string",     // One of: "HOUR", "FOUR_HOURS", "DAY", "WEEK"
-       "startTime": "string",     // Format: "YYYY-MM-DD HH:mm:ss"
-       "staffId": "number"
-     }
-     ```
-
-   - **Success Response** (200 OK):
-
-     ```
-     {
-         "orderId": 1,
-         "priceBeforeDiscount": 5.00,
-         "price": 5.00,
-         "startTime": "2025-04-21T16:00:00.000+00:00",
-         "endTime": "2025-04-21T17:00:00.000+00:00",
-         "message": "Booking successful"
-     }
-     ```
-
-     ​
+  ​
 
 #### Get All bookings (only admin can) 
 
@@ -1081,8 +1135,8 @@ Frontend service will run on http://localhost:5173
               "priceDay": 20.00,
               "priceWeek": 100.00,
               "status": 1,
-              "battery""100.00,
-              "speed":50.00,
+              "battery":100.00,
+              "speed": 50.00,
               "store": {
                   "id": 1,
                   "longitude": 103.984500,
@@ -1405,80 +1459,6 @@ The system automatically sends email confirmations for successful bookings. The 
 alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2021000146632430&biz_content=%7B%22body%22%3A%22This+is+your+rent+order%22%2C%22out_trade_no%22%3A%221%22%2C%22product_code%22%3A%22FAST_INSTANT_TRADE_PAY%22%2C%22subject%22%3A%22Your+order%22%2C%22total_amount%22%3A%225.00%22%7D&charset=utf-8&format=JSON&method=alipay.trade.app.pay&return_url=http%3A%2F%2Flocalhost%3A5173%2Fmy-bookings&sign=fU9opIqEPq6yLErRgFAmDeaphmPr06Px1CeSq7s5yT8mS2ycdENv2plpjwrh4%2BZn1XKLTCzcCpLw61Zq%2FW%2BxhQ0ODFTCVAKGxaLUS7Q0%2Bznc%2B7LqbYLVqtw3narA%2FcyAfbSy3mPa3r9TOY6jmy5%2FGVPc1JK%2BV6it1LlLVNzJMA%2Fa07sLsAgGYaVsWiBe1IwBxZYfzFfIoPGDwdRasWJdTgNYd4Mimf3IjAD41j0614TRdQLsk90ScvrhLktdY35bP7KbkmHG%2Bv79KWDXkJ5qEMEcKNLc3uShi5cWEnJy3zNeiq7KSWoIqrr9GxAfN%2F9DyoJ69pansjan%2FvzAvvlv9g%3D%3D&sign_type=RSA2&timestamp=2025-03-25+11%3A56%3A33&version=1.0
 ```
 
-### 银行卡支付 API
-
-系统提供两种支付方式，用户在支付订单时需要选择其中一种：**支付宝支付**或**银行卡支付**，二者不能同时使用。
-
-#### 银行卡支付
-
-- **URL**: `/api/bank-payment/{orderId}`
-- **Method**: `POST`
-- **Headers**:
-  ```
-  Authorization: Bearer {token}
-  ```
-- **Request Body**:
-  ```json
-  {
-    "securityCode": "string"  // 银行卡安全码（3-4位数字）
-  }
-  ```
-- **Success Response** (200 OK):
-  ```json
-  {
-    "success": true,
-    "message": "支付成功",
-    "orderId": "number",
-    "bankCardLast4": "string",  // 银行卡后4位
-    "amount": "decimal",        // 支付金额
-    "paymentTime": "datetime"   // 支付时间
-  }
-  ```
-- **Error Response** (400 Bad Request):
-  ```
-  "订单不存在"
-  ```
-  或
-  ```
-  "订单状态不正确，无法支付"
-  ```
-  或
-  ```
-  "未找到银行卡信息，请先绑定银行卡"
-  ```
-  或
-  ```
-  "无效的安全码"
-  ```
-  或
-  ```
-  "支付失败: error message"
-  ```
-
-#### 检查银行卡信息
-
-- **URL**: `/api/bank-payment/check-card/{userId}`
-- **Method**: `GET`
-- **Headers**:
-  ```
-  Authorization: Bearer {token}
-  ```
-- **Success Response** (200 OK):
-  ```json
-  {
-    "hasBankCard": true/false,
-    "maskedCard": "**** **** **** 1234"  // 仅当hasBankCard为true时存在
-  }
-  ```
-- **Error Response** (400 Bad Request):
-  ```
-  "用户不存在"
-  ```
-  或
-  ```
-  "查询银行卡失败: error message"
-  ```
-
 ### Weekly Revenue API
 
 #### Get Current Week Revenue
@@ -1542,12 +1522,6 @@ alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2021000146632430&biz_content=
     "ordersCount": "number",
     "createdAt": "datetime",
     "updatedAt": "datetime"
-  }
-  ```
-- **Error Response** (400 Bad Request):
-  ```json
-  {
-    "message": "Invalid date format"
   }
   ```
 - **Error Response** (401 Unauthorized):

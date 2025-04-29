@@ -9,8 +9,10 @@ import group6.demo.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +28,9 @@ public class BankCardPaymentController {
     @Autowired
     private UserRepository userRepository;
     
+    // 押金金额，固定50元
+    private static final BigDecimal DEPOSIT_AMOUNT = new BigDecimal("50.00");
+    
     /**
      * 银行卡支付接口
      * @param orderId 订单ID
@@ -33,6 +38,7 @@ public class BankCardPaymentController {
      * @return 支付结果
      */
     @PostMapping("/{orderId}")
+    @Transactional
     public ResponseEntity<?> processBankCardPayment(
             @PathVariable Long orderId,
             @Valid @RequestBody BankCardPaymentRequest request) {
@@ -52,16 +58,31 @@ public class BankCardPaymentController {
                 throw new IllegalArgumentException("未找到银行卡信息，请先绑定银行卡");
             }
             
+            // 检查银行卡余额是否足够（原价+押金）
+            BigDecimal totalAmount = order.getPrice().add(DEPOSIT_AMOUNT);
+            if (user.getBankBalance() == null || user.getBankBalance().compareTo(totalAmount) < 0) {
+                throw new IllegalArgumentException("银行卡余额不足，无法完成支付");
+            }
+            
             // 模拟银行卡支付验证 (验证安全码)
             if (request.getSecurityCode() == null || request.getSecurityCode().length() < 3) {
                 throw new IllegalArgumentException("无效的安全码");
             }
             
-            // 模拟支付处理
-            // 在实际环境中这里会调用银行支付网关API
+            // 设置支付方式为银行卡
+            order.setPaymentMethod("BANK_CARD");
             
-            // 更新订单状态
-            order.setStatus(2); // 已支付
+            // 添加押金信息
+            order.setDepositPaid(true);
+            order.setDepositAmount(DEPOSIT_AMOUNT);
+            order.setDepositRefunded(false);
+            
+            // 从银行卡余额扣除总金额（订单金额+押金）
+            BigDecimal newBalance = user.getBankBalance().subtract(totalAmount);
+            user.setBankBalance(newBalance);
+            userRepository.save(user);
+            
+            // 更新订单状态（保持为1-活跃状态，只有还车后才变为2-已完成）
             orderRepository.save(order);
             
             // 构建响应
@@ -73,7 +94,7 @@ public class BankCardPaymentController {
             String bankCard = user.getBankCard();
             String last4 = bankCard.substring(Math.max(0, bankCard.length() - 4));
             response.setBankCardLast4(last4);
-            response.setAmount(order.getPrice());
+            response.setAmount(totalAmount); // 总金额（含押金）
             response.setPaymentTime(new Date());
             
             return ResponseEntity.ok(response);
@@ -99,6 +120,7 @@ public class BankCardPaymentController {
             // 检查银行卡信息
             boolean hasBankCard = user.getBankCard() != null && !user.getBankCard().isEmpty();
             String maskedCard = null;
+            BigDecimal bankBalance = user.getBankBalance();
             
             if (hasBankCard) {
                 String bankCard = user.getBankCard();
@@ -109,6 +131,7 @@ public class BankCardPaymentController {
             Map<String, Object> response = new HashMap<>();
             response.put("hasBankCard", hasBankCard);
             response.put("maskedCard", maskedCard);
+            response.put("bankBalance", bankBalance);
             
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {

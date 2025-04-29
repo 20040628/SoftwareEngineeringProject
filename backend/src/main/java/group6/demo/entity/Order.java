@@ -35,6 +35,22 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal price;
     
+    // 押金相关字段
+    @Column(name = "deposit_paid")
+    private Boolean depositPaid = false;
+    
+    @Column(name = "deposit_amount")
+    private BigDecimal depositAmount = BigDecimal.ZERO;
+    
+    @Column(name = "deposit_refunded")
+    private Boolean depositRefunded = false;
+    
+    @Column(name = "return_time")
+    private Date returnTime;
+    
+    @Column(name = "payment_method", length = 20)
+    private String paymentMethod;
+    
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

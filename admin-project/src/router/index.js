@@ -3,9 +3,6 @@ import store from '../store'
 
 // 延迟加载组件
 const UserLogin = () => import('../views/login/index.vue')
-// const UserRegister = () => import('../components/UserRegister.vue')
-// const ScooterAdd = () => import('@/components/ScooterAdd.vue')
-// const ScooterAdd = () => import('../components/ScooterAdd.vue')
 const MainLayout = () => import('@/components/MainLayout.vue')
 
 
@@ -36,6 +33,7 @@ const routes = [
       { path: '/logout', component: () => import('@/components/Logout.vue') },
       { path: '/add_user', component: () => import('@/components/AddUser.vue') },
       { path: '/add_order', component: () => import('@/components/AddOrder.vue') },
+      { path: '/add_store', component: () => import('@/components/AddStore.vue') },
     ],
   },
   {

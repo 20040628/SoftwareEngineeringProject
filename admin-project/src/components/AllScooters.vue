@@ -2,6 +2,16 @@
   <div>
     <h2 class="title">Scooter Management</h2>
     <div class="filter-container">
+      <div class="store-filter">
+        <label for="store-select">Filter by Store:</label>
+        <select id="store-select" v-model="storeFilter" @change="filterScooters">
+          <option value="all">All Stores</option>
+          <option v-for="store in stores" :key="store.id" :value="store.id">
+            {{ store.id }}: {{ store.name }} ({{ store.latitude }}, {{ store.longitude }})
+          </option>
+        </select>
+      </div>
+
       <div class="status-filter">
         <label for="status-select">Filter by Status:</label>
         <select id="status-select" v-model="statusFilter" @change="filterScooters">
@@ -10,6 +20,7 @@
           <option value="0">Unavailable</option>
         </select>
       </div>
+
       <div class="search-box">
         <input
             type="text"
@@ -24,9 +35,7 @@
           <img src="/static/center/search.svg" alt="Search" class="search-icon">
         </button>
       </div>
-
     </div>
-
 
     <div class="table-container">
       <table class="scooter-table">
@@ -35,9 +44,9 @@
           <th>ID</th>
           <th>Status</th>
           <th>Pricing</th>
-          <th>Coordinates</th>
           <th>Battery</th>
           <th>Speed</th>
+          <th>Store ID</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -54,9 +63,9 @@
             <div><strong>Day:</strong> £{{ scooter.priceDay }}</div>
             <div><strong>Week:</strong> £{{ scooter.priceWeek }}</div>
           </td>
-          <td>({{ scooter.longitude }}, {{ scooter.latitude }})</td>
-          <td>{{ scooter.battery}}</td>
+          <td>{{ scooter.battery }}</td>
           <td>{{ scooter.speed }}</td>
+          <td>{{ scooter.store.id }}</td>
           <td>
             <button class="status-btn" @click="changeScooterStatus(scooter.id)">
               Change Status
@@ -129,12 +138,15 @@ export default {
   data() {
     return {
       scooters: [],
+      stores: [],
       filteredScooters: [],
       currentPage: 1,
       itemsPerPage: 10,
       inputPage: 1,
       searchQuery: '',
-      statusFilter: 'all'
+      statusFilter: 'all',
+      storeFilter: 'all',
+      selectedStore: null
     };
   },
   computed: {
@@ -175,14 +187,24 @@ export default {
       return this.filteredScooters.slice(start, end);
     }
   },
-  mounted() {
-    this.fetchScooters();
+  async mounted() {
+    await this.fetchStores();
+    await this.fetchScooters();
   },
   methods: {
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = 'all';
+      this.storeFilter = 'all';
       this.filterScooters();
+    },
+    async fetchStores() {
+      try {
+        const res = await axios.get('http://localhost:8080/api/stores/getAll');
+        this.stores = res.data;
+      } catch (error) {
+        alert('Failed to load stores');
+      }
     },
     async fetchScooters() {
       try {
@@ -199,6 +221,14 @@ export default {
     filterScooters() {
       const query = this.searchQuery.toLowerCase().trim();
       const statusFilter = this.statusFilter;
+      const storeFilter = this.storeFilter;
+
+      // Update selected store
+      if (storeFilter === 'all') {
+        this.selectedStore = null;
+      } else {
+        this.selectedStore = this.stores.find(store => store.id.toString() === storeFilter.toString());
+      }
 
       this.filteredScooters = this.scooters.filter(scooter => {
         // Status filter
@@ -206,7 +236,12 @@ export default {
           return false;
         }
 
-        // If no search query, return all matching status
+        // Store filter
+        if (storeFilter !== 'all' && scooter.store.id.toString() !== storeFilter.toString()) {
+          return false;
+        }
+
+        // If no search query, return all matching status and store
         if (!query) return true;
 
         // Search in all relevant fields
@@ -215,10 +250,9 @@ export default {
             scooter.priceHour.toString().includes(query) ||
             scooter.priceDay.toString().includes(query) ||
             scooter.priceWeek.toString().includes(query) ||
-            scooter.longitude.toString().includes(query) ||
-            scooter.latitude.toString().includes(query) ||
             scooter.battery.toString().includes(query) ||
-            scooter.speed.toString().includes(query)
+            scooter.speed.toString().includes(query) ||
+            scooter.store.id.toString().includes(query)
         );
       });
 
@@ -277,8 +311,8 @@ export default {
   padding-top: 20px;
   border-bottom: 2px solid #58c4c9;
 }
-/* Header and Filter Container Styles */
 
+/* Header and Filter Container Styles */
 .filter-container {
   display: flex;
   gap: 20px;
@@ -290,22 +324,66 @@ export default {
   padding-right: 20px;
 }
 
+.store-filter, .status-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.store-filter label, .status-filter label {
+  font-weight: 500;
+  color: #444;
+}
+
+.store-filter select, .status-filter select {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.store-filter select:focus, .status-filter select:focus {
+  outline: none;
+  border-color: #58c4c9;
+}
+
+/* Store information display */
+.store-info {
+  margin: 20px;
+  padding: 5px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.store-name {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 6px 26px;
+  border: 3px solid #008187;
+  border-radius: 30px;
+}
+
+.store-location {
+
+}
+
 /* Search Box Styles */
 .search-box {
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 20px;
   overflow: hidden;
   background: white;
-
 }
 
 .search-box input {
   padding: 10px 15px;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   width: 250px;
   outline: none;
 }
@@ -313,28 +391,28 @@ export default {
 .search-button {
   background: white;
   border: none;
-  padding: 0 5px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
+  padding-left: 5px;
+  padding-right: 10px;
 }
 
 .reset-button {
   background: white;
   border: none;
-  padding: 0 15px;
+  padding: 0 10px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
-  font-size: 14px;
+  border-left: 2px solid #ddd;
+  border-right: 2px solid #ddd;
   color: #666;
 }
 
@@ -350,31 +428,6 @@ export default {
 .reset-icon{
   width: 20px;
   height: 20px;
-}
-
-/* Status Filter Styles */
-.status-filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.status-filter label {
-  font-weight: 500;
-  color: #444;
-}
-
-.status-filter select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
-}
-
-.status-filter select:focus {
-  outline: none;
-  border-color: #409eff;
 }
 
 /* Table Styles */
@@ -420,7 +473,7 @@ export default {
 .status-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
@@ -436,35 +489,39 @@ export default {
   color: white;
 }
 
-
 /* Action Button Styles */
 .status-btn {
   background-color: #58c4c9;
   color: white;
   padding: 8px 14px;
   border: none;
-  border-radius: 4px;
+  border-radius: 20px;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
   font-size: 16px;
   font-weight: bold;
 }
 
-
 /* Pagination Styles */
 .pagination-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: 30px;
-  font-size: 14px;
+  font-size: 16px;
   flex-wrap: wrap;
   gap: 15px;
+  padding: 0 2%;
 }
 
 .pagination-info {
-  margin-right: 15px;
-  color: #666;
+  font-size: 18px;
+  font-weight: bold;
+  color: #444444;
+  padding: 1px 10px;
+  border: 3px solid #58c4c9;
+  border-radius: 20px;
+  box-shadow:  1px 1px 2px #58c4c9;
 }
 
 .pagination-buttons {
@@ -476,8 +533,8 @@ export default {
 .pagination-prev,
 .pagination-next,
 .pagination-page {
-  min-width: 32px;
-  height: 32px;
+  min-width: 36px;
+  height: 36px;
   padding: 0 8px;
   border: 1px solid #d9d9d9;
   background-color: #fff;
@@ -513,8 +570,8 @@ export default {
 }
 
 .pagination-ellipsis {
-  min-width: 32px;
-  height: 32px;
+  min-width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -530,8 +587,8 @@ export default {
 
 .pagination-jump input {
   width: 50px;
-  height: 32px;
-  border: 1px solid #d9d9d9;
+  height: 36px;
+  border: 2px solid #d9d9d9;
   border-radius: 4px;
   text-align: center;
   padding: 0 5px;
@@ -543,21 +600,42 @@ export default {
 }
 
 .pagination-jump button {
-  height: 32px;
+  height: 36px;
   padding: 0 15px;
-  background-color: #f5f5f5;
+  margin-left: 10%;
+  border-radius: 20px;
+  background-color: #58c4c9;
+  color: white;
+  font-weight: bold;
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-.pagination-jump button:hover {
-  background-color: #e6e6e6;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .store-filter, .status-filter {
+    width: 100%;
+  }
+
+  .store-filter select, .status-filter select {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
   .pagination-container {
     flex-direction: column;
     gap: 10px;
@@ -571,27 +649,6 @@ export default {
   .pagination-jump {
     margin-left: 0;
     margin-top: 10px;
-  }
-
-  .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .filter-container {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .search-box {
-    width: 100%;
-  }
-
-  .search-box input {
-    width: 100%;
   }
 }
 </style>

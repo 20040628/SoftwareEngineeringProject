@@ -30,6 +30,7 @@ CREATE TABLE `b_user`  (
 -- 创建店铺表
 CREATE TABLE `b_store` (
     `id` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(50) NOT NULL,
     `longitude` decimal(9, 6) NOT NULL,
     `latitude` decimal(9, 6) NOT NULL,
     PRIMARY KEY (`id`) USING BTREE

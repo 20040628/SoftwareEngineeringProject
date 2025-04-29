@@ -243,11 +243,11 @@ export default {
         this.filteredBookings = [...this.bookings];
         this.error = null;
 
-        // Print processed data
+        // Print processed datastatus-filter
         console.log("Processed bookings:", this.bookings);
 
         // Default disable filter
-        this.statusFilter = 'all';
+        this.statusFilter = '1';
         this.searchQuery = '';
         this.filterBookings();
       } catch (error) {
@@ -394,7 +394,7 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 20px;
   overflow: hidden;
   background: white;
@@ -403,7 +403,7 @@ export default {
 .search-box input {
   padding: 10px 15px;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   width: 250px;
   outline: none;
 }
@@ -411,28 +411,28 @@ export default {
 .search-button {
   background: white;
   border: none;
-  padding: 0 5px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
+  padding-left: 5px;
+  padding-right: 10px;
 }
 
 .reset-button {
   background: white;
   border: none;
-  padding: 0 15px;
+  padding: 0 10px;
   height: 100%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  border-left: 1px solid #ddd;
-  font-size: 14px;
+  border-left: 2px solid #ddd;
+  border-right: 2px solid #ddd;
   color: #666;
 }
 
@@ -464,7 +464,7 @@ export default {
 
 .status-filter select {
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
@@ -472,7 +472,7 @@ export default {
 
 .status-filter select:focus {
   outline: none;
-  border-color: #409eff;
+  border-color: #58c4c9;
 }
 
 /* Table Styles */
@@ -518,7 +518,7 @@ export default {
 .status-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
@@ -564,16 +564,22 @@ export default {
 .pagination-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* 添加这行 */
   margin-top: 30px;
-  font-size: 14px;
+  font-size: 16px;
   flex-wrap: wrap;
   gap: 15px;
+  padding: 0 2%;
 }
 
 .pagination-info {
-  margin-right: 15px;
-  color: #666;
+  font-size: 18px;
+  font-weight: bold;
+  color: #444444;
+  padding: 1px 10px;
+  border: 3px solid #58c4c9;
+  border-radius: 20px;
+  box-shadow:  1px 1px 2px #58c4c9;
 }
 
 .pagination-buttons {
@@ -585,8 +591,8 @@ export default {
 .pagination-prev,
 .pagination-next,
 .pagination-page {
-  min-width: 32px;
-  height: 32px;
+  min-width: 36px;
+  height: 36px;
   padding: 0 8px;
   border: 1px solid #d9d9d9;
   background-color: #fff;
@@ -622,8 +628,8 @@ export default {
 }
 
 .pagination-ellipsis {
-  min-width: 32px;
-  height: 32px;
+  min-width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -639,11 +645,12 @@ export default {
 
 .pagination-jump input {
   width: 50px;
-  height: 32px;
-  border: 1px solid #d9d9d9;
+  height: 36px;
+  border: 2px solid #d9d9d9;
   border-radius: 4px;
   text-align: center;
   padding: 0 5px;
+
 }
 
 .pagination-jump input:focus {
@@ -652,17 +659,16 @@ export default {
 }
 
 .pagination-jump button {
-  height: 32px;
+  height: 36px;
   padding: 0 15px;
-  background-color: #f5f5f5;
+  margin-left: 10%;
+  border-radius: 20px;
+  background-color: #58c4c9;
+  color: white;
+  font-weight: bold;
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s;
-}
-
-.pagination-jump button:hover {
-  background-color: #e6e6e6;
 }
 
 /* 响应式调整 */

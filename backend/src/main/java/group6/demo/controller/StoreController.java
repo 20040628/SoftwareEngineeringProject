@@ -39,6 +39,7 @@ public class StoreController {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Add successfully");
             response.put("storeId", store.getId());
+            response.put("name", store.getName());
             response.put("longitude", store.getLongitude());
             response.put("latitude", store.getLatitude());
             return ResponseEntity.ok(response);
@@ -74,4 +75,45 @@ public class StoreController {
             return ResponseEntity.badRequest().body("Failed to get store: " + e.getMessage());
         }
     }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<?> getNearby(@RequestParam("longitude") double longitude,
+                                       @RequestParam("latitude") double latitude) {
+        try {
+            List<Store> allStores = storeService.getAllStores();
+
+            // Calculate the distance from each store to the user's location
+            List<Map<String, Object>> storesWithDistance = allStores.stream()
+                    .map(store -> {
+                        double distance = calculateDistance(
+                                latitude, longitude,
+                                store.getLatitude().doubleValue(), store.getLongitude().doubleValue());
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("store", store);
+                        map.put("distance", distance);
+                        return map;
+                    })
+                    .sorted((a, b) -> Double.compare((Double) a.get("distance"), (Double) b.get("distance")))
+                    .limit(5)
+                    .toList();
+
+            return ResponseEntity.ok(storesWithDistance);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to get nearby store: " + e.getMessage());
+        }
+    }
+
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int EARTH_RADIUS = 6371; // 地球半径，单位公里
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
+    }
+
 }

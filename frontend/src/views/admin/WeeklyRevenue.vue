@@ -926,6 +926,7 @@ h2 {
   align-items: center;
 }
 
+
 .week-selector {
   display: flex;
   flex-direction: column;

@@ -2,46 +2,53 @@
   <div>
     <h2 class="title">Add Scooter</h2>
     <div class="form">
-      <!-- Location row -->
+      <!-- Store ID row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
-          <label>Location</label>
-          <input v-model="newScooter.location" placeholder="Enter location" class="input" />
+          <label>Store Name</label>
+          <select v-model="newScooter.storeId" class="input custom-select">
+            <option v-for="store in stores" :key="store.name" :value="store.name">{{ store.name }}</option>
+          </select>
         </div>
       </div>
+
 
       <!-- Price row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
           <label>Price per Hour</label>
-          <input v-model.number="newScooter.priceHour" type="number" step="0.01" placeholder="Enter the price per hour" class="input" />
+          <input v-model.number="newScooter.priceHour" type="number" step="0.01" min="0" placeholder="Enter the price per hour (price > 0)" class="input" />
         </div>
         <div class="form-group col-12 col-md-6">
           <label>Price for Four Hours</label>
-          <input v-model.number="newScooter.priceFourHour" type="number" step="0.01" placeholder="Enter the price for every 4 hours" class="input" />
+          <input v-model.number="newScooter.priceFourHour" type="number" step="0.01" min="0" placeholder="Enter the price for every 4 hours (price > 0)" class="input" />
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
           <label>Price per Day</label>
-          <input v-model.number="newScooter.priceDay" type="number" step="0.01" placeholder="Enter the daily price" class="input" />
+          <input v-model.number="newScooter.priceDay" type="number" step="0.01" min="0" placeholder="Enter the daily price (price > 0)" class="input" />
         </div>
         <div class="form-group col-12 col-md-6">
           <label>Price per Week</label>
-          <input v-model.number="newScooter.priceWeek" type="number" step="0.01" placeholder="Enter the weekly price" class="input" />
+          <input v-model.number="newScooter.priceWeek" type="number" step="0.01" min="0" placeholder="Enter the weekly price (price > 0)" class="input" />
         </div>
       </div>
 
-      <!-- Coordinates row -->
+      <!-- Battery row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
-          <label>Longitude</label>
-          <input v-model.number="newScooter.longitude" type="number" step="0.000001" placeholder="Enter the scooter longitude" class="input" />
+          <label>Battery</label>
+          <input v-model.number="newScooter.battery" type="number" step="0.01" min="0" max="100" placeholder="Enter battery level (From 0 to 100)" class="input" />
         </div>
+      </div>
+
+      <!-- Speed row -->
+      <div class="form-row">
         <div class="form-group col-12 col-md-6">
-          <label>Latitude</label>
-          <input v-model.number="newScooter.latitude" type="number" step="0.000001" placeholder="Enter the scooter latitude" class="input" />
+          <label>Speed</label>
+          <input v-model.number="newScooter.speed" type="number" step="0.01" min="0" placeholder="Enter speed (speed > 0)" class="input" />
         </div>
       </div>
 
@@ -75,7 +82,6 @@
           </div>
         </div>
       </div>
-
       <!-- Buttons row -->
       <div class="form-row">
         <div class="button-group">
@@ -83,6 +89,7 @@
           <button class="button button-submit" @click="addScooter">Add Scooter</button>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -100,9 +107,11 @@ export default {
         priceDay: null,
         priceWeek: null,
         status: 1,
-        longitude: null,
-        latitude: null,
+        battery: null,
+        speed: null,
+        storeId: null,
       },
+      stores: [],
     };
   },
   methods: {
@@ -114,12 +123,22 @@ export default {
         priceDay: null,
         priceWeek: null,
         status: 1,
-        longitude: null,
-        latitude: null,
+        battery: null,
+        speed: null,
+        storeId: null,
       };
     },
+    async fetchStores() {
+      try {
+        const res = await axios.get('http://localhost:8080/api/stores/getAll');
+        this.stores = res.data;
+        console.log(this.stores);
+      } catch (error) {
+        alert('Failed to fetch stores');
+      }
+    },
     async addScooter() {
-      if (!this.newScooter.location || !this.newScooter.priceHour || !this.newScooter.priceDay) {
+      if (!this.newScooter. || !this.newScooter.priceHour || !this.newScooter.priceDay) {
         alert('Please enter required fields (location, price per hour and day)');
         return;
       }
@@ -127,16 +146,7 @@ export default {
         const res = await axios.post('http://localhost:8080/api/scooters/add', this.newScooter);
         if (res.status === 200) {
           alert('Scooter Added');
-          this.newScooter = {
-            location: '',
-            priceHour: null,
-            priceFourHour: null,
-            priceDay: null,
-            priceWeek: null,
-            status: 1,
-            longitude: null,
-            latitude: null,
-          };
+          this.resetForm();
           this.$emit('scooter-added');
         } else {
           alert(res.data.message || 'Something went wrong');
@@ -146,10 +156,25 @@ export default {
       }
     },
   },
+  mounted() {
+    this.fetchStores();
+  },
 };
 </script>
 
+
 <style scoped>
+.custom-select {
+  display: flex;
+  flex-wrap: wrap;
+  height: auto;
+}
+
+.custom-select option {
+  flex: 1 1 30%; /* Adjust the percentage based on your layout needs */
+  margin: 5px;
+}
+
 .title {
   font-size: 28px;
   font-weight: bold;

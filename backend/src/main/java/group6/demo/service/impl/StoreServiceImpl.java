@@ -28,6 +28,7 @@ public class StoreServiceImpl implements StoreService {
 
         // Create new store entity
         Store store = new Store();
+        store.setName(storeAddDTO.getName());
         store.setLatitude(storeAddDTO.getLatitude());
         store.setLongitude(storeAddDTO.getLongitude());
         return storeRepository.save(store);

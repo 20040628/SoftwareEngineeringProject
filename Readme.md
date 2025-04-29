@@ -442,8 +442,9 @@ Frontend service will run on http://localhost:5173
 
   ```
   {
+      "name": "store 4",
       "longitude": 100.000000,
-      "latitude": 20.765000
+      "latitude": 10
   }
   ```
 
@@ -451,7 +452,8 @@ Frontend service will run on http://localhost:5173
 
   ```
   {
-      "latitude": 20.765000,
+      "latitude": 10,
+      "name": "store 4",
       "message": "Add successfully",
       "storeId": 4,
       "longitude": 100.000000
@@ -463,6 +465,12 @@ Frontend service will run on http://localhost:5173
   ```
   {
       "latitude": "The latitude of the location is required"
+  }
+
+  or 
+
+  {
+      "name": "The name of the store is required"
   }
   ```
 
@@ -478,18 +486,27 @@ Frontend service will run on http://localhost:5173
   [
       {
           "id": 1,
+          "name": "store 1",
           "longitude": 103.984500,
           "latitude": 30.765000
       },
       {
           "id": 2,
+          "name": "store 2",
           "longitude": 103.987000,
           "latitude": 30.764000
       },
       {
           "id": 3,
+          "name": "store 3",
           "longitude": 103.986500,
           "latitude": 30.766000
+      },
+      {
+          "id": 4,
+          "name": "store 4",
+          "longitude": 100.000000,
+          "latitude": 10.000000
       }
   ]
   ```
@@ -503,12 +520,55 @@ Frontend service will run on http://localhost:5173
 ```
 {
     "id": 1,
+    "name": "store 1",
     "longitude": 103.984500,
     "latitude": 30.765000
 }
 ```
 
+#### 距离最近的5个店铺
 
+- **URL**: `/api/stores/nearby?longitude=103.984500&latitude=30.765000`
+
+- **Method**: `GET`
+
+- **Success Response** (200 OK):
+
+  PS: 返回的distance单位是km，若店铺数量不足5个，就返回所有店铺
+
+  ```
+  [
+      {
+          "distance": 0.0,
+          "store": {
+              "id": 1,
+              "name": "store 1",
+              "longitude": 103.984500,
+              "latitude": 30.765000
+          }
+      },
+      {
+          "distance": 0.2210896980664518,
+          "store": {
+              "id": 3,
+              "name": "store 3",
+              "longitude": 103.986500,
+              "latitude": 30.766000
+          }
+      },
+      {
+          "distance": 0.26348108677786547,
+          "store": {
+              "id": 2,
+              "name": "store 2",
+              "longitude": 103.987000,
+              "latitude": 30.764000
+          }
+      }
+  ]
+  ```
+
+  ​
 
 ###  Scooter API
 

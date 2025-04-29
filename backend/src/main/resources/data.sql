@@ -6,11 +6,11 @@ VALUES
 ('user', '$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni', 'default_avatar.jpg', '1995-05-05', 0, '9876543210', 'user@example.com', 'paypal', 1, 1, 0);
 
 -- 添加商店数据
-INSERT INTO b_store (id, longitude, latitude)
+INSERT INTO b_store (id, name, longitude, latitude)
 VALUES
-    (1, 103.984500, 30.765000),
-    (2, 103.987000, 30.764000),
-    (3, 103.986500, 30.766000);
+    (1, 'store 1', 103.984500, 30.765000),
+    (2, 'store 2', 103.987000, 30.764000),
+    (3, 'store 3', 103.986500, 30.766000);
 
 -- 添加测试滑板车数据
 INSERT INTO b_scooter (price_hour, price_four_hour, price_day, price_week, status, battery, speed, store_id)

@@ -2,6 +2,16 @@
   <div>
     <h2 class="title">Scooter Management</h2>
     <div class="filter-container">
+      <div class="store-filter">
+        <label for="store-select">Filter by Store:</label>
+        <select id="store-select" v-model="storeFilter" @change="filterScooters">
+          <option value="all">All Stores</option>
+          <option v-for="store in stores" :key="store.id" :value="store.id">
+            {{ store.id }}: {{ store.name }} ({{ store.latitude }}, {{ store.longitude }})
+          </option>
+        </select>
+      </div>
+
       <div class="status-filter">
         <label for="status-select">Filter by Status:</label>
         <select id="status-select" v-model="statusFilter" @change="filterScooters">
@@ -10,6 +20,7 @@
           <option value="0">Unavailable</option>
         </select>
       </div>
+
       <div class="search-box">
         <input
             type="text"
@@ -24,9 +35,7 @@
           <img src="/static/center/search.svg" alt="Search" class="search-icon">
         </button>
       </div>
-
     </div>
-
 
     <div class="table-container">
       <table class="scooter-table">
@@ -37,6 +46,7 @@
           <th>Pricing</th>
           <th>Battery</th>
           <th>Speed</th>
+          <th>Store ID</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -53,8 +63,9 @@
             <div><strong>Day:</strong> £{{ scooter.priceDay }}</div>
             <div><strong>Week:</strong> £{{ scooter.priceWeek }}</div>
           </td>
-          <td>{{ scooter.battery}}</td>
+          <td>{{ scooter.battery }}</td>
           <td>{{ scooter.speed }}</td>
+          <td>{{ scooter.store.id }}</td>
           <td>
             <button class="status-btn" @click="changeScooterStatus(scooter.id)">
               Change Status
@@ -127,12 +138,15 @@ export default {
   data() {
     return {
       scooters: [],
+      stores: [],
       filteredScooters: [],
       currentPage: 1,
       itemsPerPage: 10,
       inputPage: 1,
       searchQuery: '',
-      statusFilter: 'all'
+      statusFilter: 'all',
+      storeFilter: 'all',
+      selectedStore: null
     };
   },
   computed: {
@@ -173,14 +187,24 @@ export default {
       return this.filteredScooters.slice(start, end);
     }
   },
-  mounted() {
-    this.fetchScooters();
+  async mounted() {
+    await this.fetchStores();
+    await this.fetchScooters();
   },
   methods: {
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = 'all';
+      this.storeFilter = 'all';
       this.filterScooters();
+    },
+    async fetchStores() {
+      try {
+        const res = await axios.get('http://localhost:8080/api/stores/getAll');
+        this.stores = res.data;
+      } catch (error) {
+        alert('Failed to load stores');
+      }
     },
     async fetchScooters() {
       try {
@@ -197,6 +221,14 @@ export default {
     filterScooters() {
       const query = this.searchQuery.toLowerCase().trim();
       const statusFilter = this.statusFilter;
+      const storeFilter = this.storeFilter;
+
+      // Update selected store
+      if (storeFilter === 'all') {
+        this.selectedStore = null;
+      } else {
+        this.selectedStore = this.stores.find(store => store.id.toString() === storeFilter.toString());
+      }
 
       this.filteredScooters = this.scooters.filter(scooter => {
         // Status filter
@@ -204,7 +236,12 @@ export default {
           return false;
         }
 
-        // If no search query, return all matching status
+        // Store filter
+        if (storeFilter !== 'all' && scooter.store.id.toString() !== storeFilter.toString()) {
+          return false;
+        }
+
+        // If no search query, return all matching status and store
         if (!query) return true;
 
         // Search in all relevant fields
@@ -214,7 +251,8 @@ export default {
             scooter.priceDay.toString().includes(query) ||
             scooter.priceWeek.toString().includes(query) ||
             scooter.battery.toString().includes(query) ||
-            scooter.speed.toString().includes(query)
+            scooter.speed.toString().includes(query) ||
+            scooter.store.id.toString().includes(query)
         );
       });
 
@@ -273,8 +311,8 @@ export default {
   padding-top: 20px;
   border-bottom: 2px solid #58c4c9;
 }
-/* Header and Filter Container Styles */
 
+/* Header and Filter Container Styles */
 .filter-container {
   display: flex;
   gap: 20px;
@@ -284,6 +322,51 @@ export default {
   margin-top: 20px;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+.store-filter, .status-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.store-filter label, .status-filter label {
+  font-weight: 500;
+  color: #444;
+}
+
+.store-filter select, .status-filter select {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.store-filter select:focus, .status-filter select:focus {
+  outline: none;
+  border-color: #58c4c9;
+}
+
+/* Store information display */
+.store-info {
+  margin: 20px;
+  padding: 5px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.store-name {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 6px 26px;
+  border: 3px solid #008187;
+  border-radius: 30px;
+}
+
+.store-location {
+
 }
 
 /* Search Box Styles */
@@ -347,31 +430,6 @@ export default {
   height: 20px;
 }
 
-
-/* Status Filter Styles */
-.status-filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.status-filter label {
-  font-weight: 500;
-  color: #444;
-}
-
-.status-filter select {
-  padding: 8px 12px;
-  border: 2px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
-}
-
-.status-filter select:focus {
-  outline: none;
-  border-color: #58c4c9;
-}
 /* Table Styles */
 .table-container {
   margin-top: 20px;
@@ -415,7 +473,7 @@ export default {
 .status-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
@@ -431,26 +489,24 @@ export default {
   color: white;
 }
 
-
 /* Action Button Styles */
 .status-btn {
   background-color: #58c4c9;
   color: white;
   padding: 8px 14px;
   border: none;
-  border-radius: 4px;
+  border-radius: 20px;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
   font-size: 16px;
   font-weight: bold;
 }
 
-
 /* Pagination Styles */
 .pagination-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 添加这行 */
+  justify-content: space-between;
   margin-top: 30px;
   font-size: 16px;
   flex-wrap: wrap;
@@ -536,7 +592,6 @@ export default {
   border-radius: 4px;
   text-align: center;
   padding: 0 5px;
-
 }
 
 .pagination-jump input:focus {
@@ -559,6 +614,28 @@ export default {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .store-filter, .status-filter {
+    width: 100%;
+  }
+
+  .store-filter select, .status-filter select {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
   .pagination-container {
     flex-direction: column;
     gap: 10px;
@@ -572,27 +649,6 @@ export default {
   .pagination-jump {
     margin-left: 0;
     margin-top: 10px;
-  }
-
-  .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .filter-container {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .search-box {
-    width: 100%;
-  }
-
-  .search-box input {
-    width: 100%;
   }
 }
 </style>

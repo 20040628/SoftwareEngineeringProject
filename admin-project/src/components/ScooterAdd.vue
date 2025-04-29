@@ -5,9 +5,9 @@
       <!-- Store ID row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
-          <label>Store ID</label>
+          <label>Store Name</label>
           <select v-model="newScooter.storeId" class="input custom-select">
-            <option v-for="store in stores" :key="store.id" :value="store.id">{{ store.id }}</option>
+            <option v-for="store in stores" :key="store.name" :value="store.name">{{ store.name }}</option>
           </select>
         </div>
       </div>
@@ -138,7 +138,7 @@ export default {
       }
     },
     async addScooter() {
-      if (!this.newScooter.location || !this.newScooter.priceHour || !this.newScooter.priceDay) {
+      if (!this.newScooter. || !this.newScooter.priceHour || !this.newScooter.priceDay) {
         alert('Please enter required fields (location, price per hour and day)');
         return;
       }

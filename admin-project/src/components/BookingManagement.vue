@@ -518,7 +518,7 @@ export default {
 .status-label {
   display: inline-block;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;

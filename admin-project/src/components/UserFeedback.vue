@@ -557,7 +557,7 @@ export default {
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 20px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;

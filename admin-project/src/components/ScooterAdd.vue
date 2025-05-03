@@ -5,13 +5,12 @@
       <!-- Store ID row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
-          <label>Store Name</label>
-          <select v-model="newScooter.storeId" class="input custom-select">
-            <option v-for="store in stores" :key="store.name" :value="store.name">{{ store.name }}</option>
+          <label>Store</label>
+          <select v-model.number="newScooter.storeId" class="input custom-select">
+            <option v-for="store in stores" :key="store.id" :value="store.id">{{ store.name }}</option>
           </select>
         </div>
       </div>
-
 
       <!-- Price row -->
       <div class="form-row">
@@ -101,7 +100,6 @@ export default {
   data() {
     return {
       newScooter: {
-        location: '',
         priceHour: null,
         priceFourHour: null,
         priceDay: null,
@@ -117,7 +115,6 @@ export default {
   methods: {
     resetForm() {
       this.newScooter = {
-        location: '',
         priceHour: null,
         priceFourHour: null,
         priceDay: null,
@@ -138,21 +135,39 @@ export default {
       }
     },
     async addScooter() {
-      if (!this.newScooter. || !this.newScooter.priceHour || !this.newScooter.priceDay) {
-        alert('Please enter required fields (location, price per hour and day)');
+      // Validate required fields
+      if (!this.newScooter.storeId ||
+          this.newScooter.priceHour === null ||
+          this.newScooter.priceDay === null ||
+          this.newScooter.battery === null ||
+          this.newScooter.speed === null) {
+        alert('Please fill in all required fields (Store, Price per Hour, Price per Day, Battery, and Speed)');
         return;
       }
+
+      // Validate numeric values
+      if (this.newScooter.priceHour <= 0 ||
+          this.newScooter.priceDay <= 0 ||
+          this.newScooter.battery < 0 ||
+          this.newScooter.battery > 100 ||
+          this.newScooter.speed <= 0) {
+        alert('Please enter valid values (Prices and Speed must be > 0, Battery must be between 0-100)');
+        return;
+      }
+
       try {
         const res = await axios.post('http://localhost:8080/api/scooters/add', this.newScooter);
         if (res.status === 200) {
-          alert('Scooter Added');
+          alert(`Scooter Added with ID: ${res.data.scooterId}`);
           this.resetForm();
           this.$emit('scooter-added');
-        } else {
-          alert(res.data.message || 'Something went wrong');
         }
       } catch (error) {
-        alert('Failed to add scooter');
+        if (error.response && error.response.data && error.response.data.message) {
+          alert(`Failed to add scooter: ${error.response.data.message}`);
+        } else {
+          alert('Failed to add scooter');
+        }
       }
     },
   },
@@ -161,7 +176,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .custom-select {
@@ -282,8 +296,6 @@ label {
   position: relative;
 }
 
-
-
 .checkbox-input {
   position: absolute;
   opacity: 0;
@@ -302,7 +314,6 @@ label {
   flex-shrink: 0;
   position: relative;
 }
-
 
 .checkbox-option:hover .checkbox-input ~ .checkmark {
   background-color: #f5f5f5;
@@ -356,5 +367,4 @@ label {
     width: 100%;
   }
 }
-
 </style>

@@ -2,6 +2,18 @@
   <div>
     <h2 class="title">Add New Store</h2>
     <div class="form">
+      <div class="form-row">
+        <div class="form-group col-12 col-md-6">
+          <label>Store Name</label>
+          <input
+              v-model="storeData.name"
+              type="text"
+              placeholder="Enter store name"
+              class="input"
+          />
+          <span class="error-message" v-if="errors.name">{{ errors.name }}</span>
+        </div>
+      </div>
       <!-- Latitude row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
@@ -50,6 +62,7 @@ export default {
   data() {
     return {
       storeData: {
+        name: '',
         latitude: '',
         longitude: '',
       },
@@ -59,6 +72,7 @@ export default {
   methods: {
     resetForm() {
       this.storeData = {
+        name: '',
         latitude: '',
         longitude: '',
       };
@@ -68,6 +82,9 @@ export default {
       // Reset errors
       this.errors = {};
 
+      if (!this.storeData.name) {
+        this.errors.name = 'Store name is required';
+      }
       // Basic validation
       if (!this.storeData.latitude) {
         this.errors.latitude = 'Latitude is required';
@@ -92,6 +109,7 @@ export default {
 
         // Prepare request data
         const payload = {
+          name: this.storeData.name,
           latitude: parseFloat(this.storeData.latitude),
           longitude: parseFloat(this.storeData.longitude)
         };
@@ -116,6 +134,8 @@ export default {
               this.errors = error.response.data || {};
               if (error.response.data.message) {
                 alert('Error: ' + error.response.data.message);
+              } else if (error.response.data.name) {
+                alert('Error: ' + error.response.data.name);
               } else if (error.response.data.latitude) {
                 alert('Error: ' + error.response.data.latitude);
               } else if (error.response.data.longitude) {

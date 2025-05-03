@@ -521,7 +521,7 @@ export default {
   padding: 1px 10px;
   border: 3px solid #58c4c9;
   border-radius: 20px;
-  box-shadow:  1px 1px 2px #58c4c9;
+  box-shadow:  0 0 1px #58c4c9;
 }
 
 .pagination-buttons {

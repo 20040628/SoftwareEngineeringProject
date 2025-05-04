@@ -1432,7 +1432,42 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
-  ​
+#### Create Booking for unregistered users （only admin）
+
+1. register the user, see 7.1.1
+
+2. create book
+
+   **URL**: `/api/bookings/forUnregistered`
+
+   **Method**: `POST`
+
+   **Request Body**:
+
+   ```
+   {
+     "userId": "number",       // User ID
+     "scooterId": "number",    // Scooter ID
+     "hireType": "string",     // One of: "HOUR", "FOUR_HOURS", "DAY", "WEEK"
+     "startTime": "string",     // Format: "YYYY-MM-DD HH:mm:ss"
+     "staffId": "number"
+   }
+   ```
+
+   **Success Response** (200 OK):
+
+   ```
+   {
+       "orderId": 1,
+       "priceBeforeDiscount": 5.00,
+       "price": 5.00,
+       "startTime": "2025-04-21T16:00:00.000+00:00",
+       "endTime": "2025-04-21T17:00:00.000+00:00",
+       "message": "Booking successful"
+   }
+   ```
+
+3. pay: see 7.2.6（银行卡） + 7.8.1(沙盒)
 
 ### Email Notifications
 

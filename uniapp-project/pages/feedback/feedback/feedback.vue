@@ -6,15 +6,15 @@
 		<textarea placeholder="Please describe a problem you have encountered or a recommendation for this product..." v-model="sendData.feedbackContent" class="feedback-textare" maxlength="-1"/>
 
 		<view class="image-title">
-			<text class="text-black">Upload problem screenshot<text class="text-grey"> (Optional, up to 6 photos can be uploaded)
+			<!-- <text class="text-black">Upload problem screenshot<text class="text-grey"> (Optional, up to 6 photos can be uploaded)
 				</text>
-			</text>
+			</text> -->
 			<!-- <view class="text-grey">{{ sendData.imgs.length }}/6</view> -->
 		</view>
-		<view class="filepicker">
+		<!-- <view class="filepicker">
 			<uni-file-picker file-mediatype="image" :limit="6" return-type="array" v-model="sendData.imgs">
 			</uni-file-picker>
-		</view>
+		</view> -->
 
 		<!-- <text class="text-black">联系方式<text class="text-grey">(选填)</text> </text>
 		<input class="feedback-input" v-model="sendData.mobile" placeholder="请输入您的手机号" /> -->
@@ -45,7 +45,7 @@
 		  const token = String(uni.getStorageSync('token'));
 		  try{
 			  const [err, res] = await uni.request({
-				url: 'http://localhost:8080/api/feedback', // 后端地址
+				url: `${this.$baseURL}/api/feedback`, // 后端地址
 				method: 'POST',
 				data: { content: this.sendData.feedbackContent },
 				header: { 'Content-Type': 'application/json',

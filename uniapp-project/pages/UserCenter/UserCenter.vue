@@ -1,34 +1,38 @@
 <template>
 	<view class="page">
 		<view style="background-size: 100% 100%;"
-			:style="{'padding-top':'10px','background-image':'linear-gradient(90deg, #F1EEF5, #EBF1F6)'}">
+			:style="{'padding-top':'10px','background-image':'linear-gradient(90deg, #F1EEF5, #EBF1F6)','padding-bottom':'10px'}">
 			<view>
 				<view class="my-info-box" >
 					<view>
 						<view @click="informaition()" class="my-nickName overOne">{{userInfo.username||'点击授权登录'}}</view>
-						<view @click="informaition()" class="my-vip-num">{{'Not vip'}}</view>
 	
 						<view class="my-amount-box">
 							<view>
-								<view>{{balance||0}}</view>
+								<view>{{balance}}</view>
 								<view>wallet</view>
 							</view>
 							<view>
-								<view>{{totalGainedBonus||0}}</view>
+								<view>{{totalOrders}}</view>
 								<view>scooters</view>
 							</view>
 						</view>
 					</view>
 					<view class="my-logo-box" @click="informaition()">
 						<view>
-							<image class="user-logo" :src="userLogo"></image>
-							<!-- <image class="user-vip" :src="vipLogo" v-if='isVipType'></image> -->
+							<image 
+									class="user-logo" 
+									:src="userLogo"
+									@click="chooseImg"
+							></image>
+							<image class="user-vip" :src="vipLogo" v-if='status>0'></image>
 						</view>
 					</view>
 				</view>
 			</view>
 			<view class="my-vip-box" >
 				<image :src="vipImg" mode='widthFix'></image>
+				<view :class="statusClass">{{ statusClass }}</view>
 			</view>
 			
 		</view>
@@ -42,9 +46,9 @@
 				</view>
 				<view @click="goPage(2)">
 					<view>
-						<image mode="widthFix" :src='unpaidImg'></image>
+						<image mode="widthFix" :src='doingImg'></image>
 					</view>
-					<view class="myPage-listTable-txtA">Unpaid</view>
+					<view class="myPage-listTable-txtA">Doing</view>
 				</view>
 				<view @click="goPage(3)">
 					<view>
@@ -96,33 +100,167 @@
 export default {
   data() {
     return {
-      username: '',  // 用于存储用户名
+      username: '',
+	  userid: null,
 	  userLogo:'/static/icons/user-logo.png',
 	  myOrderImg:'/static/icons/myOrder.png',
 	  unpaidImg:'/static/icons/unpay.png',
 	  unuseImg:'/static/icons/unuse.png',
 	  doneImg:'/static/icons/done.png',
+	  doingImg:'/static/icons/doing.png',
 	  paymentImg:'/static/icons/payment.png',
 	  setImg:'/static/icons/setup.png',
 	  myFeedbackImg:'/static/icons/feedback.png',
 	  logoutImg:'/static/icons/logout.png',
-	  vipImg:'/static/icons/VIP.png',
+	  vipImg:'/static/icons/name.png',
+	  vipLogo:'/static/icons/VIP.png',
 	  userInfo: uni.getStorageSync('userInfo'),
-	  balance: '',
-	  totalGainedBonus: '',
+	  balance: 0,
+	  totalOrders: 0,
+	  status: 0,
+	  isLoading:true,
+	  user:[]
     };
   },
-  onLoad() {
-    const user = uni.getStorageSync('userInfo');
-    if (user) {
-      this.username = user.username;
+  async mounted() {
+    this.user = uni.getStorageSync('userInfo');
+    if (this.user) {
+      this.username = this.user.username;
+	  this.userid = this.user.userId;
+	  await this.getuser();
     } else {
-      this.username = 'Unknown User';  // 如果没有找到token，则显示为未知用户
+      this.username = 'Unknown User'; 
     }
+	console.log(this.user)
+	
+	console.log(this.userLogo)
+	await this.getOrders();
+	await this.getCard()
   },
+   computed: {
+      statusClass() {
+        switch (this.status) {
+          case 1:
+            return 'Student';  
+          case 2:
+            return 'Senior';   
+          case 3:
+            return 'Frequent'; 
+          case 4:
+            return 'Frequent_student'; 
+		  case 5:
+			return 'Frequent_senior';
+          default:
+            return 'Ordinary User';
+        }
+      },
+    },
   methods: {
 	load: function(e) {
 			console.log("load")
+	},
+	chooseImg() {
+	  uni.chooseImage({
+	    count: 1,  // 选择的图片数量
+	    sourceType: ['album'],  // 只从相册中选择
+	    sizeType: ['original', 'compressed'],  // 可以选择原图或压缩图
+	    success: (res) => {
+	      this.userLogo = res.tempFilePaths;  // 获取选中的图片路径
+	    }
+	  })
+	},
+	async getprofile(){
+		const token = String(uni.getStorageSync('token'));
+		try {
+			uni.showLoading({ title: "Loading", mask: true });
+		    const res = await uni.request({
+		      url: `${this.$baseURL}/api/users/profile/${this.userid}`,
+		      method: 'GET',
+			  header: {
+					'Authorization': `Bearer ${token}`,
+					'Content-Type': 'application/json'
+			   },
+			});
+			if (res.statusCode === 200) {
+				this.userLogo = `../../../backend/uploads/avatars/${res.data.avatar}`
+			} else {
+				uni.showToast({
+				   title: res.data.message,
+				   icon: 'none',
+				   duration: 2000
+				 });
+			} 	
+		} catch (err) {
+		    uni.showToast({ title: '网络错误', icon: 'none' })
+		} finally {
+		  uni.hideLoading();
+		  this.isLoading = false
+		}
+	},
+	async getuser(){
+		const token = String(uni.getStorageSync('token'));
+		try {
+			uni.showLoading({ title: "Loading", mask: true });
+		    const res = await uni.request({
+		      url: `${this.$baseURL}/api/users/${this.userid}`,
+		      method: 'PUT',
+			  data: {
+				email:this.user.email ,
+				mobile:this.user.mobile,
+				birthDate: this.user.birthDate   
+			   },
+			  header: {
+					'Authorization': `Bearer ${token}`,
+					'Content-Type': 'application/json'
+			   },
+			});
+			if (res.statusCode === 200) {
+				if(res.data.isStudent==1){
+					this.status=1;
+				}else if(res.data.isSenior==1){
+					this.status=2
+				}else if(res.data.isFrequentUser==1){
+					this.status=3
+				} else if(res.data.isStudent==1 && res.data.isFrequentUser==1){
+					this.status=4
+				} else if(res.data.isSenior==1 && res.data.isFrequentUser==1){
+					this.status=5
+				}
+			} else {
+				uni.showToast({
+				   title: res.data.message,
+				   icon: 'none',
+				   duration: 2000
+				 });
+			} 	
+		} catch (err) {
+		    uni.showToast({ title: '网络错误', icon: 'none' })
+		} finally {
+		  uni.hideLoading();
+		  this.isLoading = false
+		}
+	},
+	async getCard(){
+		const token = String(uni.getStorageSync('token'));
+		this.user = uni.getStorageSync('userInfo');
+		try {
+			uni.showLoading({ title: "加载中...", mask: true });
+		    const res = await uni.request({
+		        url: `${this.$baseURL}/api/bank-payment/check-card/${this.user.userId}`,
+		        method: 'GET',
+				header: {
+				  'Content-Type': 'application/json',
+				  "Authorization": `Bearer ${token}`
+				},
+				
+		    });
+		    this.balance = res.data.bankBalance
+		} catch (err) {
+		    uni.showToast({ title: '网络错误', icon: 'none' })
+		} finally {
+			uni.hideLoading();
+		    this.isLoading = false
+		}
 	},
 	logout() {
 	  // 清除本地存储中的用户信息
@@ -134,6 +272,40 @@ export default {
 	    url: '/pages/UserLogin/UserLogin'  
 	  });
 	},
+	async getOrders(){
+		const token = String(uni.getStorageSync('token'));
+		try {
+		    const res = await uni.request({
+		      url: `${this.$baseURL}/api/bookings/getAllFinished/${this.userid}`,
+		      method: 'GET',
+			  header: {
+					'Authorization': `Bearer ${token}`,
+					'Content-Type': 'application/json'
+			   },
+			});
+			if (res.statusCode === 200) {
+				if (Array.isArray(res.data)) {
+				    console.log("订单总数:", res.data.length);
+				    this.totalOrders = res.data.length;
+				} else {
+				    console.error("返回的数据格式不正确", res.data);
+				    uni.showToast({
+				        title: '数据格式错误',
+				        icon: 'none',
+				        duration: 2000
+				    });
+				}
+			} else {
+				uni.showToast({
+				   title: res.data.message,
+				   icon: 'none',
+				   duration: 2000
+				 });
+			} 	
+		} catch (err) {
+		    uni.showToast({ title: '网络错误', icon: 'none' })
+		}
+	},
 	goPage(e){
 		switch (e) {
 			case 1:
@@ -143,22 +315,22 @@ export default {
 				break;
 			case 2:
 				uni.navigateTo({
-					url: './my/moreService/coupon/coupon'
+					url: './myorder/doing/doing'
 				})
 				break;
 			case 3:
 				uni.navigateTo({
-					url: './my/moreService/turnover/turnover'
+					url: './myorder/unuse/unuse'
 				})
 				break;
 			case 4:
 				uni.navigateTo({
-					url: './my/moreService/certification/certification'
+					url: './myorder/done/done'
 				})
 				break;
 			case 5:
 				uni.navigateTo({
-					url: './my/moreService/collection/collection'
+					url: './payment/card/card'
 				})
 				break;
 			case 6:
@@ -173,7 +345,7 @@ export default {
 				break;
 			case 9:
 				uni.navigateTo({
-					url: './my/service/service'
+					url: './information/set/set'
 				})
 				break;
 			case 10:
@@ -210,14 +382,19 @@ export default {
 		min-height: 100vh;
 	}
 	.my-vip-box {
+		display: flex;
 		width: 670rpx;
 		margin: 0 auto;
 		height: 100rpx;
 		margin-top: 60rpx;
+		justify-content: flex-start;
+		align-items: center;
 
 		image {
+			margin: 10rpx;
 			width: 10%;
 		}
+		
 	}
 
 	.my-info-box {
@@ -226,8 +403,11 @@ export default {
 		padding: 0 40rpx;
 
 		.my-logo-box {
+			display: flex;
 			> view {
+				display: flex;
 				position: relative;
+				justify-content: flex-start; 
 				width: 180rpx;
 				height: 180rpx;
 
@@ -253,6 +433,22 @@ export default {
 			max-width: 400rpx;
 			font-weight: bold;
 			margin-bottom: 6rpx;
+		}
+		.Student {
+		  background-color: lightblue;
+		  color: black;
+		}
+		.Senior {
+		  background-color: lightgreen;
+		  color: darkgreen;
+		}
+		.Frequent {
+		  background-color: lightyellow;
+		  color: darkorange;
+		}
+		.Frequent_student .Frequent_senior {
+		  background-color: lightcoral;
+		  color: white;
 		}
 
 		.my-vip-num {

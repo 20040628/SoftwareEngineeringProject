@@ -22,7 +22,7 @@
 		
 		    console.log("检测 Token 是否有效...");
 		    uni.request({
-		      url: ' http://localhost:8080/api/auth/validate', // 替换成你的 API 地址
+		      url: `${this.$baseURL}/api/auth/validate`, // 替换成你的 API 地址
 		      method: 'GET',
 		      header: { 'Authorization': 'Bearer ' + token },
 		      success: (res) => {

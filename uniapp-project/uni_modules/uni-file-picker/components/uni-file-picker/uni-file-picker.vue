@@ -8,10 +8,8 @@
 			:image-styles="imageStyles" :files-list="filesList" :limit="limitLength" :disablePreview="disablePreview"
 			:delIcon="delIcon" @uploadFiles="uploadFiles" @choose="choose" @delFile="delFile">
 			<slot>
-				<view class="is-add">
-					<view class="icon-add"></view>
-					<view class="icon-add rotate"></view>
-				</view>
+				<view class="icon-add"></view>
+				<view class="icon-add rotate"></view>
 			</slot>
 		</upload-image>
 		<upload-file v-if="fileMediatype !== 'image' || showType !== 'grid'" :readonly="readonly"
@@ -84,26 +82,23 @@
 			uploadImage,
 			uploadFile
 		},
+		options: {
+			virtualHost: true
+		},
 		emits: ['select', 'success', 'fail', 'progress', 'delete', 'update:modelValue', 'input'],
 		props: {
-			// #ifdef VUE3
 			modelValue: {
 				type: [Array, Object],
 				default () {
 					return []
 				}
 			},
-			// #endif
-
-			// #ifndef VUE3
 			value: {
 				type: [Array, Object],
 				default () {
 					return []
 				}
 			},
-			// #endif
-
 			disabled: {
 				type: Boolean,
 				default: false
@@ -182,6 +177,16 @@
 				default () {
 					return ['original', 'compressed']
 				}
+			},
+			sourceType: {
+				type: Array,
+				default () {
+					return  ['album', 'camera']
+				}
+			},
+			provider: {
+				type: String,
+				default: '' // 默认上传到 unicloud 内置存储 extStorage 扩展存储
 			}
 		},
 		data() {
@@ -191,22 +196,18 @@
 			}
 		},
 		watch: {
-			// #ifndef VUE3
 			value: {
 				handler(newVal, oldVal) {
 					this.setValue(newVal, oldVal)
 				},
 				immediate: true
 			},
-			// #endif
-			// #ifdef VUE3
 			modelValue: {
 				handler(newVal, oldVal) {
 					this.setValue(newVal, oldVal)
 				},
 				immediate: true
 			},
-			// #endif
 		},
 		computed: {
 			filesList() {
@@ -278,7 +279,7 @@
 						files.push(Object.assign({}, v))
 					}
 				})
-				this.uploadFiles(files)
+				return this.uploadFiles(files)
 			},
 			async setValue(newVal, oldVal) {
 				const newData =  async (v) => {
@@ -322,7 +323,6 @@
 			 * 选择文件
 			 */
 			choose() {
-
 				if (this.disabled) return
 				if (this.files.length >= Number(this.limitLength) && this.showType !== 'grid' && this.returnType ===
 					'array') {
@@ -346,6 +346,7 @@
 						type: this.fileMediatype,
 						compressed: false,
 						sizeType: this.sizeType,
+						sourceType: this.sourceType,
 						// TODO 如果为空，video 有问题
 						extension: _extname.length > 0 ? _extname : undefined,
 						count: this.limitLength - this.files.length, //默认9
@@ -408,6 +409,13 @@
 				if (!this.autoUpload || this.noSpace) {
 					res.tempFiles = []
 				}
+				res.tempFiles.forEach((fileItem, index) => {
+					this.provider && (fileItem.provider = this.provider);
+					const fileNameSplit = fileItem.name.split('.')
+					const ext = fileNameSplit.pop()
+					const fileName = fileNameSplit.join('.').replace(/[\s\/\?<>\\:\*\|":]/g, '_')
+					fileItem.cloudPath = fileName + '_' + Date.now() + '_' + index + '.' + ext
+				})
 			},
 
 			/**
@@ -416,11 +424,12 @@
 			 */
 			uploadFiles(files) {
 				files = [].concat(files)
-				uploadCloudFiles.call(this, files, 5, res => {
+				return uploadCloudFiles.call(this, files, 5, res => {
 						this.setProgress(res, res.index, true)
 					})
 					.then(result => {
 						this.setSuccessAndError(result)
+						return result;
 					})
 					.catch(err => {
 						console.log(err)
@@ -512,6 +521,7 @@
 			 */
 			delFile(index) {
 				this.$emit('delete', {
+					index,
 					tempFile: this.files[index],
 					tempFilePath: this.files[index].url
 				})
@@ -572,7 +582,11 @@
 						path: v.path,
 						size: v.size,
 						fileID:v.fileID,
-						url: v.url
+						url: v.url,
+						// 修改删除一个文件后不能再上传的bug, #694
+            uuid: v.uuid,
+            status: v.status,
+            cloudPath: v.cloudPath
 					})
 				})
 				return newFilesData
@@ -606,7 +620,9 @@
 		/* #ifndef APP-NVUE */
 		box-sizing: border-box;
 		overflow: hidden;
+		width: 100%;
 		/* #endif */
+		flex: 1;
 	}
 
 	.uni-file-picker__header {
@@ -626,14 +642,6 @@
 	.file-count {
 		font-size: 14px;
 		color: #999;
-	}
-
-	.is-add {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
-		align-items: center;
-		justify-content: center;
 	}
 
 	.icon-add {

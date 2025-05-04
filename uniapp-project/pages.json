@@ -9,8 +9,18 @@
 			}
 		},
 		{
-			"path": "pages/UserLogin/UserLogin"
+			"path": "pages/UserLogin/UserLogin",
+			"style": {
+				"navigationStyle": "custom", //隐藏头部
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 100
+			}
 		},
+		
+		{
+			"path": "pages/information/terms/terms"
+		},
+		
 		{
 			"path": "pages/UserRegister/UserRegister"
 		},
@@ -26,7 +36,7 @@
 		  
 		},
 		{
-		  "path": "pages/found/found"
+		  "path": "pages/now/now"
 		
 		},
 		{
@@ -99,6 +109,48 @@
 		        "navigationBarTitleText": "",
 		        "enablePullDownRefresh": false
 				}
+		},
+		{
+			"path":"pages/myorder/unuse/unuse"
+		},
+		{
+			"path":"pages/myorder/doing/doing"
+		},
+		{
+			"path":"pages/myorder/done/done"
+		},
+		{
+			"path":"pages/payment/choosePay/choosePay"
+		},
+		{
+			"path": "pages/information/findPassword/findPassword"
+		},
+		{
+			"path":"pages/payment/card/card"
+		},
+		{
+			"path":"pages/payment/addCard/addCard"
+		},
+		{
+			"path":"pages/chooseCar/chooseCar"
+		},
+		{
+			"path":"pages/information/instruction/instruction"
+		},
+		{
+			"path":"pages/information/set/set"
+		},
+		{
+			"path":"pages/information/change/changeInfo"
+		},
+		{
+			"path":"pages/information/change/changeAccount"
+		},
+		{
+			"path":"pages/information/app/app"
+		},
+		{
+			"path": "pages/information/resetPassword/resetPassword"
 		}
 	],
 	"globalStyle": {

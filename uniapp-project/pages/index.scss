@@ -1,8 +1,8 @@
-	$primary-color: #58C4C9; // 主色调
+	$primary-color: #aaaaff; // 主色调
 	$box-width: 660rpx; // 主体元素宽度
 
 	.page {
-		height: 100vh;
+		height: 100%;
 		background-color: $primary-color;
 	}
 	
@@ -12,7 +12,6 @@
 		display: flex;
 		align-items: flex-end;
 		padding: 60rpx 30rpx;
-		
 		text{
 			color: #fff;
 			font-size: 50rpx;
@@ -30,9 +29,10 @@
 		background-color: #fff;
 		border-radius: 60rpx 60rpx 0 0;
 		
+		
 		.title{
 			width: $box-width;
-			color: #316e70;
+			color: #000000;
 			font-size: 40rpx;
 			padding: 40rpx 0;
 			font-weight: bold;
@@ -88,9 +88,10 @@
 			font-size: 16px;
 			border: none;
 			box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+			margin-bottom: 20rpx;
 			
 			&:active{
-				background-color: #4f9c96;
+				background-color: #aa55ff;
 			}
 		}
 		

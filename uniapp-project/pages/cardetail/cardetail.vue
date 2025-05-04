@@ -11,122 +11,79 @@
 	  
       <!-- 价格显示 --> 
       <view class="price-section">
-        <text class="price">${{ calculatedPrice }}</text>
-        <text class="unit" v-if="durationOptions.length">/ {{ durationOptions[selectedDuration].label }}</text>
+        <text class="price">£{{ getPrice(scooter) }}</text>
+		<text class="original-price" v-if="hasDiscount">£{{ getOriginalPrice(scooter) }}</text>
+        <text class="unit">/ {{ getPriceLabel() }}</text>
       </view> 
 
-      <!-- 地址信息 -->
+      <!-- 地址时间信息 -->
       <view class="address-section" v-if="scooter">
-        <image src="/static/icons/location.png" class="icon"/>
-        <view class="address">
-          <text class="title">Pick-up Position</text>
-          <text class="detail">{{ scooter.location || 'Getting location information' }}</text>
-        </view>
-        <image src="/static/icons/arrow_right.png" class="arrow"/>
+		  <view class="notification-wrapper">
+		    <uni-icons type="notification" size="20" color="#ff4d4f"></uni-icons>
+		    <text class="note">Please carefully check the rental period and the information of the return service point</text>
+		  </view>
+        <view class="information">
+            <view class="label">
+              <text class="label-text">Pick and Return</text>
+              <text class="store-name">{{ selectedSite.name }}</text>
+            </view>
+            
+            <view class="label">
+              <text class="label-text">Location:</text>
+              <text class="store-location">{{ selectedSite.locationName }}</text>
+            </view>
+            
+            <view class="label">
+              <text class="label-text">Time:</text>
+              <text class="time-range">{{ startTime }} → {{ endTime }}</text>
+            </view>
+          </view>
       </view>
-    </view>
 
-	<view class="timeline-container">
-	    <h4>Booking Timeline</h4>
-	    <!-- 添加时间刻度 -->
-	    <view class="timeline-scale">
-	        <view v-for="day in 7" :key="day" class="timeline-day">
-	            {{ formatDate(addDays(new Date(), day-1)) }}
-	        </view>
-	    </view>
-	    <view class="timeline">
-			<view v-for="(slot, index) in timeline" :key="index" 
-				:class="['time-slot', slot.status]"
-				:style="{ width: calculateSlotWidth(slot) + '%' }">
-				<view class="slot-info">
-					{{ formatTimeSlot(slot) }}
-				</view>
-			</view>
-	    </view>
-	</view>
-	
-    <!-- 租车时长选择 -->
-    <view class="duration-section">
-      <view class="section-title">Select Duration</view>
-      <view class="duration-grid">
-        <view 
-          v-for="(option, index) in durationOptions"
-          :key="index"
-          class="duration-item"
-          :class="{ active: selectedDuration === index }"
-          @click="selectDuration(index)"
-        >
-          <text class="label">{{ option.label }}</text>
-          <text class="sub-label">{{ option.subLabel }}</text>
-        </view>
-      </view>
-    </view>
-	
-	<!-- 选择开始时间 -->
-	<view class="form-group">
-		<label>start date:</label>
-		<!-- 日期选择器 -->
-		<picker mode="date" :value="bookingForm.startDate" @change="onDateChange">
-			<view class="picker">{{ bookingForm.startDate || 'Please select a start date' }}</view>
-		</picker>
-		<label>start time:</label>
-		<!-- 时间选择器 -->
-		<picker mode="time" :value="bookingForm.startTime" @change="onTimeChange">
-			<view class="picker">{{bookingForm.startTime || 'Please select a start time' }}</view>
-		</picker>
-
-	</view>
-
+</view>
     <view class="action-bar">
     	<button @click="submitBooking" :disabled="isLoading">
     	    {{ isLoading ? 'In process...' : 'Confirming a Reservation' }}
     	</button>
     </view>
   </view>
-  <!-- <web-view :src="paymentUrl"></web-view> -->
 </template>
 
 <script>
 export default {
   data() {
     return {
-      scooter:null,
+	  scooter:null,
 	  scooterID:null,
       selectedDuration: 0, // 默认选择第一个选项
       durationOptions: [],
 	  message: '',
 	  messageType: '',
-	  bookingForm: {
-	    hireType: '',
-	    startDate: '', 
+	  hireType: '',
 	    startTime: '',
-		startDateTime:''
-	  },
-	  timeline: [],
+		selectedSite:'',
 	  isLoading:true,
 	  currentUser:{
 		userId:null
 	  },
-	  paymentUrl:''
+	  paymentUrl:'',
+	  hasDiscount:false,
     }
   },
   async onLoad(options){
+	  this.hireType = uni.getStorageSync('hireType');
+	  this.startTime = uni.getStorageSync('startTime');
+	  this.endTime = uni.getStorageSync('endTime');
+	  this.selectedSite = uni.getStorageSync('selectedStore');
+	  this.reverseGeocode(this.selectedSite)
     	this.scooterID = options.id;
-    	await this.loadScooterDetail();
-    	await this.refreshTimeline(); 
 		const userInfo = uni.getStorageSync('userInfo');
 		  if (userInfo) {
 		    this.currentUser.userId = userInfo.userId || null;
 		}
+		await this.loadScooterDetail();
   },
   computed: {
-  	    // 计算总价格
-  	    calculatedPrice() {
-  	      if (!this.durationOptions.length) return 0; // 确保 options 已加载
-  	
-  	      const option = this.durationOptions[this.selectedDuration];
-  	      return (option?.price || 0).toFixed(2)
-  	    },
 		statusClass() {
 			const statusMap = {
 				0: "unavailable",
@@ -146,165 +103,115 @@ export default {
 		 }
    },
    
-
- // 是否可租用
-  //   canRent() {
-  //     return this.scooter.status === 'available' || 
-  //           this.scooter.status === 'low_battery'
-  //   },
-
-  //   // 租车按钮文字
-  //   rentButtonText() {
-  //     if (this.scooter.status === 'low_battery') return '低电量可租用'
-  //     if (this.scooter.status === 'available') return '立即租用'
-  //     return '暂时不可用'
-  //   }
   
   methods: {
-	  // 封装 uni.request 成 Promise 以支持 async/await
-	request(options) {
-	    return new Promise((resolve, reject) => {
-	        uni.request({
-				...options,
-	            success: (res) => {
-	              if (res.statusCode === 200) {
-	                resolve(res.data);
-	              } else {
-	                reject(new Error(`请求失败: ${res.statusCode}`));
-	              }
-	            },
-	            fail: (err) => reject(err)
-	        });
-		});
-	},
+	  getPrice(scooter) {
+	     if (this.hireType === 'HOUR') {
+	       return scooter.discountedPriceHour;
+	     } else if (this.hireType === 'FOUR_HOURS') {
+	       return scooter.discountedPriceFourHour;
+	     } else if (this.hireType === 'DAY') {
+	       return scooter.discountedPriceDay;
+	     } else if (this.hireType === 'WEEK') {
+	       return scooter.discountedPriceWeek;
+	     }
+	     return 0;
+	   },
+	   getOriginalPrice(scooter){
+		   if (this.hireType === 'HOUR') {
+		     return scooter.priceHour;
+		   } else if (this.hireType === 'FOUR_HOURS') {
+		     return scooter.priceFourHour;
+		   } else if (this.hireType === 'DAY') {
+		     return scooter.priceDay;
+		   } else if (this.hireType === 'WEEK') {
+		     return scooter.priceWeek;
+		   }
+		   return 0;
+	   },
+	   
+	   // 返回价格的单位标签
+	   getPriceLabel() {
+	     switch (this.hireType) {
+	       case 'HOUR':
+	         return 'h';
+	       case 'FOUR_HOURS':
+	         return '4h';
+	       case 'DAY':
+	         return 'day';
+	       case 'WEEK':
+	         return 'week';
+	       default:
+	         return '';
+	     }
+	   },
 	
 	async loadScooterDetail() {
-	    try {
-			uni.showLoading({ title: "加载中...", mask: true });
-	        const data = await this.request({
-	            url: `http://localhost:8080/api/scooters/${this.scooterID}`,
-	            method: 'GET'
-	        });
-	        this.scooter = data
-			this.durationOptions = [
-			        { label: '1 Hour', value: 1, type: 'hour', price: this.scooter.priceHour },
-			        { label: '4 Hours', value: 4, type: 'hour', price: this.scooter.priceHour * 4 }, 
-			        { label: '1 Day', value: 1, type: 'day', price: this.scooter.priceDay }, 
-			        { label: '1 Week', value: 1, type: 'week', price: this.scooter.priceWeek } 
-			];
-	    } catch (err) {
-	        uni.showToast({ title: '网络错误', icon: 'none' })
-	    } finally {
-			uni.hideLoading();
-	        this.isLoading = false
+	  const token = String(uni.getStorageSync('token'));
+	  try {
+	    uni.showLoading({ title: "加载中...", mask: true });
+	
+	    // Make the API request to get the scooter details
+	    const res = await uni.request({
+	      url: `${this.$baseURL}/api/scooters/${this.scooterID}?userId=${this.currentUser.userId}`,
+	      method: 'POST',
+	      header: {
+	        'Content-Type': 'application/json',
+	        "Authorization": `Bearer ${token}`,
+	      },
+	    });
+	
+	    // Check if the response is successful
+	    if (res.statusCode === 200) {
+	      const data = res.data;
+	
+	      // Logging the response data (for debugging purposes)
+	      console.log(data);
+	
+	      // Update scooter details
+	      this.scooter=data
+		  this.hasDiscount = this.scooter.hasDiscount
+	
+	    } else {
+	      uni.showToast({ title: '加载失败，请稍后再试', icon: 'none' });
 	    }
-	},
 	
-	retryLoad() {
-	      this.isLoading = true
-	      this.loadScooterDetail()
+	  } catch (err) {
+	    uni.showToast({ title: '网络错误', icon: 'none' });
+	  } finally {
+	    // Hide loading spinner and update loading state
+	    uni.hideLoading();
+	    this.isLoading = false;
+	  }
 	},
-	
-	addDays(date, days) {
-	      return new Date(date.getTime() + days * 86400000); 
-	},
-	
-	formatDate(date) {
-	      return `${date.getMonth() + 1}.${date.getDate()}`;
-	},
-	// 添加刷新时间轴的方法
-	async refreshTimeline() {
-		const token = String(uni.getStorageSync('token'));
-	      if (!this.scooterID) return; // 确保有 scooterID
-		  // console.log(this.scooterID)
-	      try {
-	        this.timeline = await this.request({
-	          url: `http://localhost:8080/api/bookings/timeline/${this.scooterID}`,
-	          method: 'GET',
-			  header: {
-			  	'Content-Type': 'application/json',
-			  	"Authorization": `Bearer ${token}`
-			  	},
-	        });
-	      } catch (err) {
-	        console.error('刷新时间轴失败:', err);
-	      }
-		  // console.log(this.timeline)
-	},
-	
-	calculateSlotWidth(slot) {
-		const start = new Date(slot.startTime).getTime();
-		const end = new Date(slot.endTime).getTime();
-		const duration = end - start;
-		// console.log(slot.startTime, new Date(slot.startTime))
-		      
-		// 计算时间段占总时间范围的百分比
-		const totalDuration = 7 * 24 * 60 * 60 * 1000; // 7天的毫秒数
-		return (duration / totalDuration) * 100;
-	},
-		    
-	formatTimeSlot(slot) {
-		const start = new Date(slot.startTime);
-		const end = new Date(slot.endTime);
-		if (slot.status === 'booked') {
-		    let hirePeriodText;
-		    switch (slot.hirePeriod) {
-		        case 'HOUR':
-		        hirePeriodText = '1hour';
-		        break;
-		        case 'FOUR_HOURS':
-		        hirePeriodText = '4hours';
-		        break;
-		        case 'DAY':
-		        hirePeriodText = '1day';
-		        break;
-		        case 'WEEK':
-		        hirePeriodText = '1week';
-		        break;
-		        default:
-		        hirePeriodText = slot.hirePeriod;
+	async reverseGeocode(store){
+		 uni.request({
+		    url: `https://restapi.amap.com/v3/geocode/regeo?output=json&location=${store.longitude},${store.latitude}&key=5f722ef9e435cec7d4dba6f5daba0030&radius=1000&extensions=all&language=en`,
+		    success: (res) => {
+		      // console.log('高德逆地理编码返回数据：', res.data);
+		      if (res.data.status === '1') {
+		        // 动态为 scooter 对象添加 locationName 属性
+		        this.$set(store, 'locationName', res.data.regeocode.pois[1].name);
+				this.$set(store, 'locationNum', res.data.regeocode.formatted_address);
+		      } else {
+		        this.$set(store, 'locationName', '无法获取位置');
+		        console.error('无法获取位置，返回数据:', res.data);
+		      }
+		    },
+		    fail: (err) => {
+		      this.$set(store, 'locationName', '位置请求失败');
+		      console.error('逆地理编码请求失败:', err);
 		    }
-		    return `${this.formatTime(start)} - ${this.formatTime(end)} (${hirePeriodText})`;
-		    }
-		return 'Available';
-		},
-		
-	
-	
-	formatTime(date) {
-		return `${date.getMonth() + 1}/${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+		  });
 	},
-	
-	selectDuration(index) {
-	  this.selectedDuration = index
-	},
-	
-	onDateChange(event) {
-	    this.bookingForm.startDate = event.detail.value;
-	    this.updateStartTime();
-	},
-	    // 时间选择改变
-	onTimeChange(event) {
-	    this.bookingForm.startTime = event.detail.value;
-	    this.updateStartTime();
-	},
-	
-	// 更新完整的日期时间
-	updateStartTime() {
-	    if (this.bookingForm.startDate && this.bookingForm.startTime) {
-	    this.bookingForm.startDateTime = `${this.bookingForm.startDate} ${this.bookingForm.startTime}`;
-	    }
-	},
-
 	// 提交预订
 	async submitBooking() {
-		this.bookingForm.hireType = this.durationOptions[this.selectedDuration].type.toUpperCase();
 		const token = String(uni.getStorageSync('token'));
-		if (!this.bookingForm.startTime) {
+		if (!this.startTime) {
 			this.showMessage('请选择开始时间', 'error');
 			return;
 		}
-		if (!this.bookingForm.hireType) {
+		if (!this.hireType) {
 			this.showMessage('请选择租赁类型', 'error');
 			return;
 		}
@@ -313,27 +220,18 @@ export default {
 		uni.showLoading({ title: 'Under submission...' });
 
 		try {
-				const startTime = this.bookingForm.startDateTime.replace('T', ' ') + ':00';
-				// console.log('startDateTime:', startTime);
-				// console.log('User ID:', this.currentUser?.userId);
-				// console.log('Scooter ID:', this.scooter?.id);
-				// console.log("Token:", token);
-				const payloadBase64 = token.split('.')[1]; // JWT 的 payload 部分
-				const payload = JSON.parse(atob(payloadBase64)); 
-				// console.log("Token Payload:", payload);
-
 				const bookingData = {
 					userId: this.currentUser.userId,
 					scooterId: this.scooter.id,
-					hireType: this.bookingForm.hireType,
-					startTime: startTime
+					hireType: this.hireType,
+					startTime: this.startTime
 				};
-				// console.log("Booking Data:", bookingData);
+				
 
 				// 发送请求
 				const res = await new Promise((resolve, reject) => {
 					uni.request({
-						url: 'http://localhost:8080/api/bookings',
+						url: `${this.$baseURL}/api/bookings`,
 						method: 'POST',
 						data: bookingData,
 						header: { 
@@ -344,7 +242,6 @@ export default {
 						fail: (error) => reject(error)
 					});
 				});
-				// console.log("API Response:", res);
 
 				if (res.statusCode === 200) {
 					this.showMessage('book successfully', 'success');
@@ -389,34 +286,8 @@ export default {
 		}
 	}
 	
-	// openMap() {
-	//   uni.openLocation({
-	//     latitude: this.scooter.latitude,
-	//     longitude: this.scooter.longitude,
-	//     name: this.scooter.location
-	//   });
-	// }
 	
   }
-    // handleRent() {
-    //   if (!this.canRent) return
-      
-    //   uni.showLoading({ title: '正在创建订单' })
-      
-    //   // 调用租车接口
-    //   const orderData = {
-    //     scooterId: this.scooter.id,
-    //     duration: this.durationOptions[this.selectedDuration]
-    //   }
-      
-    //   // 模拟API调用
-    //   setTimeout(() => {
-    //     uni.hideLoading()
-    //     uni.navigateTo({
-    //       url: `/pages/payment/payment?orderId=${Date.now()}`
-    //     })
-    //   }, 1000)
-    // }
  
 
 </script>
@@ -475,6 +346,12 @@ export default {
 		color: #FF5722;
 		font-weight: bold;
 	  }
+	.original-price{
+		font-size: 28rpx;
+		  color: #999;
+		  margin-left: 20rpx;
+		  text-decoration: line-through;  
+	}
 	  .unit {
 		color: #666;
 		margin-left: 20rpx;
@@ -482,155 +359,73 @@ export default {
 	  }
 }
 
+/* address-section样式 */
 .address-section {
+  padding: 20px 15px;
+}
+
+.notification-wrapper {
   display: flex;
-  align-items: center;
-  padding: 30rpx;
-  background: #f5f5f5;
-  border-radius: 16rpx;
-  .icon {
-    width: 48rpx;
-    height: 48rpx;
-    margin-right: 20rpx;
-  }
-  .address {
-    flex: 1;
-    .title {
-      display: block;
-      color: #999;
-      font-size: 24rpx;
-    }
-    .detail {
-      font-size: 28rpx;
-    }
-  }
-  .arrow {
-    width: 30rpx;
-    height: 30rpx;
-    margin-left: 20rpx;
-  }
+  align-items: center; /* 垂直居中图标和文字 */
+  background-color: #fff3f0; /* 半弧方框的背景色 */
+  padding: 12px 20px;
+  border-radius: 25px 25px 0 0; /* 上半部分为圆弧形 */
+  border: 1px solid #ffccc7; /* 边框颜色 */
 }
 
-.timeline-container {
-  margin: 20px 0;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* note 样式 */
+.note {
+  font-size: 14px;
+  color: #ff4d4f;
+  margin-left: 10px; /* 图标和文字之间的间距 */
+  line-height: 1.5;
 }
-.timeline-container h4{
-	margin-bottom: 10rpx;
-}
-
-.timeline-scale {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  padding: 0 5px;
-}
-.timeline-day {
-  font-size: 12px;
-  color: #666;
-  flex: 1;
-  text-align: center;
-  border-right: 1px solid #ddd;
-  padding: 2px 0;
+/* information样式 */
+.information {
+	border-radius: 15px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+	background-color: #ffffff;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px 15px;
 }
 
-.timeline {
-  display: flex;
-  height: 60px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 5px 0;
-}
-
-.time-slot {
-  position: relative;
-  height: 100%;
-  min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  transition: all 0.3s ease;
-  padding: 0 5px;
-}
-
-.time-slot.available {
-  background: #E8F5E9;
-  color: #2E7D32;
-  border-right: 1px dashed #A5D6A7;
-}
-
-.time-slot.booked {
-  background: #FFEBEE;
-  color: #C62828;
-  border-right: 1px solid #FFCDD2;
-}
-
-.slot-info {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-  line-height: 1.2;
-  width: 100%;
-}
-
-
-.duration-section {
-  padding: 30rpx;
-  .section-title {
-    font-size: 25rpx;
-    font-weight: bold;
-    margin-bottom: 10rpx;
-  }
-}
-
-.duration-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
-}
-
-.duration-item {
-  padding: 30rpx;
-  border: 2rpx solid #eee;
-  border-radius: 16rpx;
-  text-align: center;
-  transition: all 0.3s;
-  
-  &.active {
-    border-color: #4CAF50;
-    background: #f0f9eb;
-  }
-  
-  .label {
-    display: block;
-    font-size: 28rpx;
-    color: #333;
-  }
-}
-
-.form-group {
+/* label样式 */
+.label {
   margin-bottom: 15px;
-  padding-bottom: 80rpx
 }
 
-.form-group label {
-  display: block;
+/* label-text样式 */
+.label-text {
+  font-size: 14px;
+  color: #555;
+  font-weight: bold;
   margin-bottom: 5px;
+  display: block;
 }
 
-.picker {
-	padding: 10px;
-	background-color: #f5f5f5;
-	border-radius: 5px;
-	text-align: center;
-	margin-bottom: 10px;
+/* store-name样式 */
+.store-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 5px;
+}
+
+/* store-location样式 */
+.store-location {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* time-range样式 */
+.time-range {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
 }
 
 .action-bar {

@@ -95,6 +95,7 @@ public class ScooterController {
         }
     }
 
+
     // 给管理员的：返回某个店铺的所有车子
     @GetMapping("/{storeId}")
     public ResponseEntity<?> getScooterByStoreId(@PathVariable Long storeId) {
@@ -105,7 +106,6 @@ public class ScooterController {
             return ResponseEntity.badRequest().body("Failed to get scooters: " + e.getMessage());
         }
     }
-
     @PostMapping("/{id}")
     public ResponseEntity<?> getScooterById(@PathVariable Long id, @RequestParam(required = false) Long userId) {
         try {

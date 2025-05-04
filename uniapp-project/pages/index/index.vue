@@ -13,50 +13,21 @@
 			  v-for="(item, index) in bannerList" 
 			  :key="index" 
 			>
-			  <image :src="item.url" lazy-load="true"></image>
+			  <image :src="item.url" lazy-load="true" alt="show the scooters"></image>
 			</swiper-item>
 		</swiper>
-		<!-- 顶部搜索栏 -->
-		<view class="soso-box">
-			<view class="soso-input-box">
-			  <view class="soso-icon">
-				<image mode="widthFix" :src="sosoImg"></image>
-			  </view>
-			  <input
-				type="text"
-				v-model="sosoTxt"
-				@confirm="getList"
-				placeholder="Search nearby scooters"
-			  />
-			</view>
-		</view>
-		<!-- 底部车辆列表 -->
 		<view class="scooter-list">
-		 <!-- 选择器 -->
-			<view class="screening-boxA">
-				<view v-for="(item, index) in screeningAList" :key="index" @click="screeningA(index)" class="screeningA-con"
-					:class="item.type?'screeningA-con-active':''">{{item.name}}
-				</view>
-			</view>
-			<view class="pricing-table">
-			   <view 
-				 v-for="(option, index) in pricingOptions" 
-				 :key="index" 
-				 class="pricing-card"
-			   >
-				 <text class="plan-price">{{ option.price }}</text>
-				 <text class="plan-duration">/{{ option.duration }}</text>
-			   </view>
-			</view>
 			<view class="container-time">
-				<!-- 开始时间选择器 -->
-				<view class="time-picker">
-				  <text>Select start time:</text>
-				  <picker mode="date" value="{{ startTime }}" @change="onStartTimeChange">
-					<view class="picker">
-					  <text>{{ startTime }}</text>
-					</view>
-				  </picker>
+				<view class="example-body">
+					<uni-datetime-picker type="datetime" :start="start" :end="end" v-model="datetimeString" @change="change" />
+				</view>
+				<view class="address-section" @click="goToSelectPage">
+					 <image src="/static/icons/location.png" class="icon" alt="Location icon"/>
+					    <view class="address">
+					        <text class="title">Pick-up Position</text>
+					        <text class="detail">{{ selectedSite.name || 'Please choose' }}</text>
+					    </view>
+					<image src="/static/icons/arrow_right.png" class="arrow" alt="arrow icon"/>
 				</view>
 				<!-- 预定时长选择器 -->
 				<view class="duration-picker">
@@ -93,17 +64,48 @@
 				  <button @click="queryAvailableScooters">Query</button>
 				</view>
 			</view>
-			<view v-for="scooter in filteredScooters" :key="scooter.id" class="scooter-item">
-				<!-- <image :src="scooter.image" class="scooter-image"/> -->
-				<view class="scooter-info">
-				  <text class="location">{{ scooter.locationName }}</text>
-				  <view class="location-name">
-						<image src="/static/icons/location_name.png" class="location-icon" />
-						<text>{{ scooter.locationNum }}</text>
-				  </view>
-				  <button class="reserve-btn" @click="showScooterDetail(scooter)">Reserve</button>
+			<view class="instruction" @click="instruction()">
+				<view class="text">
+					Instruction to use
 				</view>
+				<image src="/static/icons/arrow_right.png" class="arrow" alt="arrow icon"/>
 			</view>
+			<view class="discount-container">
+			  <view class="discount-title">Discount Policies</view>
+			  
+			  <view class="table">
+			    <view class="table-header">
+			      <view class="header-item">Discount Type</view>
+			      <view class="header-item">Details</view>
+			    </view>
+			    
+			    <view class="table-row">
+			      <view class="row-item">Student (15%)</view>
+			      <view class="row-item">
+			        For users aged 18-25
+			      </view>
+			    </view>
+			    
+			    <view class="table-row">
+			      <view class="row-item">Senior Citizen (20%)</view>
+			      <view class="row-item">
+			        For users aged 60+
+			      </view>
+			    </view>
+			    
+			    <view class="table-row">
+			      <view class="row-item">Frequent User (10%)</view>
+			      <view class="row-item">
+			        For users renting scooters 8+ hours/week
+			      </view>
+			    </view>
+			
+				<view class="note">
+				    * Discount Stacking:Multiple discounts can be combined
+				</view>
+			  </view>
+			</view>
+			
 		</view>
 	</view>
 </template>
@@ -111,135 +113,149 @@
 export default {
   data() {
     return {
-      searchKeyword: '',
       scooters:[],
 	  isLoading:true,
-	  options: ['all', 'available'], // 选项列表
 	  selectedIndex: 0, // 默认选择索引
-	  selectedOption: 'all', // 默认选择的值
 	  bannerList: [
 	          { url: '/static/images/banner1.png'},
 	          { url: '/static/images/banner2.png'},
 	          { url: '/static/images/banner3.png'}
 	        ],
-	 screeningAList: [
-				{
-					'id': 0,
-					'name': 'All',
-					'type': true
-				},
-				{
-					id: 1,
-					'name': 'Available',
-					'type': false
-				}
-		],
-	pricingOptions: [
-			      { duration: 'hour', price: '$5.00' },
-			      { duration: 'day', price: '$20.00' },
-			      { duration: 'week', price: '$100.00' }
-		],
-	sosoTxt: "", // 搜索内容
-	sosoImg: "/static/icons/search.png", // 搜索图标路径	
+	carImg:"/static/images/scooter.png",
+	speedImg:"/static/icons/speed.png",
+	batteryImg:"/static/icons/battery.png",
+	scooterImg:"/static/icons/scooter.png",
 	startTime: '',  // 开始时间
+	startDate:'',
 	selectedDuration: 0,  // 默认选择第一个选项
+	durationOptions:[
+		{ label: '1 Hour', type: 'hour' },
+		{ label: '4 Hours', type: 'FOUR_HOURS' }, 
+		{ label: '1 Day', type: 'day' }, 
+		{ label: '1 Week', type: 'week'} ],
+	datetimeString: this.getDateTime(new Date(), false),
+	selectedSite: null,
+	cates: [],
+	active: 0,
+	secondData: []
+	
     }
   },
-  computed: {
-    filteredScooters() {
-     return this.selectedOption === 'all'
-        ? this.scooters
-        : this.scooters.filter(scooter => scooter.status === 1);
-    }
-  },
+  watch: {
+  	datetimeString() {
+  		console.log('日期时间单选:', this.datetimeString);
+  	}
+   },
+  
   async mounted() {
-     await this.loadScooters();
-	 this.scooters.forEach(scooter => {
-	     this.reverseGeocode(scooter);
-	 });
+	 // const selectedSite = uni.getStorageSync('selectedStore');
+	 //  if (selectedSite) {
+	 //    this.selectedSite = selectedSite;
+	 //  }
+	 this.loadSelectedSite();
 	 
   },
+  onLoad(){
+	   
+  },
   methods: {
-	// 获取车辆列表
-	async loadScooters() {
-	  try {
-	    // 发起 GET 请求来获取所有滑板车的列表数据
-	    const res = await uni.request({
-	      url: 'http://localhost:8080/api/scooters/getAll',  // 后端接口地址
-	      method: 'GET'  // 请求方法为 GET
-	    });
-	
-	    // 如果响应状态码为 200（请求成功）
-	    if (res.statusCode === 200) {
-	      this.scooters = res.data;  // 将后端返回的滑板车数据赋值给 scooters
-	    } else {
-	      // 如果状态码不是 200，则显示加载失败的提示
-	      uni.showToast({ title: '数据加载失败', icon: 'none' });
-	    }
-	  } catch (err) {
-	    // 捕获并处理网络错误，显示提示
-	    uni.showToast({ title: '网络错误', icon: 'none' });
-	  } finally {
-	    // 请求完成后，无论成功还是失败，都将 isLoading 设置为 false
-	    this.isLoading = false;
-	  }
-	},
-	load: function(e) {
-		console.log("load")
-	},
-
-	// 跳转到详情页
-	showScooterDetail(scooter) {
-	  // 跳转到详情页，传递 scooter.id 作为参数
-	  uni.navigateTo({
-	    url: `/pages/cardetail/cardetail?id=${scooter.id}`
-	  })
-	},
-	screeningA(index) {
-		this.screeningAList.forEach((item, i) => {
-			item.type = (i === index); // 只有被点击的索引变成 true
-		});
-		this.selectedOption = this.options[index]
-	},
-	async reverseGeocode(scooter){
-		 uni.request({
-		    url: `https://restapi.amap.com/v3/geocode/regeo?output=json&location=${scooter.longitude},${scooter.latitude}&key=5f722ef9e435cec7d4dba6f5daba0030&radius=1000&extensions=all&language=en`,
-		    success: (res) => {
-		      // console.log('高德逆地理编码返回数据：', res.data);
-			
-
-		      if (res.data.status === '1') {
-		        // 动态为 scooter 对象添加 locationName 属性
-		        this.$set(scooter, 'locationName', res.data.regeocode.pois[1].name);
-				this.$set(scooter, 'locationNum', res.data.regeocode.formatted_address);
-		      } else {
-		        this.$set(scooter, 'locationName', '无法获取位置');
-		        console.error('无法获取位置，返回数据:', res.data);
-		      }
+	  // 页面加载时读取选中的位置
+	      loadSelectedSite() {
+	        const selectedSite = uni.getStorageSync('selectedStore');
+	        if (selectedSite) {
+	          this.selectedSite = selectedSite;
+	        } else {
+	          this.selectedSite = null;
+	        }
+	      },
+		   onShow() {
+		      // 每次页面显示时都重新加载选中的位置
+		      this.loadSelectedSite();
 		    },
-		    fail: (err) => {
-		      this.$set(scooter, 'locationName', '位置请求失败');
-		      console.error('逆地理编码请求失败:', err);
-		    }
-		  });
-		
-	},
-	 // 处理开始时间选择变化
-	onStartTimeChange(e) {
-	    this.startTime = e.detail.value;  // 获取选择的开始时间
-	},
 	onDurationSelect(index) {
-	      this.selectedDuration = index;  // 更新选中的预定时长
-	}
+	      this.selectedDuration = index;
+	},
+	getDateTime(date, addZero = true){
+	  return `${this.getDate(date, addZero)} ${this.getTime(date, addZero)}`
+	},
+	getDate(date, addZero = true){
+	  date = new Date(date)
+	  const year = date.getFullYear()
+	  const month = date.getMonth()+1
+	  const day = date.getDate()
+	  return `${year}-${addZero ? this.addZero(month) : month}-${addZero ? this.addZero(day) : day}`
+	},
+	getTime(date, addZero = true){
+	  date = new Date(date)
+	  const hour = date.getHours()
+	  const minute = date.getMinutes()
+	  const second = date.getSeconds()
+	 
+	return `${addZero ? this.addZero(hour) : hour}:${addZero ? this.addZero(minute) : minute}:${addZero ? this.addZero(second) : second}`;
+	    
+	},
+	addZero(num) {
+		if (num < 10) {
+			num = `0${num}`
+		}
+		return num
+	},
 	
+	goToSelectPage(){
+		uni.navigateTo({
+		    url: '/pages/map/map'
+		 });
+	},
+	queryAvailableScooters(){
+		const hireType = this.durationOptions[this.selectedDuration].type.toUpperCase();
+		console.log(this.datetimeString)
+		let startDate = new Date(this.datetimeString);
+		let endDate;
+		switch (hireType) {
+		  case 'HOUR':
+		    endDate = new Date(startDate.getTime() + 1 * 60 * 60 * 1000);  // 加 1 小时
+		    break;
+		  case 'FOUR_HOURS':
+		    endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000);  // 加 4 小时
+		    break;
+		  case 'DAY':
+		    endDate = new Date(startDate.getTime() + 1 * 24 * 60 * 60 * 1000);  // 加 1 天
+		    break;
+		  case 'WEEK':
+		    endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);  // 加 1 周
+		    break;
+		  default:
+		    endDate = startDate;  // 默认情况下，不改变时间
+		}
+		let formattedDate = endDate.getFullYear() + '-' + 
+		                    (endDate.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+		                    endDate.getDate().toString().padStart(2, '0') + ' ' + 
+		                    endDate.getHours().toString().padStart(2, '0') + ':' + 
+		                    endDate.getMinutes().toString().padStart(2, '0') + ':' + 
+		                    endDate.getSeconds().toString().padStart(2, '0'); 
+		uni.setStorageSync('hireType', hireType); 
+		uni.setStorageSync('startTime', this.datetimeString); 
+		uni.setStorageSync('endTime', formattedDate); 
+		uni.navigateTo({
+		  url: '/pages/chooseCar/chooseCar'
+		});
+
+	},
+	instruction(e){
+		uni.navigateTo({
+		  url: '/pages/information/instruction/instruction'
+		});
+	}
+				
   }
 }
 </script>
 
-<style scoped>
+<style  scoped>
 .container {
   position: relative;
   height: 100vh;
+  margin-bottom: 40rpx;
 }
 .swiper {
   width: 100%;
@@ -251,69 +267,8 @@ export default {
   height: 100%;
   object-fit: cover;
 }
-.soso-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20rpx;
-  margin: 10rpx;
-}
 
-.soso-input-box {
-  display: flex;
-  align-items: center;
-  border: 2px solid #7f669d;
-  border-radius: 50rpx;
-  height: 60rpx;
-  width: 600rpx;
-  padding: 0 20rpx;
-  background: #fff;
-}
 
-.soso-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10rpx;
-
-  image {
-    width: 32rpx;
-    height: 32rpx;
-  }
-}
-
-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 28rpx;
-  height: 72rpx;
-  line-height: 72rpx;
-  background: transparent;
-}
-
-.screening-boxA {
-		display: flex;
-		justify-content: space-between;
-		background: #fff;
-		padding: 20rpx;
-
-		.screeningA-con {
-			width: 120rpx;
-			border-radius: 50rpx;
-			color: #999;
-			font-size: 24rpx;
-			text-align: center;
-			height: 48rpx;
-			line-height: 48rpx;
-		}
-
-		.screeningA-con-active {
-			background-image: linear-gradient(to right, #A289C1, #745994);
-			color: #fff;
-			font-size: 20rpx;
-		}
-	}
 .container-time {
   padding: 20px;
   /* border: 1px solid black;
@@ -326,23 +281,67 @@ input {
   box-shadow: 0 0 5px .5px rgba(127, 102, 157, .2);
 }
 
-.time-picker{
-  margin-bottom: 20px;
+.time-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.1); /* 轻微阴影 */
+}
+
+.time-picker-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.picker-container {
+  display: flex; /* 水平排列 */
+  justify-content: space-between; /* 在水平方向上分布 */
+  width: 100%; /* 宽度占满父容器 */
 }
 
 .picker {
-  padding: 10px;
-  border: 1px solid #ddd;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  padding: 15rpx;
+  background: #f7f7f7;
+  border-radius: 8rpx;
+  margin-right: 10rpx; /* 选择器之间有间隔 */
+  width: 100%; /* 每个选择框占一半宽度 */
+  box-sizing: border-box;
 }
+
+.picker text {
+  font-size: 30rpx;
+  color: #666;
+}
+
+.picker:hover {
+  background: #e8e8e8;
+  cursor: pointer;
+}
+
+.picker:active {
+  background: #d0d0d0; /* 点击时稍微变色 */
+}
+
+.picker:last-child {
+  margin-right: 0; /* 最后一个选择框不需要右间隔 */
+}
+
 .duration-picker {
   margin-bottom: 20px;
 }
-
+ 
 .duration-options {
   display: flex;
   justify-content: space-between;
+   flex-wrap: wrap;
 }
 
 .duration-option {
@@ -350,7 +349,7 @@ input {
   border: 2px solid #ddd;
   border-radius: 5px;
   text-align: center;
-  width: 22%;  /* 每个选项宽度占 1/4 */
+  width: 30%;  /* 每个选项宽度占 1/4 */
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin: 5px;;
@@ -365,38 +364,10 @@ input {
   background-color: #aa55ff;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 30rpx;
   width: 100%;
 }	
-.pricing-table {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-  padding: 10px;
-}
 
-.pricing-card {
-  flex: 1;
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin: 5px;
-}
-
-.plan-duration {
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-}
-
-.plan-price {
-  font-size: 18px;
-  color: #ff5722;
-  font-weight: bold;
-  margin-top: 5px;
-}
 .scooter-list {
   margin: 10rpx;
   background: #fff;
@@ -405,60 +376,119 @@ input {
   box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
-.scooter-item {
+.address-section {
   display: flex;
   align-items: center;
-  flex-direction: row;
   padding: 30rpx;
-  background: #f8f8f8;
-  border-radius: 20rpx;
-  margin-bottom: 20rpx;
+  background: #f5f5f5;
+  border-radius: 16rpx;
+  margin: 20rpx;
+  .icon {
+    width: 48rpx;
+    height: 48rpx;
+    margin-right: 20rpx;
+  }
+  .address {
+    flex: 1;
+    .title {
+      display: block;
+      color: #000000;
+      font-size: 24rpx;
+    }
+    .detail {
+      font-size: 28rpx;
+    }
+  }
 }
-
-.scooter-info {
-  display: flex; 
-  justify-content: space-between;
-  flex-direction: column;
-  width: 100%;
-  padding: 0 10px;
-  flex-grow: 1;
-  align-items: flex-start;
-}
-.location {
-  font-size: 20px;
-  color: #333;
-  font-weight: bold;
-  margin-bottom: 9px;
-}
-
-.location-name {
-   display: flex;
-   font-size: 13px;
-   color: #666;
-   margin-bottom: 8px;
-}
-
-.location-icon {
-  width: 18px;
-  height: 18px;
-  margin-right: 5px;
- flex-shrink: 0; 
-}
-
-.reserve-btn {
-    background-color: #aaaaff;
-    color: white;
-    padding: 5px 20px;  /* 调整按钮的内边距 */
-    border: none;
-    border-radius: 4px;  /* 方形按钮 */
+  .arrow {
+    width: 30rpx;
+    height: 30rpx;
+    margin-left: 20rpx;
+  }
+  .instruction {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 30rpx;
+    background: linear-gradient(135deg, #dedeff, #d7cfff); /* 渐变背景 */
+    border-radius: 30rpx; /* 更圆润的圆角 */
+    padding: 20rpx 30rpx; /* 调整内边距 */
+    box-shadow: 0 6rpx 15rpx rgba(0, 0, 0, 0.1); /* 柔和的阴影效果 */
+    transition: all 0.3s ease; /* 过渡效果 */
+  }
+  
+  .instruction:hover {
+    transform: scale(1.05); /* 鼠标悬停时放大 */
+    box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.15); /* 鼠标悬停时加强阴影 */
+  }
+  
+  .text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-right: 10rpx; /* 与箭头之间的间距 */
+  }
+  
+  .discount-container {
+	margin: 30rpx;
+    padding: 20rpx;
+    background-color: #f9f9f9;
+    border-radius: 10rpx;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  }
+  .discount-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20rpx;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table-header {
+    display: flex;
+    background-color: #e5e8ff;
+    padding: 12rpx 20rpx;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8rpx;
+  }
+  
+  .header-item {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .table-row {
+    display: flex;
+    padding: 12rpx 20rpx;
+    border-bottom: 1rpx solid #ddd;
     font-size: 14px;
-    cursor: pointer;
-    width: 100%; /* 使按钮宽度占满容器 */
-    transition: background-color 0.3s ease;
-}
+    color: #555;
+  }
+  
+  .row-item {
+    flex: 1;
+    text-align: left;
+    word-wrap: break-word;
+  }
+  
+  .row-item:last-child {
+    text-align: left;
+  }
+  .note {
+    font-size: 14px;
+    color: #000000;
+    margin-top: 15rpx;
+    padding: 10rpx;
+    background-color: #dde5ff;
+    border-radius: 5rpx;
+	margin: 20rpx;
+	margin-bottom: 40rpx;
+  }
 
-.reserve-btn:hover {
-  background-color: #aa55ff;
-}
 
 </style>

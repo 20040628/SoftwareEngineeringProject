@@ -33,15 +33,18 @@
 				</view>
 				
 				<view class="form-group">
+				  <label>Card</label>
+				  <input v-model="form.card" type="text" placeholder="Enter Card number" class="input-field"/>
+				  <span v-if="errors.card" class="error-message">{{ errors.card }}</span>
+				</view>
+				
+				<view class="form-group">
 				  <label>Birthday</label>
-				  <picker mode="date":value="form.birthday" @change="getBirthday">
-				  	 <view class="picker">{{ form.birthday || 'Please select a start date' }}</view>
-				  </picker>
+				  <view class="example-body">
+				  		<uni-datetime-picker type="date" :clear-icon="false" v-model="form.birthday" @maskClick="maskClick" />
+				  </view>
 				  <span v-if="errors.birthday" class="error-message">{{ errors.birthday }}</span>
 				</view>
-				<!-- <view class="form-group">
-					<input type="tel" v-model="username" placeholder="Please enter your username" class="input-field" />
-				</view> -->
 			</form>
 			<div class="form-group">
 			  <button @click="register" :disabled="loading" class="login-btn">
@@ -79,17 +82,40 @@ export default {
       message: '',
       messageType: 'success',
       registeredUser: null,
-      errors: {}
+      errors: {},
     };
   },
   methods: {
-	  
-	getBirthday(e){
-		this.form.birthday=e.detail.value.split("T")[0];
+	maskClick() {
+		console.log('----maskClick事件');
+	},
+	getDate(date, addZero = true){
+	  date = new Date(date)
+	  const year = date.getFullYear()
+	  const month = date.getMonth()+1
+	  const day = date.getDate()
+	  return `${year}-${addZero ? this.addZero(month) : month}-${addZero ? this.addZero(day) : day}`
+	},
+	getDateTime(date, addZero = true){
+	  return `${this.getDate(date, addZero)} ${this.getTime(date, addZero)}`
+	},
+	getTime(date, addZero = true){
+	  date = new Date(date)
+	  const hour = date.getHours()
+	  const minute = date.getMinutes()
+	  const second = date.getSeconds()
+	  return this.hideSecond ?
+	  `${addZero ? this.addZero(hour) : hour}:${addZero ? this.addZero(minute) : minute}` :
+	  `${addZero ? this.addZero(hour) : hour}:${addZero ? this.addZero(minute) : minute}:${addZero ? this.addZero(second) : second}`
+	},
+	addZero(num) {
+		if (num < 10) {
+			num = `0${num}`
+		}
+		return num
 	},
     validate() {
       this.errors = {};
-
       // Username validation: 3-20 characters, letters, numbers, and underscores only
       const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
       if (!this.form.username) {
@@ -149,11 +175,11 @@ export default {
      try {
        // 发送注册请求
        const [err, res] = await uni.request({
-         url: 'http://localhost:8080/api/auth/register', // 后端地址
+         url: `${this.$baseURL}/api/auth/register`, // 后端地址
          method: 'POST',
          data: this.form,
          header: { 'Content-Type': 'application/json' }
-       }).then(res => [null, res]).catch(err => [err, null]); // 兼容 `try-catch` 方式
+       }).then(res => [null, res]).catch(err => [err, null]);
    
         if (err || res.statusCode !== 200) {
              // 这里处理后端返回的错误信息
@@ -228,11 +254,26 @@ export default {
 	.error-message{
 		color:red;
 	}
-	.picker {
-		padding: 10rpx;
-		border: 2rpx solid darkgrey;
-		border-radius: 10rpx;
-		text-align: center;
-		margin-bottom: 10rpx;
-		}
+	.picker-box {
+	  width: 90%;
+	  height: 80rpx;
+	  padding: 0 20rpx;
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-between;
+	  background-color: #f7f7f7;
+	  border: 1rpx solid #ddd;
+	  border-radius: 8rpx;
+	  margin: 10rpx;
+	}
+	
+	.picker-text {
+	  font-size: 30rpx;
+	  color: #666;
+	  flex: 1;
+	}
+	
+	.picker-box:hover {
+	  border-color: #aaa;
+	}
 </style>

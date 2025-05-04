@@ -9,7 +9,7 @@
 					<text class="tips">Please pay as soon as possible</text>
 				</view>
 			</view>
-			<view class="goods-info">
+			<view v-if="order.scooter" class="goods-info">
 				<view class="title"> Scooter Information </view>
 				<view class="list">
 					<view class="item">
@@ -20,24 +20,19 @@
 								<text class="size">Location:{{ order.scooter.location }}</text>
 							</view>
 							<view class="price">
-								<text class="unit">￥</text>
-								<text class="num">{{ order.price }}</text>
+								<text class="unit">£</text>
+								<text class="num">{{ order.priceBeforeDiscount }}</text>
 							</view>
 						</view>
-						<view class="buy-num">x{{ item.num }}</view>
 					</view>
 				</view>
-				<!-- <view class="delivery">
-					<text class="label">配送方式</text>
-					<text class="value">快递</text>
-				</view> -->
 				<view class="discount">
 					<text class="name">Discount Amount</text>
-					<view class="price"> ￥<text>0.00</text> </view>
+					<view class="price">£<text>{{ discount }}</text> </view>
 				</view>
 				<view class="pay">
 					<text class="name">Actual Payment</text>
-					<text class="price">￥{{ order.price }}</text>
+					<text class="price">£{{ order.price }}</text>
 				</view>
 			</view>
 			<view class="order-info">
@@ -86,8 +81,8 @@ export default {
       orderInfo: {},
 	  orderId : null,
 	  order:[],
-	  isLoading:true,
-	  payFormHtml: ''
+	  payFormHtml: '',
+	  discount: 0,
     }
   },
   async onLoad(options){
@@ -103,10 +98,10 @@ export default {
 
   methods:{
 	  async pay() {
-		  const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
-		  console.log(targetUrl);  // 打印 URL 以便调试
+		  // const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
+		  // console.log(targetUrl);  // 打印 URL 以便调试
 		  uni.navigateTo({
-		  	url:targetUrl
+		  	url:`/pages/payment/choosePay/choosePay?id=${this.orderId}`
 		  })
 	    // try {
 	    //   const res = await uni.request({
@@ -198,9 +193,9 @@ export default {
 		async loadOrderDetail() {
 			  const token = String(uni.getStorageSync('token'));
 		      try {
-		  		uni.showLoading({ title: "加载中...", mask: true });
+		  		uni.showLoading({ title: "Loading...", mask: true });
 		        const res = await uni.request({
-		            url: `http://localhost:8080/api/bookings/${this.orderId}`,
+		            url: `${this.$baseURL}/api/bookings/${this.orderId}`,
 		            method: 'GET',
 					header: {
 						'Authorization': `Bearer ${token}`,
@@ -209,15 +204,17 @@ export default {
 		        });
 				if (res.statusCode === 200) {
 				  this.order = res.data 
+				  console.log(this.order.priceBeforeDiscount)
+				  this.discount= this.order.priceBeforeDiscount - this.order.price
 				} else {
 				  uni.showToast({ title: '数据加载失败', icon: 'none' });
 				}
 				
 		      } catch (err) {
+				   console.error('请求失败:', err);
 		          uni.showToast({ title: '网络错误', icon: 'none' })
 		      } finally {
 		  		uni.hideLoading();
-		        this.isLoading = false
 		      }
 		},
 		formatDate(dateString) {
@@ -227,14 +224,14 @@ export default {
 		     const day = String(date.getDate()).padStart(2, '0');
 		     const hours = String(date.getHours()).padStart(2, '0');
 		     const minutes = String(date.getMinutes()).padStart(2, '0');
-		     return `${year}-${month}-${day} ${hours}:${minutes}`;
+		     return ` ${day}/${month}/${year} ${hours}:${minutes}`;
 		},
 		async cancel(){
 			const token = String(uni.getStorageSync('token'));
 			try {
-				uni.showLoading({ title: "加载中...", mask: true });
+				uni.showLoading({ title: "Loading...", mask: true });
 			    const res = await uni.request({
-			      url: `http://localhost:8080/api/bookings/cancel/${this.orderId}`,
+			      url: `${this.$baseURL}/api/bookings/cancel/${this.orderId}`,
 			      method: 'POST',
 				  header: {
 							'Authorization': `Bearer ${token}`,
@@ -261,7 +258,6 @@ export default {
 			    uni.showToast({ title: '网络错误', icon: 'none' })
 			} finally {
 			  uni.hideLoading();
-			  this.isLoading = false
 			}
 		}
   }
@@ -432,11 +428,12 @@ export default {
 
 				.pay {
 					display: flex;
-					justify-content: flex-end;
-					align-items: flex-end;
+					justify-content: center;
+		
 
 					.name {
 						display: block;
+						flex: 1;
 						margin-right: 10rpx;
 						font-size: 28rpx;
 						font-weight: 400;

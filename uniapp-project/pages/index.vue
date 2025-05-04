@@ -1,5 +1,5 @@
 <template>
-  <view class="page-container">
+  <view class="page-container":style="themeStyles">
     <view class="content">
       <view  v-show="nowBarIndex === 0">
       	<indexPage ref='indexPage' @stopDown="stopDown"></indexPage>
@@ -8,7 +8,7 @@
       	<mapPage :nowTabHeight="nowTabHeight" :paddingBottom="nowTabPaddingBottom" ref='mapPage'></mapPage>
       </view>
       <view  v-show="nowBarIndex === 3">
-      	<foundPgae ref='foundPgae' @stopDown="stopDown"></foundPgae>
+      	<nowPgae ref='nowPgae' @stopDown="stopDown"></nowPgae>
       </view>
       <view  v-show="nowBarIndex === 4"> 
       	<myPage ref='myPage'></myPage>
@@ -20,7 +20,7 @@
 
 <script>
 import indexPage from './index/index.vue'
-import foundPage from './found/found.vue'
+import nowPgae from './now/now.vue'
 import myPage from './UserCenter/UserCenter.vue'
 import mapPage from './map/map.vue'
 import tabBar from '../components/tabBar.vue'
@@ -29,7 +29,7 @@ import tabBar from '../components/tabBar.vue'
 export default {
   components: {
     indexPage,
-    foundPage,
+    nowPgae,
     myPage,
     mapPage,
     tabBar
@@ -66,7 +66,7 @@ export default {
             // that.topBarType = 1
             break
           case 3:
-            that.$refs.foundPage.load()
+            that.$refs.nowPgae.load()
             // that.topBarTitle = ['商城', '周边']
             // that.topBarType = 3
             // that.$refs.topBar.carNum()

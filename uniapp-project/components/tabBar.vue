@@ -13,11 +13,11 @@
 		</view>
 
 		<!-- 中间按钮（扫码） -->
-		<view class="tabbar-center" @click="tabBar(2)">
+		<!-- <view class="tabbar-center" @click="tabBar(2)">
 			<view class="tabbar-cen-box">
 				<image :src="scanCodeImg" />
 			</view>
-		</view>
+		</view> -->
 
 		<!-- 发现 -->
 		<view class="tabbar-item" @click="tabBar(3)">
@@ -59,7 +59,7 @@ export default {
 	},
 	methods: {
 		// 切换 tab，更新当前选中的 tab
-		tabBar(index) {console.log('11111111111111111111')
+		tabBar(index) {
 			// 当选中的 tab 和当前 tab 不同，更新 nowBar 并通知父组件
 			if (this.nowBar !== index) {
 				this.nowBar = index;

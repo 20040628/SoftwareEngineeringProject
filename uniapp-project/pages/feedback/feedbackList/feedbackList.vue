@@ -41,7 +41,7 @@
 				try{
 					const token = String(uni.getStorageSync('token'));
 					const res = await uni.request({
-					url: 'http://localhost:8080/api/feedback/user', 
+					url: `${this.$baseURL}/api/feedback/user`, 
 					method: 'GET',
 					header: { 'Content-Type': 'application/json',
 							   "Authorization": `Bearer ${token}`}

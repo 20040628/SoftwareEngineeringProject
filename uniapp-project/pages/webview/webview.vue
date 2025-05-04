@@ -24,7 +24,7 @@ export default {
       try {
         // 从后端获取支付表单的 HTML 内容
         const res = await uni.request({
-          url: `http://localhost:8080/alipay/pay/${this.orderId}`,
+          url: `${this.$baseURL}/alipay/pay/${this.orderId}`,
           header: {
             'Authorization': `Bearer ${token}`,
           },

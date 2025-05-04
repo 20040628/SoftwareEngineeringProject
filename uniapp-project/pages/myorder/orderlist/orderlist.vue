@@ -43,7 +43,7 @@
 									<text class="rate-text1">hirePeriod:{{item.hirePeriod}}</text>
 								</view>
 								<view class="item-right-v2">
-									<view class="v2-fh">￥<text class="v2-price">{{item.price}}</text></view>
+									<view class="v2-fh">£<text class="v2-price">{{item.price}}</text></view>
 								</view>
 							</view>
 						</view>
@@ -58,9 +58,9 @@
 							</view>
 						</view>
 						
-						<view class="item-btom" v-if="item.status == 3">
+						<!-- <view class="item-btom" v-if="item.status == 3">
 							<view class="item-btom-btn" @click="evaluateClick(item)">Comment</view>
-						</view>
+						</view> -->
 					</li>
 				</ul>
 			</view>
@@ -96,7 +96,7 @@
 			  const token = String(uni.getStorageSync('token'));
 			  try {
 			    const res = await uni.request({
-			      url: `http://localhost:8080/api/users/orders/${user.userId}`, 
+			      url: `${this.$baseURL}/api/users/orders/${user.userId}`, 
 			      method: 'GET',
 				  header: {
 				  	'Content-Type': 'application/json',
@@ -122,7 +122,7 @@
 			    const day = String(date.getDate()).padStart(2, '0');
 			    const hours = String(date.getHours()).padStart(2, '0');
 			    const minutes = String(date.getMinutes()).padStart(2, '0');
-			    return `${year}-${month}-${day} ${hours}:${minutes}`;
+			    return ` ${day}/${month}/${year} ${hours}:${minutes}`;
 			  },
 			  
 			tabClick(item){
@@ -149,7 +149,7 @@
 			                try {
 			                    uni.showLoading({ title: "loading...", mask: true });
 			                    const res = await uni.request({
-			                        url: `http://localhost:8080/api/bookings/cancel/${item.id}`,
+			                        url: `${this.$baseURL}/api/bookings/cancel/${item.id}`,
 			                        method: 'POST',
 			                        header: {
 			                            'Authorization': `Bearer ${token}`,

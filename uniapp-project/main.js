@@ -4,6 +4,7 @@ import App from './App'
 import Vue from 'vue'
 import './uni.promisify.adaptor'
 Vue.config.productionTip = false
+Vue.prototype.$baseURL = 'http://172.20.10.6:8080';
 App.mpType = 'app'
 const app = new Vue({
   ...App
@@ -15,6 +16,7 @@ app.$mount()
 import { createSSRApp } from 'vue'
 export function createApp() {
   const app = createSSRApp(App)
+  app.config.globalProperties.$baseURL = 'http://172.20.10.6:8080'
   return {
     app
   }

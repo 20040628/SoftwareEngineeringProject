@@ -45,7 +45,7 @@ public class BankCardPaymentController {
         try {
             // 查找订单
             Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+                .orElseThrow(() -> new IllegalArgumentException("The order does not exist"));
                 
             // 验证订单状态
             if (order.getStatus() != 1) {
@@ -65,8 +65,8 @@ public class BankCardPaymentController {
             }
             
             // 模拟银行卡支付验证 (验证安全码)
-            if (request.getSecurityCode() == null || request.getSecurityCode().length() < 3) {
-                throw new IllegalArgumentException("无效的安全码");
+            if (request.getSecurityCode() == null || request.getSecurityCode().length() != 6) {
+                throw new IllegalArgumentException("Invalid security code");
             }
             
             // 设置支付方式为银行卡

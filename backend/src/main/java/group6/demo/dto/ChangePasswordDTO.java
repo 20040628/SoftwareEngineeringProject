@@ -6,14 +6,14 @@ import jakarta.validation.constraints.Pattern;
 
 @Data
 public class ChangePasswordDTO {
-    @NotBlank(message = "旧密码不能为空")
+    @NotBlank(message = "The old password cannot be left blank")
     private String oldPassword;
     
-    @NotBlank(message = "新密码不能为空")
+    @NotBlank(message = "The new password cannot be left blank")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$",
-            message = "密码必须至少8个字符，包含至少一个大写字母、一个小写字母和一个数字")
+            message = "The password must consist of at least 8 characters, including at least one capital letter, one lowercase letter and one digit.")
     private String newPassword;
     
-    @NotBlank(message = "确认密码不能为空")
+    @NotBlank(message = "The confirmation password cannot be left blank")
     private String confirmPassword;
 } 

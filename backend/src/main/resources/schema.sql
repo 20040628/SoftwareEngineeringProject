@@ -19,6 +19,7 @@ CREATE TABLE `b_user`  (
   `email` varchar(50) NOT NULL,
   `payment_method` text DEFAULT NULL,
   `bank_card` varchar(50) DEFAULT NULL,
+  `bank_balance` DECIMAL(7,2) CHECK (bank_balance BETWEEN 1000.00 AND 10000.00),
   `status` tinyint(1) NOT NULL DEFAULT 1,
   `role` tinyint(1) NOT NULL DEFAULT 1,
   `is_frequent_user` tinyint(1) NOT NULL DEFAULT 0,

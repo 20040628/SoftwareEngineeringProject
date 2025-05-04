@@ -415,7 +415,7 @@ Frontend service will run on http://localhost:5173
 - **Success Response** (200 OK):
   ```json
   {
-    "message": "银行卡信息更新成功",
+    "message": "Bank card information updated successfully",
     "userId": "number",
     "bankCard": "string"
   }
@@ -427,7 +427,7 @@ Frontend service will run on http://localhost:5173
   ```
   或
   ```json
-  "更新银行卡信息失败: error message"
+  "Failed to update bank card information: error message"
   ```
 
 #### Check Bank Card
@@ -469,7 +469,7 @@ Frontend service will run on http://localhost:5173
 - **Request Body**:
   ```json
   {
-    "securityCode": "string"  // 3-4 digits security code
+    "securityCode": "string"  // 6 digits security code
   }
   ```
 - **Success Response** (200 OK):
@@ -548,6 +548,47 @@ Frontend service will run on http://localhost:5173
   ```json
   {
     "message": "只有活跃订单才能进行还车操作"
+  }
+  ```
+
+#### change password
+
+- **URL**: `/api/users/changePassword/{userId}`
+
+- **Method**: `POST`
+
+- **Request Body**:
+
+  ```
+  {
+      "oldPassword": string
+      "newPassword":string，must consist at least 8 characters, including at least one capital letter, one lowercase letter and one digit
+      "confirmPassword": string,要和newPassword一样
+  }
+  ```
+
+  **Success Response** (200 OK):
+
+  ```
+  {
+      "message": "Successfully modify password",
+  	"userId": userId
+  }
+  ```
+
+  **Error Response** (400 Bad Request):
+
+  ```
+  {
+      "The new password and the confirmed password do not match"
+  }
+  OR
+  {
+      "Password modification failed. The old password might be incorrect"
+  }
+  OR
+  {
+      "Password modification failed: " + e.getMessage()
   }
   ```
 
@@ -801,36 +842,59 @@ Frontend service will run on http://localhost:5173
         "discountedPriceFourHour": 10.00,
         "discountedPriceDay": 20.00,
         "discountedPriceWeek": 100.00,
-        "hasDiscount": true
+        "hasDiscount": true,
+        "speed": 100.00,
+        "battery": 100.00
     }
 ]
 ```
 
-#### view one scooter
+#### get all scooters in one store
 
-**URL**:  `/api/scooters/{id}`
+**URL**: `/api/scooters/{storeId}`
 
-**Method**: `Get`
+**method**:`Get`
 
-**Success Response** (200 OK):
+**Success Response** (200 OK)
 
 ```
-{
-    "id": 1,
-    "priceHour": 5.00,
-    "priceFourHour": 10.00,
-    "priceDay": 20.00,
-    "priceWeek": 100.00,
-    "status": 1,
-    "battery": 100.00,
-    "speed": 100.00,
-    "store": {
+[
+    {
         "id": 1,
-        "longitude": 103.984500,
-        "latitude": 30.765000
+        "priceHour": 5.00,
+        "priceFourHour": 10.00,
+        "priceDay": 20.00,
+        "priceWeek": 100.00,
+        "status": 1,
+        "battery": 100.00,
+        "speed": 100.00,
+        "store": {
+            "id": 1,
+            "name": "store 1",
+            "longitude": 103.984500,
+            "latitude": 30.765000
+        }
+    },
+    {
+        "id": 2,
+        "priceHour": 5.00,
+        "priceFourHour": 10.00,
+        "priceDay": 20.00,
+        "priceWeek": 100.00,
+        "status": 1,
+        "battery": 50.00,
+        "speed": 50.00,
+        "store": {
+            "id": 1,
+            "name": "store 1",
+            "longitude": 103.984500,
+            "latitude": 30.765000
+        }
     }
-}
+]
 ```
+
+
 
 #### change status: valid to invalid or invalid to valid
 
@@ -1967,14 +2031,19 @@ The application provides automatic discount calculation based on user profiles a
 #### Generate Daily Revenue for Specific Date
 
 - **URL**: `/api/weekly-revenue/generate-daily`
+
 - **Method**: `POST`
+
 - **Auth Required**: Yes (Admin only)
+
 - **Parameters**:
   - `date`: Date in format YYYY-MM-DD
+
 - **Headers**:
   ```
   Authorization: Bearer {token}
   ```
+
 - **Success Response** (200 OK):
   ```json
   {
@@ -1990,4 +2059,5 @@ The application provides automatic discount calculation based on user profiles a
     "totalDiscount": 12.00
   }
   ```
+
 - **Error Responses**: Same as above

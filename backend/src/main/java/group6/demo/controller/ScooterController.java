@@ -78,17 +78,6 @@ public class ScooterController {
         }
     }
 
-    // 给管理员的：返回某个店铺的所有车子
-    @GetMapping("/{storeId}")
-    public ResponseEntity<?> getScooterByStoreId(@PathVariable Long storeId) {
-        try {
-            List<Scooter> scooters = scooterService.getScooterByStoreId(storeId);
-            return ResponseEntity.ok(scooters);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to get scooters: " + e.getMessage());
-        }
-    }
-
     // 给用户的：返回指定店铺中有电且没有冲突订单的全部滑板车
     @PostMapping("/getScootersAvailable/{userId}/{storeId}")
     public ResponseEntity<?> getScootersAvailable(@PathVariable Long userId, @PathVariable Long storeId, @Valid @RequestBody AvailableScooterDTO availableDTO){
@@ -106,7 +95,18 @@ public class ScooterController {
         }
     }
 
-    @GetMapping("/{id}")
+    // 给管理员的：返回某个店铺的所有车子
+    @GetMapping("/{storeId}")
+    public ResponseEntity<?> getScooterByStoreId(@PathVariable Long storeId) {
+        try {
+            List<Scooter> scooters = scooterService.getScooterByStoreId(storeId);
+            return ResponseEntity.ok(scooters);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to get scooters: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}")
     public ResponseEntity<?> getScooterById(@PathVariable Long id, @RequestParam(required = false) Long userId) {
         try {
             Optional<Scooter> scooterOptional = scooterService.getScooterById(id);
@@ -128,6 +128,7 @@ public class ScooterController {
             return ResponseEntity.badRequest().body("Failed to get scooter: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/changeStatus/{id}")
     public Optional<Scooter> changeScooterStatus(@PathVariable Long id) {

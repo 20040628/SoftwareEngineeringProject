@@ -172,7 +172,7 @@ public class UserController {
             User updatedUser = userService.updateBankCard(userId, updateBankCardDTO);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "银行卡信息更新成功");
+            response.put("message", "Bank card information updated successfully");
             response.put("userId", updatedUser.getId());
             response.put("bankCard", updatedUser.getBankCard());
             
@@ -180,7 +180,7 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("更新银行卡信息失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to update bank card information: " + e.getMessage());
         }
     }
     
@@ -257,21 +257,21 @@ public class UserController {
         try {
             // 验证新密码和确认密码是否一致
             if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword())) {
-                return ResponseEntity.badRequest().body("新密码和确认密码不一致");
+                return ResponseEntity.badRequest().body("The new password and the confirmed password do not match");
             }
             
             boolean changed = userService.changePassword(userId, changePasswordDTO);
             if (!changed) {
-                return ResponseEntity.badRequest().body("密码修改失败，旧密码可能不正确");
+                return ResponseEntity.badRequest().body("Password modification failed. The old password might be incorrect");
             }
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "密码修改成功");
+            response.put("message", "Successfully modify password");
             response.put("userId", userId);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("修改密码失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Password modification failed: " + e.getMessage());
         }
     }
     

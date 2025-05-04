@@ -25,4 +25,7 @@ public class ScooterWithDiscountDTO {
     
     // 是否有折扣
     private boolean hasDiscount;
+
+    private BigDecimal speed;
+    private BigDecimal battery;
 } 

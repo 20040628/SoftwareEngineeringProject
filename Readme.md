@@ -302,7 +302,6 @@ Frontend service will run on http://localhost:5173
               "userType": 0,
               "mobile": "9876543210",
               "email": "user@example.com",
-              "paymentMethod": "paypal",
               "status": 1,
               "role": 1,
               "isFrequentUser": 0
@@ -345,7 +344,6 @@ Frontend service will run on http://localhost:5173
           "userType": 0,
           "mobile": "1234567890",
           "email": "admin@example.com",
-          "paymentMethod": "credit_card",
           "status": 1,
           "role": 0,
           "isFrequentUser": 0
@@ -359,7 +357,6 @@ Frontend service will run on http://localhost:5173
           "userType": 0,
           "mobile": "9876543210",
           "email": "user@example.com",
-          "paymentMethod": "paypal",
           "status": 1,
           "role": 1,
           "isFrequentUser": 0
@@ -385,7 +382,6 @@ Frontend service will run on http://localhost:5173
       "userType": 0,
       "mobile": "9876543210",
       "email": "user@example.com",
-      "paymentMethod": "paypal",
       "status": 0,
       "role": 1,
       "isFrequentUser": 0,
@@ -561,8 +557,8 @@ Frontend service will run on http://localhost:5173
 
   ```
   {
-      "oldPassword": string
-      "newPassword":string，must consist at least 8 characters, including at least one capital letter, one lowercase letter and one digit
+      "oldPassword": string,
+      "newPassword":string，must consist at least 8 characters, including at least one capital letter, one lowercase letter and one digit,
       "confirmPassword": string,要和newPassword一样
   }
   ```
@@ -589,6 +585,43 @@ Frontend service will run on http://localhost:5173
   OR
   {
       "Password modification failed: " + e.getMessage()
+  }
+  ```
+
+#### upload avatar
+
+- **URL**: `/api/users/avatar/{userId}`
+
+- **Method**: `POST`
+
+- **Request Parameter**
+
+  ```
+  {
+      "file": 本地的jpg文件
+  }
+  ```
+
+- **Success Response(200 OK)** 
+
+  ```
+  {
+      "avatarUrl": "/uploads/avatars/avatar_2_7aedf007-6111-4e50-8214-bef843f2a3cd.jpg",
+      "avatar": "avatar_2_7aedf007-6111-4e50-8214-bef843f2a3cd.jpg",
+      "message": "User avatar upload was successful",
+      "userId": 2
+  }
+  ```
+
+  备注：
+
+  SoftwareEngineeringProject\avatar_for_test中提供了三个可选的头像，上传头像后，用户的avatar会自动保存到SoftwareEngineeringProject\backend\uploads\avatars文件夹内
+
+- **Error Response** (400 Bad Request):
+
+  ```
+  {
+  	Failed to upload the profile picture:  + e.getMessage()
   }
   ```
 
@@ -961,7 +994,6 @@ Frontend service will run on http://localhost:5173
               "userType": 0,
               "mobile": "9876543210",
               "email": "user@example.com",
-              "paymentMethod": "paypal",
               "status": 1,
               "role": 1,
               "isFrequentUser": 0
@@ -990,7 +1022,6 @@ Frontend service will run on http://localhost:5173
               "userType": 0,
               "mobile": "1234567890",
               "email": "admin@example.com",
-              "paymentMethod": "credit_card",
               "status": 1,
               "role": 0,
               "isFrequentUser": 0,
@@ -1033,7 +1064,6 @@ Frontend service will run on http://localhost:5173
           "userType": 0,
           "mobile": "15806120102",
           "email": "2079815209@qq.com",
-          "paymentMethod": null,
           "status": 1,
           "role": 1,
           "isFrequentUser": 0
@@ -1062,7 +1092,6 @@ Frontend service will run on http://localhost:5173
           "userType": 0,
           "mobile": "1234567890",
           "email": "admin@example.com",
-          "paymentMethod": "credit_card",
           "status": 1,
           "role": 0,
           "isFrequentUser": 0,
@@ -1111,7 +1140,6 @@ Frontend service will run on http://localhost:5173
               "userType": 0,
               "mobile": "9876543210",
               "email": "user@example.com",
-              "paymentMethod": "paypal",
               "status": 1,
               "role": 1,
               "isFrequentUser": 0,
@@ -1178,7 +1206,6 @@ Frontend service will run on http://localhost:5173
               "userType": 0,
               "mobile": "9876543210",
               "email": "user@example.com",
-              "paymentMethod": "paypal",
               "status": 1,
               "role": 1,
               "isFrequentUser": 0,
@@ -1245,7 +1272,6 @@ Frontend service will run on http://localhost:5173
               "userType": 0,
               "mobile": "9876543210",
               "email": "user@example.com",
-              "paymentMethod": "paypal",
               "status": 1,
               "role": 1,
               "isFrequentUser": 0,

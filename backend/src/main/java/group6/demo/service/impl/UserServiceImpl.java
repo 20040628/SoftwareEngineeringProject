@@ -71,7 +71,6 @@ public class UserServiceImpl implements UserService {
         
         // Set default values
         user.setUserType(0);  // 0: normal user
-        user.setPaymentMethod(null);  // no payment method
         user.setAvatar("default_avatar.jpg");
         user.setStatus(1);  // 1: account enabled
         user.setRole(1);    // 1: normal user

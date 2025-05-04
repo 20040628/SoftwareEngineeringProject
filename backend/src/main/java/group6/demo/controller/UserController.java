@@ -217,7 +217,7 @@ public class UserController {
             // 查询用户
             User user = userRepository.findById(userId).orElse(null);
             if (user == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+                return ResponseEntity.badRequest().body("The user does not exist");
             }
             
             // 保存文件
@@ -232,14 +232,14 @@ public class UserController {
             user = userService.updateAvatar(userId, filename);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "用户头像上传成功");
+            response.put("message", "User avatar upload was successful");
             response.put("userId", user.getId());
             response.put("avatar", user.getAvatar());
             response.put("avatarUrl", "/uploads/avatars/" + filename);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("上传头像失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to upload the profile picture: " + e.getMessage());
         }
     }
     

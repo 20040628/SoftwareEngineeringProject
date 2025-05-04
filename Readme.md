@@ -625,6 +625,37 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
+#### get one user
+
+- **URL**: `/api/users/profile/{userId}`
+
+- **Method**: `Get`
+
+- **Success Response(200 OK)** 
+
+  ```
+  {
+      "id": 2,
+      "username": "user",
+      "email": "user@example.com",
+      "mobile": "9876543210",
+      "avatar": "avatar_2_9483cf59-8bcb-4784-abb2-4f94cf9a8376.jpg",
+      "birthday": "1995-05-05",
+      "userType": 0,
+      "status": 1,
+      "role": 1,
+      "hasBankCard": true,
+      "maskedBankCard": "**** **** **** 1111",
+      "bankBalance": 3442.89,
+      "isStudent": 0,
+      "isSenior": 0,
+      "isFrequentUser": 0,
+      "avatarUrl": "/uploads/avatars/avatar_2_9483cf59-8bcb-4784-abb2-4f94cf9a8376.jpg"
+  }
+  ```
+
+  ​
+
 ### Store API
 
 #### add store

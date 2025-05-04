@@ -1,9 +1,9 @@
 use vuesb;
 -- 添加测试用户数据
-INSERT INTO b_user (username, password, avatar, birthday, user_type, mobile, email, status, role, is_frequent_user)
+INSERT INTO b_user (username, password, avatar, birthday, user_type, mobile, email, bank_card, bank_balance, status, role, is_frequent_user)
 VALUES 
-('admin', '$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni', 'default_avatar.jpg', '1990-01-01', 0, '1234567890', 'admin@example.com', 1, 0, 0),
-('user', '$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni', 'avatar_2_9483cf59-8bcb-4784-abb2-4f94cf9a8376.jpg', '1995-05-05', 0, '9876543210', 'user@example.com', 1, 1, 0);
+('admin', '$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni', 'default_avatar.jpg', '1990-01-01', 0, '1234567890', 'admin@example.com', '222222222222222',5000.00, 1, 0, 0),
+('user', '$2a$10$pfvdfutJj.b/NloLAgOos.sOAgkJXH3uKAIasXfgAMNEpfzGG3Uni', 'avatar_2_9483cf59-8bcb-4784-abb2-4f94cf9a8376.jpg', '1995-05-05', 0, '9876543210', 'user@example.com', '11111111111111', 3442.89, 1, 1, 0);
 
 -- 添加商店数据
 INSERT INTO b_store (id, name, longitude, latitude)

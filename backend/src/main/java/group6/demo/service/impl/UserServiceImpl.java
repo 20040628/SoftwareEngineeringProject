@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
         if (!ValidationUtil.isValidBirthday(registrationDTO.getBirthday())) {
             throw new IllegalArgumentException("Invalid birthday. Birthday cannot be in the future.");
         }
-        
+
         System.out.println("验证通过，开始创建用户实体");
 
         // Create new user entity
@@ -77,7 +77,16 @@ public class UserServiceImpl implements UserService {
         user.setIsFrequentUser(0);  // 0: not frequent user
         user.setIsStudent(0);  // 初始设置为非学生
         user.setIsSenior(0);   // 初始设置为非老人
-        
+
+        // 设置银行卡和余额
+        user.setBankCard(registrationDTO.getBankCard());
+        // 随机生成银行卡余额 (1000-10000元之间)
+        Random random = new Random();
+        double balance = 1000 + random.nextDouble() * 9000;
+        // 四舍五入保留两位小数
+        BigDecimal bankBalance = new BigDecimal(balance).setScale(2, BigDecimal.ROUND_HALF_UP);
+        user.setBankBalance(bankBalance);
+
         // 保存用户
         User savedUser = userRepository.save(user);
         System.out.println("用户创建成功，ID: " + savedUser.getId());
@@ -95,6 +104,9 @@ public class UserServiceImpl implements UserService {
     public boolean isEmailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
+
+    @Override
+    public boolean isBankcardExists(String bankcard) { return userRepository.findByBankCard(bankcard) != null;}
 
     @Override
     public User loginUser(UserLoginDTO loginDTO) {

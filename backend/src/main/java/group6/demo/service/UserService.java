@@ -14,6 +14,7 @@ public interface UserService {
     User loginUser(UserLoginDTO loginDTO);
     boolean isUsernameExists(String username);
     boolean isEmailExists(String email);
+    boolean isBankcardExists(String bankcard);
     Optional<User> changeUserStatus(Long id);
     User updateBankCard(Long userId, UpdateBankCardDTO updateBankCardDTO);
     

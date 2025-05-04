@@ -23,7 +23,6 @@ public class User {
     private Integer userType;
     private String mobile;
     private String email;
-//    private String paymentMethod;
     private String bankCard;
     
     // 银行卡余额

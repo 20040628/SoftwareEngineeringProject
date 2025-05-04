@@ -92,6 +92,7 @@ Frontend service will run on http://localhost:5173
     "mobile": "string",       // 10-13 digits
     "birthday": "date"        // Format: YYYY-MM-DD, must be in the past
                              // Will be used to automatically determine discount eligibility
+     "bankCard": "string"    //13-16 digits
   }
   ```
 - **Success Response** (200 OK):
@@ -112,6 +113,18 @@ Frontend service will run on http://localhost:5173
     "email": "error message",
     "mobile": "error message",
     "birthday": "error message"
+  }
+  or
+  {
+      "username already exists"
+  }
+  or 
+  {
+      "Email already exists"
+  }
+  or
+  {
+      "Bankcard already exists"
   }
   ```
 
@@ -651,6 +664,39 @@ Frontend service will run on http://localhost:5173
       "isSenior": 0,
       "isFrequentUser": 0,
       "avatarUrl": "/uploads/avatars/avatar_2_9483cf59-8bcb-4784-abb2-4f94cf9a8376.jpg"
+  }
+  ```
+
+#### modify bankcard
+
+- **URL**: `/api/users//updateBankCard/{userId}`
+
+- **Method**: `Post`
+
+- **Request Body**:
+
+  ```
+  {
+      "bankCard": "11111111111112"
+  }
+
+  ```
+
+- **Success Response(200 OK)** 
+
+  ```
+  {
+      "bankCard": "11111111111112",
+      "message": "Bank card information updated successfully",
+      "userId": 2
+  }
+  ```
+
+- Error(400Bad Request)
+
+  ```
+  {
+   "Failed to update bank card information: " + e.getMessage()   
   }
   ```
 

@@ -157,33 +157,7 @@ public class UserController {
         return userService.changeUserStatus(id);
     }
     
-    /**
-     * 更新用户银行卡信息
-     * @param userId 用户ID
-     * @param updateBankCardDTO 银行卡信息DTO
-     * @return 更新结果
-     */
-    @PostMapping("/updateBankCard/{userId}")
-    public ResponseEntity<?> updateBankCard(
-            @PathVariable Long userId,
-            @Valid @RequestBody UpdateBankCardDTO updateBankCardDTO) {
-        
-        try {
-            User updatedUser = userService.updateBankCard(userId, updateBankCardDTO);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Bank card information updated successfully");
-            response.put("userId", updatedUser.getId());
-            response.put("bankCard", updatedUser.getBankCard());
-            
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to update bank card information: " + e.getMessage());
-        }
-    }
-    
+
     /**
      * 获取用户个人中心完整信息
      * @param userId 用户ID
@@ -194,11 +168,11 @@ public class UserController {
         try {
             UserProfileDTO profileDTO = userService.getUserProfile(userId);
             if (profileDTO == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+                return ResponseEntity.badRequest().body("The user doesn't exist");
             }
             return ResponseEntity.ok(profileDTO);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("获取用户个人信息失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to obtain user's personal information: " + e.getMessage());
         }
     }
     
@@ -274,7 +248,35 @@ public class UserController {
             return ResponseEntity.badRequest().body("Password modification failed: " + e.getMessage());
         }
     }
-    
+
+    /**
+     * 更新用户银行卡信息
+     * @param userId 用户ID
+     * @param updateBankCardDTO 银行卡信息DTO
+     * @return 更新结果
+     */
+    @PostMapping("/updateBankCard/{userId}")
+    public ResponseEntity<?> updateBankCard(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateBankCardDTO updateBankCardDTO) {
+
+        try {
+            User updatedUser = userService.updateBankCard(userId, updateBankCardDTO);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Bank card information updated successfully");
+            response.put("userId", updatedUser.getId());
+            response.put("bankCard", updatedUser.getBankCard());
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update bank card information: " + e.getMessage());
+        }
+    }
+
+
     /**
      * 解绑银行卡
      * @param userId 用户ID

@@ -2,6 +2,8 @@ package group6.demo.dto;
 
 import lombok.Data;
 import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -28,6 +30,11 @@ public class UserRegistrationDTO {
     @NotNull(message = "Birthday is required")
     @Past(message = "Birthday must be in the past")
     private Date birthday;
+
+    @Pattern(regexp = "^[0-9]{13,19}$", message = "Bank card number must be 13-19 digits")
+    private String bankCard;
+    // 银行卡余额字段 - 在服务层生成随机值
+    private BigDecimal bankBalance;
 
     private Integer isStudent;
     private Integer isSenior;

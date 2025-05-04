@@ -111,7 +111,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO registrationDTO) {
         try {
             // 打印收到的注册信息，特别是生日信息
             System.out.println("收到注册请求：" + registrationDTO.getUsername());
@@ -125,6 +125,11 @@ public class AuthController {
             // 检查邮箱是否已存在
             if (userService.isEmailExists(registrationDTO.getEmail())) {
                 return ResponseEntity.badRequest().body("Email already exists");
+            }
+
+            // 检查银行卡是否已存在
+            if (userService.isBankcardExists(registrationDTO.getBankCard())) {
+                return ResponseEntity.badRequest().body("Bankcard already exists");
             }
             
             // 注册用户

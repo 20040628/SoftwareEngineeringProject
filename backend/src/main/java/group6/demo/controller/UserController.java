@@ -39,8 +39,8 @@ public class UserController {
     private FileStorageService fileStorageService;
 
     @GetMapping("/getAll")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserProfileDTO> getAllUsers() {
+        return userService.getAllUserProfiles();
     }
 
     @PostMapping

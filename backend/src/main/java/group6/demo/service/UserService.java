@@ -7,6 +7,7 @@ import group6.demo.dto.ChangePasswordDTO;
 import group6.demo.dto.UserProfileDTO;
 import group6.demo.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -32,6 +33,7 @@ public interface UserService {
      * @return 用户个人信息DTO
      */
     UserProfileDTO getUserProfile(Long userId);
+    List<UserProfileDTO> getAllUserProfiles();
     
     /**
      * 更新用户头像

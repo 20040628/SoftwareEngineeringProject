@@ -75,7 +75,7 @@ class UserControllerTest {
         when(userRepository.findAll()).thenReturn(Arrays.asList(testUser));
 
         // Act
-        List<User> users = userController.getAllUsers();
+        List<UserProfileDTO> users = userController.getAllUsers();
 
         // Assert
         assertEquals(1, users.size());

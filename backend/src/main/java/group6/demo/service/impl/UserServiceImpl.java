@@ -15,8 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -232,7 +235,17 @@ public class UserServiceImpl implements UserService {
         
         return profileDTO;
     }
-    
+
+    @Override
+    public List<UserProfileDTO> getAllUserProfiles() {
+        // 获取所有用户 ID
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> getUserProfile(user.getId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public User updateAvatar(Long userId, String filename) {
         Optional<User> optionalUser = userRepository.findById(userId);

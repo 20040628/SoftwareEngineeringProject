@@ -35,7 +35,7 @@
           <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
         </button>
         <button class="search-button" @click="handleSearch">
-          <img src="/static/center/search.svg" alt="Search" class="search-icon">
+          <img src="/static/center/search.png" alt="Search" class="search-icon">
         </button>
       </div>
     </div>
@@ -92,7 +92,7 @@
               <textarea
                   v-model="feedback.adminResponse"
                   class="admin-response"
-                  placeholder="输入回复..."
+                  placeholder="Enter response..."
               ></textarea>
           </td>
           <td>
@@ -167,7 +167,7 @@ export default {
       feedbacks: [],
       filteredFeedbacks: [],
       currentPage: 1,
-      itemsPerPage: 10,
+      itemsPerPage: 4,
       inputPage: 1,
       searchQuery: '',
       statusOptions: {
@@ -348,7 +348,7 @@ export default {
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 
 /* Header and Filter Container Styles */
@@ -441,8 +441,8 @@ export default {
 }
 
 .search-icon {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
 }
 
 .reset-icon{
@@ -548,7 +548,7 @@ export default {
 }
 
 .admin-response:focus {
-  border-color: #58c4c9;
+  border-color: #003c51;
   box-shadow: 0 0 5px rgba(88, 196, 201, 0.5);
   outline: none;
 }
@@ -561,7 +561,7 @@ export default {
 
 /* Update Button */
 .update-button {
-  background: #58c4c9;
+  background: #003c51;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -594,9 +594,9 @@ export default {
   font-weight: bold;
   color: #444444;
   padding: 1px 10px;
-  border: 3px solid #58c4c9;
+  border: 3px solid #003c51;
   border-radius: 20px;
-  box-shadow:  0 0 1px #58c4c9;
+  box-shadow:  0 0 1px #003c51;
 }
 
 .pagination-buttons {
@@ -625,8 +625,8 @@ export default {
 .pagination-prev:hover:not(:disabled),
 .pagination-next:hover:not(:disabled),
 .pagination-page:hover:not(.pagination-active) {
-  color: #58c4c9;
-  border-color: #58c4c9;
+  color: #003c51;
+  border-color: #003c51;
 }
 
 .pagination-prev:disabled,
@@ -638,9 +638,9 @@ export default {
 }
 
 .pagination-active {
-  background-color: #58c4c9;
+  background-color: #003c51;
   color: #fff !important;
-  border-color: #58c4c9 !important;
+  border-color: #003c51 !important;
   font-weight: 500;
 }
 
@@ -671,7 +671,7 @@ export default {
 
 .pagination-jump input:focus {
   outline: none;
-  border-color: #58c4c9;
+  border-color: #003c51;
 }
 
 .pagination-jump button {
@@ -679,7 +679,7 @@ export default {
   padding: 0 15px;
   margin-left: 10%;
   border-radius: 20px;
-  background-color: #58c4c9;
+  background-color: #003c51;
   color: white;
   font-weight: bold;
   border: 1px solid #d9d9d9;

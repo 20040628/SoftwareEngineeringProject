@@ -28,7 +28,7 @@
           <img src="/static/center/reset.png" alt="Reset" class="reset-icon">
         </button>
         <button class="search-button" @click="handleSearch">
-          <img src="/static/center/search.svg" alt="Search" class="search-icon">
+          <img src="/static/center/search.png" alt="Search" class="search-icon">
         </button>
       </div>
 
@@ -62,7 +62,7 @@
           <td>{{ user.email }}</td>
           <td>{{ user.mobile }}</td>
           <td>{{ formatDate(user.birthday) }}</td>
-          <td>{{ user.bank_card }}</td>
+          <td>{{ user.maskedBankCard }}</td>
           <td>
             <span :class="['frequent-label', user.isFrequentUser ? 'frequent-yes' : 'frequent-no']">
               {{ user.isFrequentUser ? 'Yes' : 'No' }}
@@ -149,7 +149,7 @@ export default {
       users: [],
       filteredUsers: [],
       currentPage: 1,
-      itemsPerPage: 10,
+      itemsPerPage: 8,
       inputPage: 1,
       searchQuery: '',
       statusFilter: '1',
@@ -216,8 +216,8 @@ export default {
       try {
         const res = await axios.get('http://localhost:8080/api/users/getAll');
         if (res.status === 200) {
+          console.log(res.data);
           this.users = res.data;
-          console.log(this.users.bank_card);
           this.filteredUsers = [...res.data];
           this.filterUsers();
         }
@@ -291,8 +291,7 @@ export default {
             user.username.toLowerCase().includes(query) ||
             user.email.toLowerCase().includes(query) ||
             user.mobile.toLowerCase().includes(query) ||
-            this.formatDate(user.birthday).toLowerCase().includes(query) ||
-            user.paymentMethod.toLowerCase().includes(query)
+            this.formatDate(user.birthday).toLowerCase().includes(query)
         );
       });
 
@@ -335,7 +334,7 @@ export default {
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 /* Header and Filter Container Styles */
 .filter-container {
@@ -408,8 +407,8 @@ export default {
 }
 
 .search-icon {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
 }
 
 .reset-icon {
@@ -439,7 +438,7 @@ export default {
 
 .status-filter select:focus, .role-filter select:focus {
   outline: none;
-  border-color: #58c4c9;
+  border-color: #003c51;
 }
 
 /* Table Styles */
@@ -493,14 +492,15 @@ export default {
 }
 
 .status-active {
-  background-color: #67c23a;
+  background-color: #016025;
   color: white;
 }
 
 .status-inactive {
-  background-color: #f56c6c;
+  background-color: #6e0202;
   color: white;
 }
+
 
 /* Role Label Styles */
 .role-label {
@@ -512,12 +512,12 @@ export default {
 }
 
 .role-admin {
-  background-color: #e6a23c;
+  background-color: #02536F;
   color: white;
 }
 
 .role-user {
-  background-color: #409eff;
+  background-color: #033161;
   color: white;
 }
 
@@ -530,12 +530,12 @@ export default {
 }
 
 .frequent-yes {
-  background-color: #ef504c;
+  background-color: #6e0202;
   color: white;
 }
 
 .frequent-no {
-  background-color: #909399;
+  background-color: #505058;
   color: white;
 }
 
@@ -579,9 +579,9 @@ export default {
   font-weight: bold;
   color: #444444;
   padding: 1px 10px;
-  border: 3px solid #58c4c9;
+  border: 3px solid #003c51;
   border-radius: 20px;
-  box-shadow:  0 0 1px #58c4c9;
+  box-shadow:  0 0 1px #003c51;
 }
 
 .pagination-buttons {
@@ -610,8 +610,8 @@ export default {
 .pagination-prev:hover:not(:disabled),
 .pagination-next:hover:not(:disabled),
 .pagination-page:hover:not(.pagination-active) {
-  color: #58c4c9;
-  border-color: #58c4c9;
+  color: #003c51;
+  border-color: #003c51;
 }
 
 .pagination-prev:disabled,
@@ -623,9 +623,9 @@ export default {
 }
 
 .pagination-active {
-  background-color: #58c4c9;
+  background-color: #003c51;
   color: #fff !important;
-  border-color: #58c4c9 !important;
+  border-color: #003c51 !important;
   font-weight: 500;
 }
 
@@ -657,7 +657,7 @@ export default {
 
 .pagination-jump input:focus {
   outline: none;
-  border-color: #58c4c9;
+  border-color: #003c51;
 }
 
 .pagination-jump button {
@@ -665,7 +665,7 @@ export default {
   padding: 0 15px;
   margin-left: 10%;
   border-radius: 20px;
-  background-color: #58c4c9;
+  background-color: #003c51;
   color: white;
   font-weight: bold;
   border: 1px solid #d9d9d9;

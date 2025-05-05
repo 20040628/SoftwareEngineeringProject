@@ -84,7 +84,7 @@ export default {
         { id: 3, name: 'Add User', icon: '/static/center/adduser.png' },
         { id: 4, name: 'Add Order', icon: '/static/center/addorder.png' },
         { id: 5, name: 'User Feedback', icon: '/static/center/comment.png' },
-        { id: 6, name: 'Data Analysis', icon: '/static/center/appstore-add.png' },
+        { id: 6, name: 'Data Analysis', icon: '/static/center/data_analysis.png' },
         { id: 7, name: 'Scooter Management', icon: '/static/center/share.png' },
         { id: 8, name: 'Order Management', icon: '/static/center/order.png' },
         { id: 9, name: 'User Management', icon: '/static/center/user.png' },
@@ -171,7 +171,7 @@ export default {
 }
 
 .navbar {
-  background: #58c4c9 !important;
+  background: #003c51 !important;
 }
 
 .navbar-nav {
@@ -208,7 +208,7 @@ export default {
 
 .sidebar {
   width: 250px;
-  background-color: #58c4c9 !important;
+  background-color: #003c51 !important;
 }
 
 .content {

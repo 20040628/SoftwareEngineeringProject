@@ -195,7 +195,7 @@ export default {
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 .form {
   display: flex;
@@ -239,8 +239,8 @@ label {
 
 .input:focus {
   outline: none;
-  border-color: #58c4c9;
-  box-shadow: 0 0 1px #58c4c9;
+  border-color: #003c51;
+  box-shadow: 0 0 1px #003c51;
 }
 
 .button-group {
@@ -261,7 +261,7 @@ label {
 }
 
 .button-submit {
-  background: #58c4c9;
+  background: #003c51;
   color: white;
 }
 
@@ -271,9 +271,9 @@ label {
 
 .button-reset {
   background: white;
-  color: #58c4c9;
+  color: #003c51;
   font-weight: bold;
-  border: 3px solid #58c4c9;
+  border: 3px solid #003c51;
 }
 
 .button-reset:hover {
@@ -320,8 +320,8 @@ label {
 }
 
 .checkbox-option .checkbox-input:checked ~ .checkmark {
-  background-color: #58c4c9;
-  border-color: #58c4c9;
+  background-color: #003c51;
+  border-color: #003c51;
 }
 
 .checkmark:after {

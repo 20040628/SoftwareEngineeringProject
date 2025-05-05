@@ -35,7 +35,7 @@
         <div class="form-group col-12 col-md-6">
           <label>Bank Card</label>
           <input
-              v-model="newUser.bank_card"
+              v-model="newUser.bankCard"
               type="text"
               minlength="16"
               maxlength="19"
@@ -109,7 +109,7 @@ export default {
         email: '',
         mobile: '',
         birthday: '',
-        bank_card: ''
+        bankCard: ''
       },
       successMessage: '',
       registrationResult: null
@@ -123,7 +123,7 @@ export default {
         email: '',
         mobile: '',
         birthday: '',
-        bank_card: ''
+        bankCard: ''
       };
     },
     async registerUser() {
@@ -149,7 +149,7 @@ export default {
       if (!this.newUser.birthday) {
         errors.push('Birthday is required');
       }
-      if (!this.newUser.bank_card) {
+      if (!this.newUser.bankCard) {
         errors.push('Bank card is required');
       }
 
@@ -181,7 +181,7 @@ export default {
             email: '',
             mobile: '',
             birthday: '',
-            bank_card: ''
+            bankCard: ''
           };
           alert("Add User successfully");
         }
@@ -190,7 +190,7 @@ export default {
           // Handle validation errors from server
           const serverErrors = error.response.data;
           const errorMessages = Object.values(serverErrors).flat();
-          console.log(this.newUser.bank_card);
+          console.log(this.newUser.bankCard);
           alert("Validation errors:\n" + errorMessages.join(''));
         } else if (error.response && error.response.status === 401) {
           alert('Unauthorized: Only admins can register users');
@@ -210,7 +210,7 @@ export default {
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 
 .form {
@@ -255,8 +255,8 @@ label {
 
 .input:focus {
   outline: none;
-  border-color: #58c4c9;
-  box-shadow: 0 0 1px #58c4c9;
+  border-color: #003c51;
+  box-shadow: 0 0 1px #003c51;
 }
 
 .button-group {
@@ -277,19 +277,19 @@ label {
 }
 
 .button-submit {
-  background: #58c4c9;
+  background: #003c51;
   color: white;
 }
 
 .button-submit:hover {
-  background: #3bb7bd;
+  background: #003c51;
 }
 
 .button-reset {
   background: white;
-  color: #58c4c9;
+  color: #003c51;
   font-weight: bold;
-  border: 3px solid #58c4c9;
+  border: 3px solid #003c51;
 }
 
 .button-reset:hover {

@@ -226,11 +226,20 @@ public class UserServiceImpl implements UserService {
             profileDTO.setHasBankCard(false);
         }
         
-        // 设置头像URL
-        if ("default_avatar.jpg".equals(user.getAvatar())) {
+        // 设置头像
+        String avatarData = user.getAvatar();
+        profileDTO.setAvatar(avatarData);
+        
+        // 直接将Base64数据设置为头像URL
+        // 如果是旧版默认头像，返回默认路径
+        if ("default_avatar.jpg".equals(avatarData)) {
             profileDTO.setAvatarUrl("/uploads/avatars/default_avatar.jpg");
+        } else if (avatarData != null && avatarData.startsWith("data:image/")) {
+            // 对于Base64格式的图片，直接使用
+            profileDTO.setAvatarUrl(avatarData);
         } else {
-            profileDTO.setAvatarUrl("/uploads/avatars/" + user.getAvatar());
+            // 旧数据兼容处理
+            profileDTO.setAvatarUrl("/uploads/avatars/" + (avatarData != null ? avatarData : "default_avatar.jpg"));
         }
         
         return profileDTO;
@@ -247,14 +256,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateAvatar(Long userId, String filename) {
+    public User updateAvatar(Long userId, String base64Image) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new IllegalArgumentException("User not found with id: " + userId);
         }
         
         User user = optionalUser.get();
-        user.setAvatar(filename);
+        user.setAvatar(base64Image);
         return userRepository.save(user);
     }
     

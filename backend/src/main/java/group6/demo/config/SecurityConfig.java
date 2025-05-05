@@ -1,6 +1,7 @@
 package group6.demo.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    @Value("${app.test-mode:false}")
+    private boolean testMode;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -32,8 +36,32 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
+            .csrf(csrf -> csrf.disable());
+            
+        if (testMode) {
+            // 测试模式下，允许特定API无需认证
+            http.authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/avatar/test-base64").permitAll()
+                .requestMatchers("/api/admin/migration/**").permitAll()
+                .requestMatchers("/api/scooters/add").hasRole("ADMIN")
+                .requestMatchers("/api/scooters/delete/**").hasRole("ADMIN")
+                .requestMatchers("/api/scooters/update/**").hasRole("ADMIN")
+                .requestMatchers("/api/scooters/getAll", "/api/scooters/{id}").permitAll()
+                .requestMatchers("/api/feedback/all").hasRole("ADMIN")
+                .requestMatchers("/api/feedback/**").authenticated()
+                .requestMatchers("/api/bookings/forUnregistered").hasRole("ADMIN")
+                .requestMatchers("/api/bookings/getAll").hasRole("ADMIN")
+                .requestMatchers("/api/bookings/**").authenticated()
+                .requestMatchers("/api/users/changeStatus/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/users/**").authenticated()
+                .requestMatchers("/api/alipay/**").authenticated()
+                .requestMatchers("/api/stores/**").authenticated()
+                .anyRequest().authenticated()
+            );
+        } else {
+            // 正常模式
+            http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/scooters/add").hasRole("ADMIN")
                 .requestMatchers("/api/scooters/delete/**").hasRole("ADMIN")
@@ -49,8 +77,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/alipay/**").authenticated()
                 .requestMatchers("/api/stores/**").authenticated()
                 .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            );
+        }
+            
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
             .exceptionHandling(exceptions -> exceptions

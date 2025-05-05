@@ -38,10 +38,10 @@ public interface UserService {
     /**
      * 更新用户头像
      * @param userId 用户ID
-     * @param filename 头像文件名
+     * @param base64Image 头像的Base64编码字符串
      * @return 更新后的用户
      */
-    User updateAvatar(Long userId, String filename);
+    User updateAvatar(Long userId, String base64Image);
     
     /**
      * 解绑银行卡

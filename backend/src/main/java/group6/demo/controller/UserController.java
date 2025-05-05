@@ -10,6 +10,7 @@ import group6.demo.repository.UserRepository;
 import group6.demo.service.FileStorageService;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.UserService;
+import group6.demo.util.Base64Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -194,22 +195,19 @@ public class UserController {
                 return ResponseEntity.badRequest().body("The user does not exist");
             }
             
-            // 保存文件
-            String filename = fileStorageService.storeAvatar(file, userId);
-            
-            // 删除旧头像（如果不是默认头像）
-            if (user.getAvatar() != null && !user.getAvatar().equals("default_avatar.jpg")) {
-                fileStorageService.deleteFile(user.getAvatar());
+            // 将文件转换为Base64编码
+            String base64Image = Base64Util.encodeToBase64(file);
+            if (base64Image == null) {
+                return ResponseEntity.badRequest().body("Failed to process the image file");
             }
             
             // 更新用户头像
-            user = userService.updateAvatar(userId, filename);
+            user = userService.updateAvatar(userId, base64Image);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User avatar upload was successful");
             response.put("userId", user.getId());
-            response.put("avatar", user.getAvatar());
-            response.put("avatarUrl", "/uploads/avatars/" + filename);
+            response.put("avatar", "base64_image"); // 不返回实际的Base64内容，避免响应过大
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -297,6 +295,26 @@ public class UserController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("解绑银行卡失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试头像Base64编码功能
+     * @return 测试结果
+     */
+    @GetMapping("/avatar/test-base64")
+    public ResponseEntity<?> testBase64Avatar() {
+        try {
+            // 创建一个小的测试图片（1x1像素的红色图片）
+            String testBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Base64 avatar test successful");
+            response.put("testAvatar", testBase64);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Test failed: " + e.getMessage());
         }
     }
 }

@@ -15,6 +15,9 @@ public class User {
     
     private String username;
     private String password;
+    
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String avatar;
     
     @Temporal(TemporalType.DATE)

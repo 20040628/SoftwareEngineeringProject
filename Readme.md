@@ -611,43 +611,6 @@ Frontend service will run on http://localhost:5173
   }
   ```
 
-#### upload avatar
-
-- **URL**: `/api/users/avatar/{userId}`
-
-- **Method**: `POST`
-
-- **Request Parameter**
-
-  ```
-  {
-      "file": 本地的jpg文件
-  }
-  ```
-
-- **Success Response(200 OK)** 
-
-  ```
-  {
-      "avatarUrl": "/uploads/avatars/avatar_2_7aedf007-6111-4e50-8214-bef843f2a3cd.jpg",
-      "avatar": "avatar_2_7aedf007-6111-4e50-8214-bef843f2a3cd.jpg",
-      "message": "User avatar upload was successful",
-      "userId": 2
-  }
-  ```
-
-  备注：
-
-  SoftwareEngineeringProject\avatar_for_test中提供了三个可选的头像，上传头像后，用户的avatar会自动保存到SoftwareEngineeringProject\backend\uploads\avatars文件夹内
-
-- **Error Response** (400 Bad Request):
-
-  ```
-  {
-  	Failed to upload the profile picture:  + e.getMessage()
-  }
-  ```
-
 #### get one user
 
 - **URL**: `/api/users/profile/{userId}`
@@ -2102,6 +2065,88 @@ The application provides automatic discount calculation based on user profiles a
     "isStudent": "number",  // 1: yes, 0: no
     "isSenior": "number",   // 1: yes, 0: no
     "isFrequentUser": "number"  // 1: yes, 0: no
+  }
+  ```
+
+#### Upload User Avatar
+
+- **URL**: `/api/users/avatar/{userId}`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  Content-Type: multipart/form-data
+  ```
+- **Form Data**:
+  ```
+  file: 图片文件（最大5MB，支持jpg、jpeg、png等格式）
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "User avatar upload was successful",
+    "userId": "number",
+    "avatar": "base64_image"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "error": "The user does not exist"
+  }
+  ```
+  或
+  ```json
+  {
+    "error": "Failed to process the image file"
+  }
+  ```
+  或
+  ```json
+  {
+    "error": "Failed to upload the profile picture: error message"
+  }
+  ```
+
+#### Get User Profile
+
+- **URL**: `/api/users/profile/{userId}`
+- **Method**: `GET`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "id": "number",
+    "username": "string",
+    "email": "string",
+    "mobile": "string",
+    "avatar": "string", // Base64编码的图片数据或默认头像路径
+    "avatarUrl": "string", // 头像完整URL（Base64数据或路径）
+    "birthday": "date",
+    "userType": "number",
+    "status": "number",
+    "role": "number",
+    "hasBankCard": "boolean",
+    "maskedBankCard": "string", // 脱敏的银行卡号
+    "bankBalance": "number",
+    "isStudent": "number",
+    "isSenior": "number",
+    "isFrequentUser": "number"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  {
+    "error": "The user doesn't exist"
+  }
+  ```
+  或
+  ```json
+  {
+    "error": "Failed to obtain user's personal information: error message"
   }
   ```
 

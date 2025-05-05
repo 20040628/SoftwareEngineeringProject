@@ -11,6 +11,10 @@ import jakarta.servlet.MultipartConfigElement;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * 文件上传配置
+ * 注意：头像已改为使用Base64存储，此配置仅用于访问默认头像等静态资源
+ */
 @Configuration
 public class FileUploadConfig implements WebMvcConfigurer {
 
@@ -24,7 +28,8 @@ public class FileUploadConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 配置静态资源目录，使得上传的头像可以通过URL访问
+        // 配置静态资源目录，主要用于访问默认头像等静态资源
+        // 自定义头像已改为使用Base64编码直接存储在数据库中
         Path uploadDir = Paths.get("uploads/avatars");
         String uploadPath = uploadDir.toFile().getAbsolutePath();
         

@@ -4,7 +4,7 @@ import store from '../store'
 // 延迟加载组件
 const UserLogin = () => import('../views/login/index.vue')
 const MainLayout = () => import('@/components/MainLayout.vue')
-
+const Payment = () => import('@/components/Payment.vue')
 
 // 路由配置
 const routes = [
@@ -35,6 +35,11 @@ const routes = [
       { path: '/add_order', component: () => import('@/components/AddOrder.vue') },
       { path: '/add_store', component: () => import('@/components/AddStore.vue') },
     ],
+  },
+  {
+    path: '/payment/:orderId',
+    name: 'Payment',
+    component: Payment,
   },
   {
     path: '/:pathMatch(.*)*',

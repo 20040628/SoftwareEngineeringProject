@@ -76,18 +76,26 @@
           </div>
         </el-card>
 
-        <!-- revenue trend analysis -->
+        <!-- daily trend analysis -->
         <el-card v-if="currentWeekRevenue" class="analysis-card">
           <template #header>
             <div class="card-header">
-              <span>Revenue Statistic</span>
+              <span>Daily Revenue Trend</span>
             </div>
           </template>
           <div class="analysis-content">
-
-
-            <div class="bar-chart-container">
-              <v-chart :option="barChartOption" autoresize />
+            <div style="margin-bottom: 16px; width: 150px">
+              <el-select v-model="selectedRevenueType" placeholder="Select Revenue Type" @change="updateDailyChart">
+                <el-option
+                    v-for="item in revenueTypeOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+              </el-select>
+            </div>
+            <div class="line-chart-container">
+              <v-chart :option="dailyChartOption" autoresize style="height: 400px;" />
             </div>
           </div>
         </el-card>
@@ -142,20 +150,33 @@
             <el-empty description="No revenue data" />
           </div>
           <div class="analysis-recommendation">
-            <h4>Revenue Optimization Suggestions:</h4>
-            <p>{{ getRevenueRecommendation() }}</p>
-
+            <h3>Recommendation</h3>
+            <!-- Add peak days analysis -->
+            <div class="peak-days-analysis" v-if="processedDailyData">
+              <h4>Peak Revenue Days:</h4>
+              <div class="peak-day-item">
+                <span class="peak-label">Highest Hourly Revenue:</span>
+                <span class="peak-value">{{ peakDays.hourly.day }} (£{{ peakDays.hourly.value }})</span>
+              </div>
+              <div class="peak-day-item">
+                <span class="peak-label">Highest 4-Hour Revenue:</span>
+                <span class="peak-value">{{ peakDays.fourHours.day }} (£{{ peakDays.fourHours.value }})</span>
+              </div>
+              <div class="peak-day-item">
+                <span class="peak-label">Highest Daily Revenue:</span>
+                <span class="peak-value">{{ peakDays.daily.day }} (£{{ peakDays.daily.value }})</span>
+              </div>
+            </div>
             <div class="analysis-highlight">
               <div class="highlight-icon" :class="getTopPerformingClass()">
                 <i :class="getTopPerformingIcon()"></i>
               </div>
               <div class="highlight-text">
-                <h3>{{ topPerformingType ? topPerformingType.label : 'No data' }} rental generates the most revenue</h3>
+                <h4>{{ topPerformingType ? topPerformingType.label : 'No data' }} rental generates the most revenue</h4>
                 <p>Making up {{ topPerformingType ? getPercentage(topPerformingType.value, currentWeekRevenue.totalRevenue) : '0' }}% of total weekly revenue</p>
               </div>
             </div>
           </div>
-
         </div>
       </el-card>
     </div>
@@ -166,7 +187,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { PieChart, BarChart } from 'echarts/charts'
+import { PieChart, BarChart, LineChart } from 'echarts/charts'
 import {
   GridComponent,
   TooltipComponent,
@@ -184,6 +205,7 @@ use([
   CanvasRenderer,
   PieChart,
   BarChart,
+  LineChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,
@@ -205,6 +227,120 @@ export default {
     const errorMessage = ref('')
     const topPerformingType = ref(null)
 
+    // Daily revenue chart configuration
+    // Daily revenue chart configuration
+    const dailyChartOption = ref({
+      title: {
+        text: 'Daily Revenue Trend',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+        formatter: (params) => {
+          const date = params[0].axisValue
+          const value = params[0].data
+          return `${date}<br/>${selectedRevenueType.value}: £${value}`
+        }
+      },
+      xAxis: {
+        type: 'category',
+        data: [],
+        name: 'Day',
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Revenue (£)',
+      },
+      series: [
+        {
+          name: 'Revenue',
+          type: 'line',
+          smooth: true,
+          data: [],
+          lineStyle: {
+            width: 3,
+            color: '#5470C6',
+          },
+          itemStyle: {
+            color: '#5470C6',
+          },
+        },
+      ],
+    })
+
+    // Revenue type selector
+    const selectedRevenueType = ref('hourlyRevenue')
+    const revenueTypeOptions = ref([
+      { value: 'hourlyRevenue', label: 'Hourly Revenue' },
+      { value: 'fourHoursRevenue', label: '4-Hour Revenue' },
+      { value: 'dailyRevenue', label: 'Daily Revenue' }
+    ])
+
+    // Process daily revenue data
+    const processDailyRevenueData = (revenueData) => {
+      const dayNames = {
+        1: 'Mon',
+        2: 'Tue',
+        3: 'Wed',
+        4: 'Thu',
+        5: 'Fri',
+        6: 'Sat',
+        7: 'Sun',
+      }
+
+      return {
+        dates: revenueData.map(item => dayNames[item.dayOfWeek] || item.dayOfWeekName),
+        hourlyValues: revenueData.map(item => item.hourlyRevenue),
+        fourHoursValues: revenueData.map(item => item.fourHoursRevenue),
+        dailyValues: revenueData.map(item => item.dailyRevenue)
+      }
+    }
+
+    // Update chart based on selected revenue type
+    const updateDailyChart = () => {
+      if (!processedDailyData.value) return
+
+      switch (selectedRevenueType.value) {
+        case 'hourlyRevenue':
+          dailyChartOption.value.series[0].data = processedDailyData.value.hourlyValues
+          dailyChartOption.value.series[0].name = 'Hourly Revenue'
+          break
+        case 'fourHoursRevenue':
+          dailyChartOption.value.series[0].data = processedDailyData.value.fourHoursValues
+          dailyChartOption.value.series[0].name = '4-Hour Revenue'
+          break
+        case 'dailyRevenue':
+          dailyChartOption.value.series[0].data = processedDailyData.value.dailyValues
+          dailyChartOption.value.series[0].name = 'Daily Revenue'
+          break
+      }
+    }
+
+    // Store processed daily data
+    const processedDailyData = ref(null)
+
+    // Fetch daily revenue data for the selected week
+    const fetchDailyRevenue = async () => {
+      try {
+        const response = await axios.get('/api/weekly-revenue/daily', {
+          params: { weekStartDate: selectedDate.value },
+          headers: {
+            Authorization: `Bearer ${store.getters.token}`
+          }
+        })
+
+        // Process the response data
+        processedDailyData.value = processDailyRevenueData(response.data)
+        dailyChartOption.value.xAxis.data = processedDailyData.value.dates
+
+        // Update chart with default selected revenue type
+        updateDailyChart()
+
+      } catch (error) {
+        console.error('Failed to get daily revenue:', error)
+      }
+    }
+
     // Get current date (format: YYYY-MM-DD)
     const getCurrentDate = () => {
       const date = new Date()
@@ -219,6 +355,29 @@ export default {
       store.dispatch('logout')
       router.push('/login')
     }
+
+    const peakDays = computed(() => {
+      if (!processedDailyData.value) return {
+        hourly: { day: 'N/A', value: 0 },
+        fourHours: { day: 'N/A', value: 0 },
+        daily: { day: 'N/A', value: 0 }
+      }
+
+      const findPeakDay = (values) => {
+        const maxValue = Math.max(...values)
+        const maxIndex = values.indexOf(maxValue)
+        return {
+          day: processedDailyData.value.dates[maxIndex],
+          value: maxValue
+        }
+      }
+
+      return {
+        hourly: findPeakDay(processedDailyData.value.hourlyValues),
+        fourHours: findPeakDay(processedDailyData.value.fourHoursValues),
+        daily: findPeakDay(processedDailyData.value.dailyValues)
+      }
+    })
 
     // Calculate top performing revenue type
     const analyzeTopPerformingType = () => {
@@ -323,6 +482,7 @@ export default {
         })
         currentWeekRevenue.value = response.data
         analyzeTopPerformingType()
+        await fetchDailyRevenue()
       } catch (error) {
         console.error('API error details:', error.response || error)
 
@@ -357,6 +517,7 @@ export default {
         // Update selectedDate to current week
         selectedDate.value = getCurrentDate()
         analyzeTopPerformingType()
+        await fetchDailyRevenue()
       } catch (error) {
         console.error('API error details:', error.response || error)
 
@@ -594,6 +755,9 @@ export default {
       topPerformingType,
       pieChartOption,
       barChartOption,
+      dailyChartOption,
+      selectedRevenueType,
+      revenueTypeOptions,
       logoutAndRedirect,
       fetchCurrentWeekRevenue,
       fetchWeeklyRevenueByDate,
@@ -604,7 +768,10 @@ export default {
       getTopPerformingIcon,
       getTopPerformingClass,
       getPercentage,
-      getRevenueRecommendation
+      getRevenueRecommendation,
+      processedDailyData,
+      updateDailyChart,
+      peakDays
     }
   }
 }
@@ -612,19 +779,30 @@ export default {
 
 <style scoped lang="scss">
 
+.card-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+.analysis-content {
+  padding: 10px;
+}
+.line-chart-container {
+  width: 100%;
+}
+
 .title {
   font-size: 28px;
   font-weight: bold;
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 .card-header {
   display: flex;
   justify-content: center;
   background-color: #ffffff;
-  border-bottom: 0px solid #58c4c9;
+  border-bottom: 0px solid #003c51;
   align-items: center;
   font-weight: bold;
   font-size: 1.2em;
@@ -632,7 +810,7 @@ export default {
 
 .card-header span{
   padding: 6px 26px;
-  border: 3px solid #008187;
+  border: 3px solid #003c51;
   border-radius: 30px;
 }
 
@@ -693,13 +871,13 @@ export default {
       }
 
       &.current-button {
-        background-color: #58c4c9;
-        border-color: #58c4c9;
+        background-color: #003c51;
+        border-color: #003c51;
         color: white;
 
         &:hover {
-          background-color: #6fdce1;
-          border-color: #6fdce1;
+          background-color: #003c51;
+          border-color: #003c51;
         }
       }
 
@@ -846,10 +1024,10 @@ export default {
   align-items: center;
   background-color: #ffffff;
   padding: 15px;
-  border-radius: 4px;
+  border-radius: 10px;
   margin-bottom: 20px;
   margin-top: 10%;
-
+  border: 1px solid #dfd782;
   min-height: 80px;
 }
 
@@ -913,6 +1091,14 @@ export default {
   border: 4px solid #5ba4f8;
   max-width: 400px;
 
+  h3 {
+    margin-top: 0;
+    color: #303133;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
   h4 {
     margin-top: 0;
     color: #303133;
@@ -927,6 +1113,39 @@ export default {
     font-size: 18px;
     line-height: 1.6;
   }
+}
+
+.peak-days-analysis {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  border: 1px solid #093159;
+}
+
+.peak-day-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.peak-label {
+  font-weight: 500;
+  color: #606266;
+}
+
+.peak-value {
+  font-weight: 600;
+  color: #093159;
+}
+
+.analysis-recommendation {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 1200px) {

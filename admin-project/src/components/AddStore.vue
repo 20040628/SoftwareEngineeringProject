@@ -182,7 +182,7 @@ export default {
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 
 .form {
@@ -227,8 +227,8 @@ label {
 
 .input:focus {
   outline: none;
-  border-color: #58c4c9;
-  box-shadow: 0 0 1px #58c4c9;
+  border-color: #003c51;
+  box-shadow: 0 0 1px #003c51;
 }
 
 .button-group {
@@ -249,19 +249,19 @@ label {
 }
 
 .button-submit {
-  background: #58c4c9;
+  background: #003c51;
   color: white;
 }
 
 .button-submit:hover {
-  background: #3bb7bd;
+  background: #003c51;
 }
 
 .button-reset {
   background: white;
-  color: #58c4c9;
+  color: #003c51;
   font-weight: bold;
-  border: 3px solid #58c4c9;
+  border: 3px solid #003c51;
 }
 
 .button-reset:hover {

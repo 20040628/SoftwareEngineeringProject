@@ -44,7 +44,7 @@
           <th>Email</th>
           <th>Mobile</th>
           <th>Birthday</th>
-          <th>Payment Method</th>
+          <th>Bank Card</th>
           <th>Frequent User</th>
           <th>Status</th>
           <th>Actions</th>
@@ -62,7 +62,7 @@
           <td>{{ user.email }}</td>
           <td>{{ user.mobile }}</td>
           <td>{{ formatDate(user.birthday) }}</td>
-          <td>{{ user.paymentMethod }}</td>
+          <td>{{ user.bank_card }}</td>
           <td>
             <span :class="['frequent-label', user.isFrequentUser ? 'frequent-yes' : 'frequent-no']">
               {{ user.isFrequentUser ? 'Yes' : 'No' }}
@@ -217,6 +217,7 @@ export default {
         const res = await axios.get('http://localhost:8080/api/users/getAll');
         if (res.status === 200) {
           this.users = res.data;
+          console.log(this.users.bank_card);
           this.filteredUsers = [...res.data];
           this.filterUsers();
         }

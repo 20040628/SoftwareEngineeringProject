@@ -3,8 +3,8 @@
     <!-- Side Navbar for large screens (d-lg-block to show only on large screens) -->
     <div class="sidebar bg-info d-flex flex-column p-3 text-white shadow-sm d-none d-lg-block">
       <div class="user mb-4">
-        <img src="/static/center/avatar.png" alt="avatar" class="img-fluid rounded-circle mb-2" style="width: 40px; height: 40px;" />
-        <span>Administrator</span>
+        <img src="/static/center/logo.png" alt="avatar" class="img-fluid rounded-circle mb-2" style="width: 60px; height: 60px;" />
+        <span>ScootGo Admin</span>
       </div>
       <div class="menu w-100">
         <div
@@ -23,8 +23,8 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-info d-lg-none w-100">
       <div class="container-fluid">
         <div class="user d-flex align-items-center">
-          <img src="/static/center/avatar.png" alt="avatar" class="img-fluid rounded-circle" style="width: 40px; height: 40px;" />
-          <span class="ms-2">Administrator</span>
+          <img src="/static/center/logo.png" alt="avatar" class="img-fluid rounded-circle" style="width: 40px; height: 40px;" />
+          <span class="ms-2">ScootGo Admin</span>
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>

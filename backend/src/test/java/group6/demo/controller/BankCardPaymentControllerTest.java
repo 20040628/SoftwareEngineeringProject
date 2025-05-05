@@ -1,0 +1,197 @@
+package group6.demo.controller;
+
+import group6.demo.dto.BankCardPaymentRequest;
+import group6.demo.dto.BankCardPaymentResponse;
+import group6.demo.entity.Order;
+import group6.demo.entity.User;
+import group6.demo.repository.OrderRepository;
+import group6.demo.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class BankCardPaymentControllerTest {
+
+    @Mock
+    private OrderRepository orderRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private BankCardPaymentController bankCardPaymentController;
+
+    private Order testOrder;
+    private User testUser;
+    private final Long orderId = 1L;
+    private final Long userId = 1L;
+    private BankCardPaymentRequest validRequest;
+
+    @BeforeEach
+    void setUp() {
+        testUser = new User();
+        testUser.setId(userId);
+        testUser.setBankCard("1234567890123456");
+        testUser.setBankBalance(new BigDecimal("200.00"));
+
+        testOrder = new Order();
+        testOrder.setId(orderId);
+        testOrder.setUser(testUser);
+        testOrder.setPrice(new BigDecimal("100.00"));
+        testOrder.setStatus(1); // Active status
+
+        validRequest = new BankCardPaymentRequest();
+        validRequest.setSecurityCode("123456");
+    }
+
+
+    @Test
+    void processBankCardPayment_OrderNotFound() {
+        // Arrange
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("The order does not exist", response.getBody());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(userRepository, orderRepository);
+    }
+
+    @Test
+    void processBankCardPayment_InvalidOrderStatus() {
+        // Arrange
+        testOrder.setStatus(2); // Completed status
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("订单状态不正确，无法支付", response.getBody());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(userRepository, orderRepository);
+    }
+
+    @Test
+    void processBankCardPayment_NoBankCard() {
+        // Arrange
+        testUser.setBankCard(null);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("未找到银行卡信息，请先绑定银行卡", response.getBody());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(userRepository, orderRepository);
+    }
+
+    @Test
+    void processBankCardPayment_InsufficientBalance() {
+        // Arrange
+        testUser.setBankBalance(new BigDecimal("100.00")); // Not enough for order + deposit
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("银行卡余额不足，无法完成支付", response.getBody());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(userRepository, orderRepository);
+    }
+
+    @Test
+    void processBankCardPayment_InvalidSecurityCode() {
+        // Arrange
+        validRequest.setSecurityCode("123"); // Invalid length
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("Invalid security code", response.getBody());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(userRepository, orderRepository);
+    }
+
+    @Test
+    void checkBankCard_SuccessWithCard() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.checkBankCard(userId);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody() instanceof Map);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseMap = (Map<String, Object>) response.getBody();
+        assertTrue((Boolean) responseMap.get("hasBankCard"));
+        assertEquals("**** **** **** 3456", responseMap.get("maskedCard"));
+        assertEquals(new BigDecimal("200.00"), responseMap.get("bankBalance"));
+
+        verify(userRepository).findById(userId);
+    }
+
+    @Test
+    void checkBankCard_SuccessWithoutCard() {
+        // Arrange
+        testUser.setBankCard(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.checkBankCard(userId);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody() instanceof Map);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseMap = (Map<String, Object>) response.getBody();
+        assertFalse((Boolean) responseMap.get("hasBankCard"));
+        assertNull(responseMap.get("maskedCard"));
+        assertEquals(new BigDecimal("200.00"), responseMap.get("bankBalance"));
+
+        verify(userRepository).findById(userId);
+    }
+
+    @Test
+    void checkBankCard_UserNotFound() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.checkBankCard(userId);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("用户不存在", response.getBody());
+        verify(userRepository).findById(userId);
+    }
+}

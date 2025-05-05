@@ -30,6 +30,21 @@
         </div>
       </div>
 
+      <!-- Bank Card row -->
+      <div class="form-row">
+        <div class="form-group col-12 col-md-6">
+          <label>Bank Card</label>
+          <input
+              v-model="newUser.bank_card"
+              type="text"
+              minlength="16"
+              maxlength="19"
+              placeholder="16-19 digits"
+              class="input"
+          />
+        </div>
+      </div>
+
       <!-- Email row -->
       <div class="form-row">
         <div class="form-group col-12 col-md-6">
@@ -93,7 +108,8 @@ export default {
         password: '',
         email: '',
         mobile: '',
-        birthday: ''
+        birthday: '',
+        bank_card: ''
       },
       successMessage: '',
       registrationResult: null
@@ -106,7 +122,8 @@ export default {
         password: '',
         email: '',
         mobile: '',
-        birthday: ''
+        birthday: '',
+        bank_card: ''
       };
     },
     async registerUser() {
@@ -131,6 +148,9 @@ export default {
       }
       if (!this.newUser.birthday) {
         errors.push('Birthday is required');
+      }
+      if (!this.newUser.bank_card) {
+        errors.push('Bank card is required');
       }
 
       // Show all errors in one alert
@@ -160,7 +180,8 @@ export default {
             password: '',
             email: '',
             mobile: '',
-            birthday: ''
+            birthday: '',
+            bank_card: ''
           };
           alert("Add User successfully");
         }
@@ -169,6 +190,7 @@ export default {
           // Handle validation errors from server
           const serverErrors = error.response.data;
           const errorMessages = Object.values(serverErrors).flat();
+          console.log(this.newUser.bank_card);
           alert("Validation errors:\n" + errorMessages.join(''));
         } else if (error.response && error.response.status === 401) {
           alert('Unauthorized: Only admins can register users');

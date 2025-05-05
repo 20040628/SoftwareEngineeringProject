@@ -13,6 +13,17 @@
           </option>
         </select>
       </div>
+      <div class="priority-filter">
+        <label for="priority-select">Filter by Priority:</label>
+        <select id="priority-select" v-model="selectedPriority" @change="filterFeedbacks">
+          <option value="">All</option>
+          <option v-for="(priority, key) in priorityOptions"
+                  :key="key"
+                  :value="key">
+            {{ priority.label }}
+          </option>
+        </select>
+      </div>
       <div class="search-box">
         <input
             type="text"
@@ -169,14 +180,11 @@ export default {
         2: { label: 'High', color: '#dc3545' },
         1: { label: 'Medium', color: '#ffc107' },
         0: { label: 'Low', color: '#28a745' }
-      }
+      },
+      selectedPriority: ''
     };
   },
   computed: {
-    filteredFeedbacks() {
-      if (!this.selectedStatus) return this.feedbacks;
-      return this.feedbacks.filter(f => f.status === this.selectedStatus);
-    },
     totalPages() {
       return Math.ceil(this.filteredFeedbacks.length / this.itemsPerPage);
     },
@@ -221,6 +229,7 @@ export default {
     resetSearch() {
       this.searchQuery = '';
       this.selectedStatus = '';
+      this.selectedPriority = '';
       this.filterFeedbacks();
     },
     formatDate(dateString) {
@@ -270,6 +279,7 @@ export default {
     filterFeedbacks() {
       const query = this.searchQuery.toLowerCase().trim();
       const statusFilter = this.selectedStatus;
+      const priorityFilter = this.selectedPriority;
 
       this.filteredFeedbacks = this.feedbacks.filter(feedback => {
         // Status filter
@@ -277,7 +287,12 @@ export default {
           return false;
         }
 
-        // If no search query, return all matching status
+        // Priority filter
+        if (priorityFilter && feedback.priority !== Number(priorityFilter)) {
+          return false;
+        }
+
+        // If no search query, return all matching status and priority
         if (!query) return true;
 
         // Search in all relevant fields
@@ -335,6 +350,7 @@ export default {
   padding-top: 20px;
   border-bottom: 2px solid #58c4c9;
 }
+
 /* Header and Filter Container Styles */
 .filter-container {
   display: flex;
@@ -347,11 +363,30 @@ export default {
   padding-right: 20px;
 }
 
-.filter-container {
+/* Status and Priority Filter Styles */
+.status-filter, .priority-filter {
   display: flex;
-  gap: 20px;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.status-filter label, .priority-filter label {
+  font-weight: 500;
+  color: #444;
+}
+
+.status-filter select, .priority-filter select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.status-filter select:focus, .priority-filter select:focus {
+  outline: none;
+  border-color: #409eff;
 }
 
 /* Search Box Styles */
@@ -413,31 +448,6 @@ export default {
 .reset-icon{
   width: 20px;
   height: 20px;
-}
-
-/* Status Filter Styles */
-.status-filter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.status-filter label {
-  font-weight: 500;
-  color: #444;
-}
-
-.status-filter select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
-}
-
-.status-filter select:focus {
-  outline: none;
-  border-color: #409eff;
 }
 
 /* Table Styles */
@@ -526,24 +536,22 @@ export default {
   padding: 12px 16px;
   border: 2px solid #e0e3e7;
   border-radius: 8px;
-  font-size: 14px; /* Slightly increased font size */
+  font-size: 14px;
   color: #495057;
   line-height: 1.5;
   min-height: 100px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slightly darker shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   resize: vertical;
-
 }
 
 .admin-response:focus {
-  border-color: #58c4c9; /* Change border color on focus */
-  box-shadow: 0 0 5px rgba(88, 196, 201, 0.5); /* Add focus shadow */
-  outline: none; /* Remove default outline */
+  border-color: #58c4c9;
+  box-shadow: 0 0 5px rgba(88, 196, 201, 0.5);
+  outline: none;
 }
-
 
 .admin-response::placeholder {
   color: #9aa1a9;
@@ -573,7 +581,7 @@ export default {
 .pagination-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 添加这行 */
+  justify-content: space-between;
   margin-top: 30px;
   font-size: 16px;
   flex-wrap: wrap;
@@ -659,7 +667,6 @@ export default {
   border-radius: 4px;
   text-align: center;
   padding: 0 5px;
-
 }
 
 .pagination-jump input:focus {
@@ -680,20 +687,16 @@ export default {
   transition: all 0.3s;
 }
 
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .header-container {
+  .filter-container {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
   }
 
-  .filter-container {
+  .status-filter, .priority-filter {
     width: 100%;
-    flex-direction: column;
-    gap: 15px;
-    align-items: flex-start;
   }
 
   .search-box {
@@ -728,6 +731,28 @@ export default {
   .status-button, .priority-button {
     width: auto;
     min-width: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-filter select, .priority-filter select {
+    width: 100%;
+  }
+
+  .feedback-table th,
+  .feedback-table td {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+
+  .admin-response {
+    min-height: 80px;
+    font-size: 13px;
+  }
+
+  .update-button {
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }
 </style>

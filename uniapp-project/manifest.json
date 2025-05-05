@@ -20,7 +20,8 @@
         "modules" : {
             "Barcode" : {},
             "Camera" : {},
-            "Payment" : {}
+            "Payment" : {},
+            "Maps" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -61,6 +62,13 @@
                 "payment" : {
                     "alipay" : {
                         "__platform__" : [ "ios", "android" ]
+                    }
+                },
+                "maps" : {
+                    "amap" : {
+                        "name" : "amap9knjJJyK",
+                        "appkey_ios" : "364932a64abf6eca15c81338d198a8fd",
+                        "appkey_android" : "364932a64abf6eca15c81338d198a8fd"
                     }
                 }
             }

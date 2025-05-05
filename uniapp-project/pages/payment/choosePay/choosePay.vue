@@ -6,7 +6,6 @@
 	
 	    <!-- 支付方式选择 -->
 	    <view class="payment-method-section">
-	      <text class="title">PAYMENT METHOD</text>
 	      <view class="payment-options">
 	        <view class="payment-option":class="{ selected: selectedPaymentMethod === 'card' }" @click="selectPaymentMethod('card')">
 			  <view class="left">
@@ -35,7 +34,6 @@
 	    <view class="card-option"  @click="selectCard(card)">
 	      <text>{{ bankCards.maskedCard }}</text>
 	    </view>
-		<button @click="bindNewCard">Bind New Card</button>
 		<button @click="closeCardSelectModal">Close</button>
 	  </view>
 	  
@@ -127,14 +125,6 @@
 		      this.showCardSelectModal = false;
 		      this.show_key=true;
 		    },
-		
-		    // 绑定新银行卡
-		    bindNewCard() {
-		      // 模拟绑定新卡
-		      this.bankCards.push({ cardNumber: '1111 2222 3333 4444' });
-		      this.showCardSelectModal = false;
-		    },
-		
 		    // 关闭银行卡选择框
 		    closeCardSelectModal() {
 		      this.showCardSelectModal = false;
@@ -159,16 +149,15 @@
 				this.show_key = false
 			},
 			async getPassword(n){
-				console.log("用户输入的密码",n.password)
 				const token = String(uni.getStorageSync('token'));
 				this.user = uni.getStorageSync('userInfo');
 				try {
-					uni.showLoading({ title: "加载中...", mask: true });
+					//uni.showLoading({ title: "加载中...", mask: true });
 				    const res = await uni.request({
-				        url: `${this.$baseURL}/api/bank-payment/${orderId}`,
+				        url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
 				        method: 'POST',
 						data:{
-							securityCode:n.password
+							securityCode:String(n.password)
 						},
 						header: {
 						  'Content-Type': 'application/json',
@@ -180,8 +169,11 @@
 				    if (res.statusCode === 200) {
 				      uni.showToast({
 				        title: res.data.message,
-				        icon: 'success',
+				        icon: 'none',
 				      });
+					  uni.navigateTo({
+					  	url:"/pages/myorder/orderlist/orderlist"
+					  })
 				    } else {
 				      uni.showToast({
 				        title: res.data.message || 'Update failed',
@@ -191,7 +183,7 @@
 				} catch (err) {
 				    uni.showToast({ title: '网络错误', icon: 'none' })
 				} finally {
-					uni.hideLoading();
+					//uni.hideLoading();
 				    this.isLoading = false
 				}
 			}
@@ -209,7 +201,7 @@
 		margin: 30rpx 20rpx;
 	}
 	.payment-method-section {
-	  margin-bottom: 20px;
+	  margin-bottom: 30px;
 	}
 	
 	.payment-header .title {
@@ -235,16 +227,16 @@
 	}
 	.payment-option.selected {
 	  font-weight: bold; /* 选中时加粗文本 */
-	  border: #aaaaff solid 2rpx;
+	  border: #014d87 solid 2rpx;
 	}
 	.check-icon {
 	  font-size: 18px;
-	  color: #0095FF; /* 勾选标记的颜色 */
+	  color: #55557f; /* 勾选标记的颜色 */
 	  margin-left: 10px; /* 勾选标记和文本之间的间距 */
 	}
 	
 	.payment-option:hover {
-	 border: #aaaaff solid 2rpx; 
+	 border: #014d87 solid 2rpx; 
 	}
 	
 	.payment-icon {
@@ -261,7 +253,7 @@
 	.payment-btn button {
 	  width: 100%;
 	  padding: 12px;
-	  background-color: #aaaaff;
+	  background-color: #2c3e50;
 	  color: white;
 	  font-size: 16px;
 	  border: none;
@@ -317,7 +309,7 @@
 	}
 	
 	.card-options button {
-	  background-color: #aaaaff;
+	  background-color: #2c3e50;
 	  color: #fff;
 	  padding: 12px;
 	  width: 100%;

@@ -12,13 +12,6 @@
 			<view :class="{ 'tabbar-active': nowBar === 1 }">Map</view>
 		</view>
 
-		<!-- 中间按钮（扫码） -->
-		<!-- <view class="tabbar-center" @click="tabBar(2)">
-			<view class="tabbar-cen-box">
-				<image :src="scanCodeImg" />
-			</view>
-		</view> -->
-
 		<!-- 发现 -->
 		<view class="tabbar-item" @click="tabBar(3)">
 			<image :src="nowBar === 3 ? activeIcons.found : defaultIcons.found" />

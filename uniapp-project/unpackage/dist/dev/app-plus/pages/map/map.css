@@ -1,0 +1,67 @@
+
+.picker-btn[data-v-e06b858f] {
+	   position: absolute;
+	   top: 1.5625rem;  /* 调整位置，使其从顶部下移 */
+	   left: 50%;
+	   transform: translateX(-50%);
+	   width: 85%;  /* 调整宽度，确保适应不同屏幕 */
+	   background-color: rgba(255, 255, 255, 0.9);  /* 提高透明度，使背景色稍微深一点 */
+	   border-radius: 0.3125rem;  /* 增加圆角 */
+	   /* box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);  /* 添加阴影效果 */ 
+		text-align: center;
+		font-size: 0.9375rem;
+		border: 0.25rem solid #2c3e50;
+		font-weight: bold;
+}
+.dialog-seletion[data-v-e06b858f] {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	background-color: rgba(255, 255, 255, 0.9);
+	padding: 0.9375rem;
+	width: 80%; /* 调整宽度为80% */
+	border-radius: 0.3125rem;
+	box-shadow: 0 0 0.3125rem rgba(0, 0, 0, 0.1);
+}
+.selection-item[data-v-e06b858f] {
+	color: #333;
+	font-size: 16px;
+}
+.address-card[data-v-e06b858f] {
+  position: absolute;
+    bottom: 3.75rem;
+    left: 1.5625rem;
+    right: 1.5625rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 0.9375rem;
+    border-radius: 0.3125rem;
+    box-shadow: 0 0 0.3125rem rgba(0, 0, 0, 0.1);
+}
+.card-content[data-v-e06b858f] {
+  font-size: 16px;
+  color: #333;
+  text-align: left;
+}
+.store-name[data-v-e06b858f] {
+  font-weight: bold;
+  font-size: 18px;
+  display: block;
+}
+.store-location[data-v-e06b858f] {
+  font-size: 14px;
+  color: #777;
+  margin-top: 0.15625rem;
+  line-height: normal;
+  white-space: normal;
+}
+.choose-btn[data-v-e06b858f] {
+  text-align: center;
+  margin-top: 0.46875rem;
+  line-height: 1.875rem;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 0.15625rem;
+  font-size: 16px;
+}

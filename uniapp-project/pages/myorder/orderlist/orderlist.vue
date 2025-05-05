@@ -1,5 +1,8 @@
 <template>
 	<view class="content">
+		<view class="none" v-if="!data">
+			There has no order!
+		</view>
 		<view class="me-head">
 		      <view class="tabs-container">
 		        <view class="tabs">
@@ -27,7 +30,7 @@
 						<view class="dashed-line"></view>
 						<view class="item-content">
 							<view  class="item-left">
-								 <img :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;">
+								 <image src="@/static/images/car.jpg" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;"></image>
 							</view>
 							<view class="item-right"  @click="goDetail(item)">
 								<!-- <view class="item-right-v1">
@@ -69,6 +72,12 @@
 </template>
 <script>
 	export default {
+		onBackPress(e) {
+			uni.navigateTo({
+			  url: '/pages/index'
+			});
+			return true;
+		},
 		data() {
 			return {
 				tabsIndex: 0,
@@ -81,13 +90,14 @@
 				orderList: [],
 				userInfo: uni.getStorageSync('userInfo'),
 				isLoading:true,
-				picUrl:"../../../static/images/car.jpg",
+				data:false,
 			}
 		},
 		async mounted() {
 		   await this.loadBookings();			 
 		},
 		onLoad() {
+	
 		},
 
 		methods: {
@@ -105,7 +115,10 @@
 			    });
 			
 			    if (res.statusCode === 200) {
-			      this.orderList = res.data;  
+			      this.orderList = res.data; 
+				  if(this.orderList.length>0){
+					  this.data= true
+				  }
 			    } else {
 			      uni.showToast({ title: '数据加载失败', icon: 'none' });
 			    }
@@ -231,7 +244,7 @@
   }
 
   .tab.active {
-    color: #aaaaff;
+    color:  #2c3e50;
     font-weight: bold;
     transform: scale(1.05);
   }
@@ -354,8 +367,8 @@
 					align-items: center;
 				}
 				.pay{
-					background-color: #aaaaff;
-					border: 1px solid #aaaaff;
+					background-color:  #2c3e50;
+					border: 1px solid  #2c3e50;
 					color: #ffffff;
 				}
 			}

@@ -4,7 +4,7 @@
 			"path": "pages/index",
 			"style": {
 				"navigationStyle": "custom", //隐藏头部
-				"enablePullDownRefresh": true,
+				"enablePullDownRefresh": false,
 				"onReachBottomDistance": 100
 			}
 		},
@@ -28,11 +28,15 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "E-scooter"
+				"navigationBarTitleText": "E-scooter",
+				"enablePullDownRefresh": false
 			}
 		},
 		{
-		  "path": "pages/map/map"
+		  "path": "pages/map/map",
+		  "style": {
+		  	"enablePullDownRefresh": false
+		  }
 		  
 		},
 		{

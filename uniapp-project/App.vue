@@ -46,6 +46,11 @@
 	}
 </script>
 
-<style>
-	/*每个页面公共css */
+<style lang="scss">
+	:root {
+	  --bg-color: #2c3e50; /* 类似图中背景深蓝色，可根据实际微调 */
+	  --text-color: #ffffff;
+	  --button-bg-color: #014d87; /* 类似按钮颜色 */
+	  --button-text-color: #ffffff;
+	}
 </style>

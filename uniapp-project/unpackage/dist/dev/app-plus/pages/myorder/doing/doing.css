@@ -254,3 +254,7 @@ body[data-v-4d33d24e] {
   background-color: #fff;
   color: #74bfe7;
 }
+.none[data-v-4d33d24e] {
+  color: #B9B9B9;
+  text-align: center;
+}

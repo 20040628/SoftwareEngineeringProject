@@ -40,6 +40,13 @@ export default {
       pageTitles: ['首页', '地图', '发现', '我的']
     };
   },
+  onShow() {
+	  setTimeout(() => {
+		  if (this.$refs['indexPage']) {
+			  this.$refs['indexPage'].loadSelectedSite()
+		  }
+	  }, 300)
+  },
   methods: {
     // 切换bar
     nowBar: function(e) {

@@ -775,7 +775,7 @@
 </script>
 
 <style lang="scss">
-	$uni-primary: #007aff !default;
+	$uni-primary: #0066cc !default;
 
 	.uni-datetime-picker {
 		/* #ifndef APP-NVUE */
@@ -861,7 +861,7 @@
 	}
 
 	.uni-datetime-picker-time {
-		color: grey;
+		color: black;
 	}
 
 	.uni-datetime-picker-column {
@@ -902,7 +902,7 @@
 		position: absolute;
 		top: 53px;
 		/* 减掉 10px 的元素高度，兼容nvue */
-		color: #999;
+		color: #000000;
 		/* #ifdef APP-NVUE */
 		font-size: 16px;
 		/* #endif */

@@ -152,4 +152,29 @@ public class BookingController {
             return ResponseEntity.badRequest().body("归还电动车失败: " + e.getMessage());
         }
     }
+
+    /**
+     * 开始租赁 - 将订单状态从"已支付未开始"(2)转换为"使用中"(3)
+     * @param orderId 订单ID
+     * @return 更新后的订单状态
+     */
+    @PostMapping("/start/{orderId}")
+    public ResponseEntity<?> startRental(@PathVariable Long orderId) {
+        try {
+            Order order = bookingService.startRental(orderId);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "租赁已开始");
+            response.put("orderId", order.getId());
+            response.put("status", order.getStatus());
+            response.put("startTime", order.getStartTime());
+            response.put("endTime", order.getEndTime());
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("开始租赁失败: " + e.getMessage());
+        }
+    }
 }

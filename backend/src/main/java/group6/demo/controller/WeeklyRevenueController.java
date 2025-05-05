@@ -1,5 +1,6 @@
 package group6.demo.controller;
 
+import group6.demo.config.TestingModeConfig;
 import group6.demo.dto.DailyRevenueDTO;
 import group6.demo.dto.WeeklyRevenueDTO;
 import group6.demo.service.WeeklyRevenueService;
@@ -24,12 +25,21 @@ public class WeeklyRevenueController {
     @Autowired
     private JwtUtil jwtUtil;
     
+    @Autowired
+    private TestingModeConfig testingModeConfig;
+    
     /**
      * 获取当前周收入统计
      */
     @GetMapping("/current")
     public ResponseEntity<?> getCurrentWeekRevenue(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
+            // 测试模式下不需要验证
+            if (testingModeConfig.isTestingEnabled()) {
+                WeeklyRevenueDTO revenue = weeklyRevenueService.generateCurrentWeekRevenue();
+                return ResponseEntity.ok(revenue);
+            }
+            
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
@@ -60,6 +70,12 @@ public class WeeklyRevenueController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         try {
+            // 测试模式下不需要验证
+            if (testingModeConfig.isTestingEnabled()) {
+                WeeklyRevenueDTO revenue = weeklyRevenueService.getWeeklyRevenueByDate(date);
+                return ResponseEntity.ok(revenue);
+            }
+            
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
@@ -149,6 +165,12 @@ public class WeeklyRevenueController {
     @PostMapping("/update")
     public ResponseEntity<?> updateWeeklyRevenue(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         try {
+            // 测试模式下不需要验证
+            if (testingModeConfig.isTestingEnabled()) {
+                weeklyRevenueService.updateWeeklyRevenue();
+                return ResponseEntity.ok("revenue statistics updated successfully");
+            }
+            
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body("unauthorized: please provide a valid token");

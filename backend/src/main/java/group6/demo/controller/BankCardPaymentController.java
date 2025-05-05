@@ -82,7 +82,8 @@ public class BankCardPaymentController {
             user.setBankBalance(newBalance);
             userRepository.save(user);
             
-            // 更新订单状态（保持为1-活跃状态，只有还车后才变为2-已完成）
+            // 更新订单状态为已支付未开始(2)
+            order.setStatus(2);
             orderRepository.save(order);
             
             // 构建响应

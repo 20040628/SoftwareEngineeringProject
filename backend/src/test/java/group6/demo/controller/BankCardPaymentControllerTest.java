@@ -139,6 +139,31 @@ class BankCardPaymentControllerTest {
     }
 
     @Test
+    void processBankCardPayment_Success() {
+        // Arrange
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody() instanceof BankCardPaymentResponse);
+        BankCardPaymentResponse responseBody = (BankCardPaymentResponse) response.getBody();
+        assertTrue(responseBody.isSuccess());
+        assertEquals(orderId, responseBody.getOrderId());
+        assertEquals("3456", responseBody.getBankCardLast4());
+        assertEquals("BANK_CARD", testOrder.getPaymentMethod());
+        assertEquals(2, testOrder.getStatus()); // 检查状态是否更新为已支付未开始(2)
+        assertTrue(testOrder.getDepositPaid());
+        verify(orderRepository).findById(orderId);
+        verify(orderRepository).save(testOrder);
+        verify(userRepository).save(testUser);
+    }
+
+    @Test
     void checkBankCard_SuccessWithCard() {
         // Arrange
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));

@@ -1915,6 +1915,61 @@ alipay_sdk=alipay-sdk-java-dynamicVersionNo&app_id=2021000146632430&biz_content=
   }
   ```
 
+### get revenue daily
+
+- **URL**: `/api/weekly-revenue/daily`
+
+- **Method**: `GET`
+
+- **Headers**:
+
+  ```
+  Authorization: Bearer {token}
+
+  ```
+
+- **Query Parameters**:
+
+  - `weekStartDate`: Start date in format "YYYY-MM-DD"
+
+- **Success Response** (200 OK):
+
+  ```
+  {
+      // 日期
+      date;
+      
+      // 星期几 (1-7, 1表示周一)
+      dayOfWeek;
+      
+      // 星期几名称 (如"周一")
+      dayOfWeekName;
+      
+      // 小时租赁收入
+      hourlyRevenue;
+      
+      // 4小时租赁收入
+      fourHoursRevenue;
+      
+      // 日租赁收入
+      dailyRevenue;
+      
+      // 周租赁收入
+      weeklyRevenue;
+      
+      // 总收入
+      totalRevenue;
+      
+      // 订单数量
+      ordersCount;
+      
+      // 折扣总额（原价-折扣价）
+      totalDiscount;
+  }
+  ```
+
+  ​
+
 ## Validation Rules
 
 b_user

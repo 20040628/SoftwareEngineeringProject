@@ -72,14 +72,24 @@ class UserControllerTest {
     @Test
     void getAllUsers_Success() {
         // Arrange
-        when(userRepository.findAll()).thenReturn(Arrays.asList(testUser));
+        UserProfileDTO dto1 = new UserProfileDTO();
+        dto1.setId(1L);
+        dto1.setUsername("user1");
+
+        UserProfileDTO dto2 = new UserProfileDTO();
+        dto2.setId(2L);
+        dto2.setUsername("user2");
+
+        List<UserProfileDTO> expectedList = Arrays.asList(dto1, dto2);
+        when(userService.getAllUserProfiles()).thenReturn(expectedList);
 
         // Act
-        List<UserProfileDTO> users = userController.getAllUsers();
+        List<UserProfileDTO> actualList = userController.getAllUsers();
 
         // Assert
-        assertEquals(1, users.size());
-        assertEquals(testUser, users.get(0));
+        assertEquals(2, actualList.size());
+        assertEquals("user1", actualList.get(0).getUsername());
+        assertEquals("user2", actualList.get(1).getUsername());
     }
 
     @Test

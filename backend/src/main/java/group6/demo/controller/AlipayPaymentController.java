@@ -61,7 +61,7 @@ public class AlipayPaymentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("支付失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Payment failed: " + e.getMessage());
         }
     }
 } 

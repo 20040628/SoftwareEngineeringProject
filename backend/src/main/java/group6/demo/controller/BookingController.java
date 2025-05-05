@@ -149,7 +149,7 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("归还电动车失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to return the scooter: " + e.getMessage());
         }
     }
 
@@ -174,7 +174,7 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("开始租赁失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to start rental: " + e.getMessage());
         }
     }
 }

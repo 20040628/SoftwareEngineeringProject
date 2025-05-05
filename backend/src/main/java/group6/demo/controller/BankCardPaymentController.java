@@ -102,7 +102,7 @@ public class BankCardPaymentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("支付失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Payment failed: " + e.getMessage());
         }
     }
     
@@ -138,7 +138,7 @@ public class BankCardPaymentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("查询银行卡失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to query bank card: " + e.getMessage());
         }
     }
 } 

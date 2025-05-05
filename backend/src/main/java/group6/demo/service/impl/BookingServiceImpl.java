@@ -330,7 +330,7 @@ public class BookingServiceImpl implements BookingService {
 
         // 检查订单状态，如果已经完成或已取消则不能再取消
         if (order.getStatus() == 4 || order.getStatus() == 5) {
-            throw new IllegalArgumentException("订单已完成或已取消，无法再次取消");
+            throw new IllegalArgumentException("Order has been completed or cancelled, cannot cancel again");
         }
 
         // 更新订单状态为已取消(5)
@@ -494,11 +494,11 @@ public class BookingServiceImpl implements BookingService {
     public Order returnScooter(ReturnScooterDTO returnScooterDTO) {
         // 查找订单
         Order order = orderRepository.findById(returnScooterDTO.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         // 验证订单状态必须为使用中(3)才能还车
         if (order.getStatus() != 3) {
-            throw new IllegalArgumentException("只有使用中订单才能进行还车操作");
+            throw new IllegalArgumentException("Only orders in use can be returned");
         }
 
         // 获取用户和电动车信息
@@ -570,11 +570,11 @@ public class BookingServiceImpl implements BookingService {
     public Order startRental(Long orderId) {
         // 查找订单
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         
         // 验证订单状态必须为已支付未开始(2)
         if (order.getStatus() != 2) {
-            throw new IllegalArgumentException("只有已支付未开始的订单才能开始使用");
+            throw new IllegalArgumentException("Only paid orders that have not started can begin rental");
         }
         
         // 更新订单状态为使用中(3)

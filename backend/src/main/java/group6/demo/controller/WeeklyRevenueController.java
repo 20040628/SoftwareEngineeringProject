@@ -203,7 +203,7 @@ public class WeeklyRevenueController {
         try {
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("未授权: 请提供有效的令牌");
+                return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
             }
 
             // 验证用户是否是管理员
@@ -211,15 +211,15 @@ public class WeeklyRevenueController {
             Integer role = jwtUtil.extractRole(token);
 
             if (role != 0) {
-                return ResponseEntity.status(403).body("权限不足: 需要管理员权限");
+                return ResponseEntity.status(403).body("insufficient permissions: admin rights required");
             }
 
             List<DailyRevenueDTO> dailyRevenues = weeklyRevenueService.getDailyRevenuesInWeek(weekStartDate);
             return ResponseEntity.ok(dailyRevenues);
         } catch (io.jsonwebtoken.JwtException e) {
-            return ResponseEntity.status(401).body("无效的令牌: " + e.getMessage());
+            return ResponseEntity.status(401).body("invalid token: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("获取每日收入统计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("failed to get daily revenue statistics: " + e.getMessage());
         }
     }
 
@@ -234,7 +234,7 @@ public class WeeklyRevenueController {
         try {
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("未授权: 请提供有效的令牌");
+                return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
             }
 
             // 验证用户是否是管理员
@@ -242,15 +242,15 @@ public class WeeklyRevenueController {
             Integer role = jwtUtil.extractRole(token);
 
             if (role != 0) {
-                return ResponseEntity.status(403).body("权限不足: 需要管理员权限");
+                return ResponseEntity.status(403).body("insufficient permissions: admin rights required");
             }
 
             List<DailyRevenueDTO> dailyRevenues = weeklyRevenueService.getDailyRevenuesByDateRange(startDate, endDate);
             return ResponseEntity.ok(dailyRevenues);
         } catch (io.jsonwebtoken.JwtException e) {
-            return ResponseEntity.status(401).body("无效的令牌: " + e.getMessage());
+            return ResponseEntity.status(401).body("invalid token: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("获取每日收入统计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("failed to get daily revenue statistics: " + e.getMessage());
         }
     }
 
@@ -264,7 +264,7 @@ public class WeeklyRevenueController {
         try {
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("未授权: 请提供有效的令牌");
+                return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
             }
 
             // 验证用户是否是管理员
@@ -272,15 +272,15 @@ public class WeeklyRevenueController {
             Integer role = jwtUtil.extractRole(token);
 
             if (role != 0) {
-                return ResponseEntity.status(403).body("权限不足: 需要管理员权限");
+                return ResponseEntity.status(403).body("insufficient permissions: admin rights required");
             }
 
             List<DailyRevenueDTO> dailyRevenues = weeklyRevenueService.getRecentDailyRevenues(days);
             return ResponseEntity.ok(dailyRevenues);
         } catch (io.jsonwebtoken.JwtException e) {
-            return ResponseEntity.status(401).body("无效的令牌: " + e.getMessage());
+            return ResponseEntity.status(401).body("invalid token: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("获取最近每日收入统计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("failed to get recent daily revenue statistics: " + e.getMessage());
         }
     }
 
@@ -293,7 +293,7 @@ public class WeeklyRevenueController {
         try {
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("未授权: 请提供有效的令牌");
+                return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
             }
 
             // 验证用户是否是管理员
@@ -301,7 +301,7 @@ public class WeeklyRevenueController {
             Integer role = jwtUtil.extractRole(token);
 
             if (role != 0) {
-                return ResponseEntity.status(403).body("权限不足: 需要管理员权限");
+                return ResponseEntity.status(403).body("insufficient permissions: admin rights required");
             }
 
             // 获取昨天的日期
@@ -311,11 +311,11 @@ public class WeeklyRevenueController {
 
             // 手动更新昨天的收入统计
             weeklyRevenueService.generateAndSaveDailyRevenue(yesterday);
-            return ResponseEntity.ok("每日收入统计更新成功");
+            return ResponseEntity.ok("daily revenue statistics updated successfully");
         } catch (io.jsonwebtoken.JwtException e) {
-            return ResponseEntity.status(401).body("无效的令牌: " + e.getMessage());
+            return ResponseEntity.status(401).body("invalid token: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("更新每日收入统计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("failed to update daily revenue statistics: " + e.getMessage());
         }
     }
 
@@ -329,7 +329,7 @@ public class WeeklyRevenueController {
         try {
             // 检查Authorization头是否存在
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(401).body("未授权: 请提供有效的令牌");
+                return ResponseEntity.status(401).body("unauthorized: please provide a valid token");
             }
 
             // 验证用户是否是管理员
@@ -337,16 +337,16 @@ public class WeeklyRevenueController {
             Integer role = jwtUtil.extractRole(token);
 
             if (role != 0) {
-                return ResponseEntity.status(403).body("权限不足: 需要管理员权限");
+                return ResponseEntity.status(403).body("insufficient permissions: admin rights required");
             }
 
             // 生成并保存指定日期的收入统计
             DailyRevenueDTO dailyRevenue = weeklyRevenueService.generateAndSaveDailyRevenue(date);
             return ResponseEntity.ok(dailyRevenue);
         } catch (io.jsonwebtoken.JwtException e) {
-            return ResponseEntity.status(401).body("无效的令牌: " + e.getMessage());
+            return ResponseEntity.status(401).body("invalid token: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("生成每日收入统计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("failed to generate daily revenue statistics: " + e.getMessage());
         }
     }
 }

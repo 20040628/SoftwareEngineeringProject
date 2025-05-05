@@ -71,10 +71,12 @@ public class UserController {
             @RequestParam String birthDate) {
         
         try {
-            User user = userRepository.findById(userId).orElse(null);
-            if (user == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("User not found");
             }
+            
+            User user = userOptional.get();
             
             // 解析并设置生日
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -91,7 +93,7 @@ public class UserController {
             user = userRepository.findById(userId).orElse(null);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "用户生日信息更新成功");
+            response.put("message", "User birthday information updated successfully");
             response.put("userId", user.getId());
             response.put("birthDate", format.format(user.getBirthday()));
             response.put("isStudent", user.getIsStudent());
@@ -99,17 +101,19 @@ public class UserController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("更新用户生日失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to update user birthday: " + e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         try {
-            User user = userRepository.findById(id).orElse(null);
-            if (user == null) {
-                return ResponseEntity.badRequest().body("用户不存在");
+            Optional<User> userOptional = userRepository.findById(id);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("User not found");
             }
+            
+            User user = userOptional.get();
             
             boolean updatedBirthday = false;
             
@@ -149,7 +153,7 @@ public class UserController {
             
             return ResponseEntity.ok(user);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("更新用户信息失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to update user information: " + e.getMessage());
         }
     }
 
@@ -190,8 +194,8 @@ public class UserController {
         
         try {
             // 查询用户
-            User user = userRepository.findById(userId).orElse(null);
-            if (user == null) {
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (userOptional.isEmpty()) {
                 return ResponseEntity.badRequest().body("The user does not exist");
             }
             
@@ -202,6 +206,7 @@ public class UserController {
             }
             
             // 更新用户头像
+            User user = userOptional.get();
             user = userService.updateAvatar(userId, base64Image);
             
             Map<String, Object> response = new HashMap<>();
@@ -283,18 +288,23 @@ public class UserController {
     @PostMapping("/unbindBankCard/{userId}")
     public ResponseEntity<?> unbindBankCard(@PathVariable Long userId) {
         try {
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("Failed to unbind bank card, user may not exist");
+            }
+            
             boolean unbound = userService.unbindBankCard(userId);
             if (!unbound) {
-                return ResponseEntity.badRequest().body("解绑银行卡失败，用户可能不存在");
+                return ResponseEntity.badRequest().body("Failed to unbind bank card");
             }
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "银行卡解绑成功");
+            response.put("message", "Bank card unbinding was successful");
             response.put("userId", userId);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("解绑银行卡失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to unbind bank card: " + e.getMessage());
         }
     }
 

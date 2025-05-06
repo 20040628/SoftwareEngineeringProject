@@ -44,7 +44,7 @@ CREATE TABLE `b_scooter` (
   `price_day` decimal(5, 2) NOT NULL,
   `price_week` decimal(5, 2) NOT NULL, 
   `status` tinyint(1) NOT NULL DEFAULT 1,
-  `battery` decimal(5, 2) NOT NULL,
+  `battery` decimal(5, 2) NOT NULL  CHECK (battery BETWEEN 0.00 AND 100.00),
   `speed` decimal(5, 2) NOT NULL,
   `store_id` bigint NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,

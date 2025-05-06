@@ -987,6 +987,45 @@ Frontend service will run on http://localhost:5173
 
 **Success Response** (200 OK)
 
+#### edit scooter information
+
+**URL**: `/api/scooters/update/{id}`
+
+**method**:`Put`
+
+**Request Body** : 
+
+```
+{
+    "priceHour": 11.00,
+    "priceFourHour": 10.00,
+    "priceDay": 20.00,
+    "priceWeek": 100.00,
+    "status": 1,
+    "battery": 50.00,
+    "speed": 20.00,
+    "storeId":  1
+}
+```
+
+**Success Response** (200 OK)
+
+```
+{
+    "No changes detected"
+}
+or
+{
+    "Scooter updated successfully"
+}
+or
+{
+    每一个表单相应的报错
+}
+```
+
+
+
 ### Booking API
 
 #### Create Booking
@@ -2014,13 +2053,31 @@ The application provides automatic discount calculation based on user profiles a
 #### Get Single Scooter with Discounts
 
 - **URL**: `/api/scooters/{id}?userId={userId}`
-- **Method**: `GET`
+- **Method**: `Post`
 - **Path Parameters**:
   - `id`: ID of the scooter
 - **Query Parameters**:
   - `userId`: ID of the current user (optional)
 - **Success Response** (200 OK):
   ```json
+  1. 没有userId:
+  {
+      "id": 2,
+      "priceHour": 5.00,
+      "priceFourHour": 10.00,
+      "priceDay": 20.00,
+      "priceWeek": 100.00,
+      "status": 1,
+      "battery": 50.00,
+      "speed": 50.00,
+      "store": {
+          "id": 1,
+          "name": "store 1",
+          "longitude": 103.984500,
+          "latitude": 30.765000
+      }
+  }
+  2. 有userId:
   {
     "id": "number",
     "status": "number",

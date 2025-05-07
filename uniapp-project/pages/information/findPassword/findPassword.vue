@@ -1,7 +1,7 @@
 <template>
 	<view class="page">
 		<view class="header">
-			<text>Welcome to E-Scooter Rental System</text>
+			<text>Welcome to ScootGo</text>
 		</view>
 		<view class="container">
 			<view class="title">

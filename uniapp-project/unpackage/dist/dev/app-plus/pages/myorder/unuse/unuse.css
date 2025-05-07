@@ -155,8 +155,8 @@ body[data-v-f4e2d880] {
 }
 .me-center .list-tab .item-btom .item-btom-btn[data-v-f4e2d880] {
   padding: 0.1875rem 1.25rem;
-  border: 1px solid #d2d3d4;
-  border-radius: 1.25rem;
+  border: 1px solid #2c3e50;
+  border-radius: 0.9375rem;
   margin-right: 0.625rem;
   align-items: center;
 }
@@ -191,7 +191,7 @@ body[data-v-f4e2d880] {
   height: 3.125rem;
 }
 .duration-item.active[data-v-f4e2d880] {
-  background: #e3e2ff;
+  border-color: #2c3e50;
 }
 .duration-item .label[data-v-f4e2d880] {
   display: block;
@@ -216,19 +216,21 @@ body[data-v-f4e2d880] {
   background-color: white;
   /* padding: 20px; */
   width: 18.75rem;
-  height: 25rem;
+  height: 21.875rem;
   border-radius: 0.25rem;
   position: relative;
 }
 .modal-content uni-view[data-v-f4e2d880]:first-child {
   padding: 0.625rem;
-  font-size: 1.875rem;
+  font-size: 1.25rem;
   font-weight: bold;
+  text-align: center;
 }
 .modal-content uni-view[data-v-f4e2d880]:nth-child(2) {
   padding: 0.625rem;
   font-size: 0.9375rem;
-  color: #4891d9;
+  color: #000000;
+  text-align: center;
 }
 
 /* 按钮 */
@@ -243,14 +245,18 @@ body[data-v-f4e2d880] {
   border: none;
 }
 .modal-buttons uni-button[data-v-f4e2d880]:first-child {
-  background-color: #74bfe7;
+  background-color: #014d87;
   color: #fff;
   border-radius: 0;
 }
 .modal-buttons uni-button[data-v-f4e2d880]:last-child {
   width: 100%;
-  border: 0.0625rem solid #74bfe7;
+  border: 0.09375rem solid #014d87;
   border-radius: 0px;
   background-color: #fff;
-  color: #74bfe7;
+  color: #014d87;
+}
+.none[data-v-f4e2d880] {
+  color: #B9B9B9;
+  text-align: center;
 }

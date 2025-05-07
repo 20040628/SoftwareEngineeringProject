@@ -38,16 +38,20 @@
 		},
 		methods:{
 			inputNumFun(op){
-				let _this = this
-				if(_this.password.length <=6){
-					_this.password += op.num
-					if(_this.password.length == 6){
-						_this.$emit('getPassword',{password:_this.password})
+				if(this.password.length <=6){
+					this.password += op.num
+					if(this.password.length == 6){
 						uni.showModal({
-							title:'密码',
-							content:_this.password,
-							success() {
-								_this.password = ""
+							title:'Password',
+							content: this.password,
+							confirmText:'OK',
+							cancelText:'Delete',
+							success: ()=> {
+								this.$emit('getPassword',{password:this.password})
+								this.password = ""
+							},
+							fail: () => {
+								this.password = ""
 							}
 						})
 					}

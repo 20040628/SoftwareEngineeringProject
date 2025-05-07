@@ -1,5 +1,8 @@
 <template>
 	<view class="content">
+		<view class="none" v-if="!data">
+			<text>There has no order!</text>
+		</view>
 		<view class="me-center">
 			<view class="list-tab">
 				<ul class="item-ul" v-for="(item, index) in orderList" :key="index">
@@ -13,7 +16,7 @@
 						<view class="dashed-line"></view>
 						<view class="item-content">
 							<view  class="item-left">
-								 <img :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;">
+								 <image :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;"></image>
 							</view>
 							<view class="item-right"  @click="goDetail(item)">
 								<!-- <view class="item-right-v1">
@@ -93,6 +96,7 @@
 			        { label: '1 Week', value: "WEEK"} ,
 				],
 				showModal: false,
+				data:false,
 			}
 		},
 		async mounted() {
@@ -120,6 +124,9 @@
 			           ...order,
 			           showModal: false, // 为每个订单项添加showModal字段
 			    }));
+				if(this.orderList.length>0){
+					this.data= true
+				}
 			    } else {
 			      uni.showToast({ title: '数据加载失败', icon: 'none' });
 			    }
@@ -512,5 +519,8 @@
 			background-color: #fff;
 			color: #74bfe7;
 	}
-	
+	.none{
+		color: #B9B9B9;
+		text-align: center;
+	}
 </style>

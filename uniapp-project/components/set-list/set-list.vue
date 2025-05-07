@@ -29,6 +29,7 @@
 								console.log('用户点击确定');
 								uni.clearStorage()
 								uni.showToast({
+									icon: 'none',
 									title:"清除成功"
 								})
 							} else if (res.cancel) {

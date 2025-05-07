@@ -87,7 +87,7 @@
 	          // 显示成功提示
 	          uni.showToast({
 	            title: 'Submition successful!',
-	            icon: 'success',
+	            icon: 'none',
 	            duration: 2000
 	          });
 

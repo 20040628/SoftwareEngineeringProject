@@ -92,13 +92,13 @@ export default {
   margin-right: 10px;
 }
 .default-text {
-  color: #1E90FF;
+  color: #2c3e50;
   font-size: 14px;
 }
 .add-card-btn {
   width: 100%;
-  padding: 15px;
-  background-color: #1E90FF;
+  padding: 10px;
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 5px;

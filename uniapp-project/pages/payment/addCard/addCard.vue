@@ -2,7 +2,7 @@
   <view class="container">
     <view class="form-item">
       <text class="label">Card Number</text>
-      <input class="input" v-model="card.cardNumber" type="number" placeholder="Please enter the bank card number(13-19)" />
+      <input class="input" v-model="card.cardNumber" type="number" placeholder="Please enter the number(13-19)" />
     </view>
 
     <button class="submit-btn" @click="submitCard">Submit</button>
@@ -65,7 +65,7 @@ export default {
         if (res.data.success) {
           uni.showToast({
             title: 'Bank card updated successfully',
-            icon: 'success',
+            icon: 'none',
           });
         } else {
           uni.showToast({
@@ -114,8 +114,8 @@ export default {
 }
 .submit-btn {
   width: 100%;
-  padding: 15px;
-  background-color: #1E90FF;
+  padding: 10px;
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 5px;

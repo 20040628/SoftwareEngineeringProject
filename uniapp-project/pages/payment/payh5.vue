@@ -5,7 +5,7 @@
 			<view class="status">
 				<image class="s-img" src="/static/images/car.jpg" mode="aspectFill" />
 				<view class="main">
-					<text class="status-name">successful booking</text>
+					<text class="status-name">Successful Booking</text>
 					<text class="tips">Please pay as soon as possible</text>
 				</view>
 			</view>
@@ -86,110 +86,17 @@ export default {
     }
   },
   async onLoad(options){
-	console.log('Query params:', options);
     this.orderId = options.id;
 	await this.loadOrderDetail();
-	// 设置沙箱环境
-	// if (plus && plus.android) {
-	//     var EnvUtils = plus.android.importClass('com.alipay.sdk.app.EnvUtils');
-	//     EnvUtils.setEnv(EnvUtils.EnvEnum.SANDBOX); // 设置为沙箱环境
-	// }
   },
 
   methods:{
 	  async pay() {
-		  // const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
-		  // console.log(targetUrl);  // 打印 URL 以便调试
 		  uni.navigateTo({
 		  	url:`/pages/payment/choosePay/choosePay?id=${this.orderId}`
 		  })
-	    // try {
-	    //   const res = await uni.request({
-	    //     url: `http://172.20.10.6:8080/alipay/pay/${this.orderId}`, 
-	    //     method: 'GET',
-	    //     success: (response) => {
-			  //  this.payFormHtml = res.data;
-	    //     }, 
-	    //     fail: (error) => {
-	    //       console.error("Error processing payment:", error);
-	    //     }
-	    //   });
-	    // } catch (error) {
-	    //   console.error("Error processing payment:", error);
-	    // }
 	  },
 
-	  //  async pay() {
-	  //      try {
-	  //        const token = String(uni.getStorageSync('token'));
-	  //        const res = await new Promise((resolve, reject) => {
-	  //          uni.request({
-	  //            // url: `http://192.168.101.8:8080/alipay/appPay/${this.orderId}`, 
-			// 	 url:`http://192.168.101.8:8080/alipay/pay/${this.orderId}`,
-	  //            method: 'GET',  
-	  //            header: {
-	  //              'Authorization': `Bearer ${token}` 
-	  //            },
-	  //            success: (res) => resolve(res),
-	  //            fail: (error) => reject(error)
-	  //          });
-	  //        });
-	   
-	  //        if (res.statusCode === 200) {
-	  //          // 获取支付订单信息
-	  //          this.orderInfo = res.data; 
-	  //          console.log('Order Info:', this.orderInfo);  // 打印订单信息，确保正确
-	   
-	  //          // 检查是否有有效的订单信息
-	  //          if (!this.orderInfo) {
-	  //            uni.showToast({
-	  //              title: '订单信息无效',
-	  //              icon: 'none'
-	  //            });
-	  //            return;
-	  //          }
-			// console.log(this.orderInfo)
-	  //       // 调用支付功能
-	  //       uni.getProvider({
-	  //           service: 'payment',
-	  //           success: (res) => {
-	  //           console.log(res.provider);
-	  //           if (~res.provider.indexOf('alipay')) {
-	  //               uni.requestPayment({
-	  //               provider: 'alipay',  // 固定值为"alipay"
-	  //               orderInfo: this.orderInfo, // 订单信息字符串
-	  //               success: (res) => {
-	  //                   const rawdata = JSON.parse(res.rawdata);
-	  //                   console.log("支付成功");
-	  //                   this.paymentStatus = '支付成功！';
-	  //               },
-	  //               fail: (err) => {
-	  //                   console.log('支付失败:', JSON.stringify(err));
-	  //                   this.paymentStatus = '支付失败，请重试！';
-	  //               }
-	  //               });
-	  //           }
-	  //           },
-	  //           fail: (err) => {
-			// 		console.log('支付服务获取失败：' + JSON.stringify(err));
-	  //               this.paymentStatus = '支付服务不可用';
-	  //               }
-	  //           });
-	        
-	  //           } else {
-	  //               // 如果状态码不是 200，则显示加载失败的提示
-	  //              uni.showToast({ title: '支付请求失败', icon: 'none' });
-	  //           }
-	              
-	  //           } catch (error) {
-	  //             console.error('支付请求失败:', error);
-	  //             uni.showToast({
-	  //               title: '支付请求失败，请重试',
-	  //               icon: 'none',
-	  //               duration: 2000
-	  //             });
-	  //           }
-	  //   },
 		async loadOrderDetail() {
 			  const token = String(uni.getStorageSync('token'));
 		      try {
@@ -277,7 +184,7 @@ export default {
 			width: 100%;
 			height: 548rpx;
 			margin-top: -44px;
-			background: linear-gradient(180deg, #D3A7FF 80%, #f7f7f7 100%);
+			background: linear-gradient(180deg, #2c3e50 80%, #f7f7f7 100%);
 		}
 
 		.body {

@@ -25,37 +25,37 @@
 					 <image src="/static/icons/location.png" class="icon" alt="Location icon"/>
 					    <view class="address">
 					        <text class="title">Pick-up Position</text>
-					        <text class="detail">{{ selectedSite.name || 'Please choose' }}</text>
+					        <text class="detail" v-if="selectedSite">{{ selectedSite.name || 'Please choose' }}</text>
 					    </view>
 					<image src="/static/icons/arrow_right.png" class="arrow" alt="arrow icon"/>
 				</view>
 				<!-- 预定时长选择器 -->
 				<view class="duration-picker">
-					<text>Select scheduled duration:</text>
+					<text>Select Scheduled Duration:</text>
 					<view class="duration-options">
 						<view
 							class="duration-option" 
 							:class="{ selected: selectedDuration === 0 }" 
 							@click="onDurationSelect(0)">
-							1hour
+							1 Hour
 						</view>
 						<view 
 							class="duration-option" 
 							:class="{ selected: selectedDuration === 1 }" 
 							@click="onDurationSelect(1)">
-							4hours
+							4 Hours
 						</view>
 						<view 
 							class="duration-option" 
 							:class="{ selected: selectedDuration === 2 }" 
 							@click="onDurationSelect(2)">
-							1day
+							1 Day
 						</view>
 						<view 
 							class="duration-option" 
 							:class="{ selected: selectedDuration === 3 }" 
 							@click="onDurationSelect(3)">
-							1week
+							1 Week
 						</view>
 					</view>
 				</view>
@@ -66,9 +66,9 @@
 			</view>
 			<view class="instruction" @click="instruction()">
 				<view class="text">
-					Instruction to use
+					Instruction To Use
 				</view>
-				<image src="/static/icons/arrow_right.png" class="arrow" alt="arrow icon"/>
+				<uni-icons type="right" size="20" color="white" class="arrow"></uni-icons>
 			</view>
 			<view class="discount-container">
 			  <view class="discount-title">Discount Policies</view>
@@ -101,7 +101,7 @@
 			    </view>
 			
 				<view class="note">
-				    * Discount Stacking:Multiple discounts can be combined
+				    *Discount Stacking: Multiple discounts can be combined
 				</view>
 			  </view>
 			</view>
@@ -146,7 +146,6 @@ export default {
   		console.log('日期时间单选:', this.datetimeString);
   	}
    },
-  
   async mounted() {
 	 // const selectedSite = uni.getStorageSync('selectedStore');
 	 //  if (selectedSite) {
@@ -155,23 +154,20 @@ export default {
 	 this.loadSelectedSite();
 	 
   },
-  onLoad(){
-	   
+  onLoad() {
+  	uni.setLocale('en');
   },
+  
   methods: {
 	  // 页面加载时读取选中的位置
-	      loadSelectedSite() {
+	loadSelectedSite() {
 	        const selectedSite = uni.getStorageSync('selectedStore');
 	        if (selectedSite) {
 	          this.selectedSite = selectedSite;
 	        } else {
 	          this.selectedSite = null;
 	        }
-	      },
-		   onShow() {
-		      // 每次页面显示时都重新加载选中的位置
-		      this.loadSelectedSite();
-		    },
+	},
 	onDurationSelect(index) {
 	      this.selectedDuration = index;
 	},
@@ -251,11 +247,11 @@ export default {
 }
 </script>
 
-<style  scoped>
+<style  scoped lang="scss">
+	
 .container {
   position: relative;
-  height: 100vh;
-  margin-bottom: 40rpx;
+  box-sizing: border-box;
 }
 .swiper {
   width: 100%;
@@ -271,12 +267,11 @@ export default {
 
 .container-time {
   padding: 20px;
-  /* border: 1px solid black;
   margin: 5rpx;
-  border-radius: 10rpx; */
-  border: 1px solid rgba(127, 102, 157, .5);
+  border-radius: 10rpx; 
+  border: 1.5px solid var(--bg-color);
   border-radius: 16rpx;
-  background: rgba(252, 250, 255, 1);
+  // background: rgba(252, 250, 255, 1);
   margin: 20rpx;
   box-shadow: 0 0 5px .5px rgba(127, 102, 157, .2);
 }
@@ -356,12 +351,12 @@ export default {
 }
 
 .duration-option.selected {
-  border-color:#aaaaff;
+  border-color:var(--button-bg-color);
 }
 
 .query-btn button {
   padding: 5px 10px;
-  background-color: #aa55ff;
+  background-color: #34495e;
   color: white;
   border: none;
   border-radius: 30rpx;
@@ -370,10 +365,10 @@ export default {
 
 .scooter-list {
   margin: 10rpx;
-  background: #fff;
-  border-radius: 40rpx 40rpx 0 0;
-  padding: 30rpx;
-  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.1);
+  // background: #fff;
+  // border-radius: 40rpx 40rpx 0 0;
+  // padding: 30rpx;
+  // box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.1);
 }
 
 .address-section {
@@ -410,7 +405,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     margin: 30rpx;
-    background: linear-gradient(135deg, #dedeff, #d7cfff); /* 渐变背景 */
+    background: #34495e; /* 渐变背景 */
     border-radius: 30rpx; /* 更圆润的圆角 */
     padding: 20rpx 30rpx; /* 调整内边距 */
     box-shadow: 0 6rpx 15rpx rgba(0, 0, 0, 0.1); /* 柔和的阴影效果 */
@@ -425,14 +420,14 @@ export default {
   .text {
     font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: white;
     margin-right: 10rpx; /* 与箭头之间的间距 */
   }
   
   .discount-container {
 	margin: 30rpx;
     padding: 20rpx;
-    background-color: #f9f9f9;
+    // border: 1.5px solid var(--bg-color);
     border-radius: 10rpx;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   }
@@ -441,6 +436,7 @@ export default {
     font-weight: bold;
     color: #333;
     margin-bottom: 20rpx;
+	align-items: center;
   }
   
   .table {
@@ -450,11 +446,13 @@ export default {
   
   .table-header {
     display: flex;
-    background-color: #e5e8ff;
+    background-color: #34495e;
     padding: 12rpx 20rpx;
     font-size: 16px;
     font-weight: bold;
     border-radius: 8rpx;
+	border: 2rpx solid var(--bg-color);
+	color: white;
   }
   
   .header-item {
@@ -465,9 +463,9 @@ export default {
   .table-row {
     display: flex;
     padding: 12rpx 20rpx;
-    border-bottom: 1rpx solid #ddd;
-    font-size: 14px;
-    color: #555;
+    border-bottom: 2rpx solid var(--bg-color);
+    font-size: 12px;
+    color: black;
   }
   
   .row-item {
@@ -483,11 +481,11 @@ export default {
     font-size: 14px;
     color: #000000;
     margin-top: 15rpx;
-    padding: 10rpx;
-    background-color: #dde5ff;
+    padding: 5rpx;
+    font-weight: bold;
     border-radius: 5rpx;
-	margin: 20rpx;
-	margin-bottom: 40rpx;
+	margin: 10rpx;
+	margin-bottom: 20rpx;
   }
 
 

@@ -77,7 +77,7 @@ export default {
         if (response.statusCode === 200) {
           uni.showToast({
             title: response.data.message,
-            icon:'success'
+            icon: 'none',
           });
 		  this.oldPassword = '';
 		this.newPassword = '';
@@ -99,18 +99,41 @@ export default {
 };
 </script>
 
-<style>
-	@import '../../index.scss';
+<style scoped>
+
+	.container{
+		height: 100%;
+		width: 750rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		box-sizing: border-box;
+		background-color: #fff;
+		border-radius: 60rpx 60rpx 0 0;
+	}
+	.form-group {
+		width: 660rpx;
+		margin-bottom: 60rpx;
+		position: relative;
+	}
+	.input-field {
+		box-sizing: border-box;
+		width: 660rpx;
+		height: 90rpx;
+		border-bottom: 1rpx solid #333;
+		font-size: 14px;
+		background-color: #fff;
+	}
+	
+	
 .container {
   padding: 20px;
 }
 
-
-
 button {
   width: 100%;
   padding: 10px;
-  background-color: #aaaaff;
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 5px;

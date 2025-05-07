@@ -1,40 +1,39 @@
 <template>
 	<view class="page">
 		<view style="background-size: 100% 100%;"
-			:style="{'padding-top':'10px','background-image':'linear-gradient(90deg, #F1EEF5, #EBF1F6)','padding-bottom':'10px'}">
+			:style="{'padding-top':'10px'}">
 			<view>
 				<view class="my-info-box" >
-					<view>
-						<view @click="informaition()" class="my-nickName overOne">{{userInfo.username||'点击授权登录'}}</view>
-	
-						<view class="my-amount-box">
+					<view class="left">
+						<view class="my-logo-box" @click="informaition()">
 							<view>
-								<view>{{balance}}</view>
-								<view>wallet</view>
-							</view>
-							<view>
-								<view>{{totalOrders}}</view>
-								<view>scooters</view>
+								<image	class="user-logo" 
+										:src="userLogo"
+										@click="chooseImg"
+								></image>
+								<image class="user-vip" :src="vipLogo" v-if='status>0'></image>
 							</view>
 						</view>
+						<view @click="login()" class="my-nickName">{{userInfo.username||'Click "Authorize Login"'}}</view>
 					</view>
-					<view class="my-logo-box" @click="informaition()">
-						<view>
-							<image 
-									class="user-logo" 
-									:src="userLogo"
-									@click="chooseImg"
-							></image>
-							<image class="user-vip" :src="vipLogo" v-if='status>0'></image>
-						</view>
+					<view class="right">
+							<view class="my-vip-box" >
+								<image :src="vipImg" mode='widthFix'></image>
+								<view :class="statusClass">{{ statusClass }}</view>
+							</view>
+							<view class="my-amount-box">
+								<view class="amount">
+									<text>Balance</text>
+									<view>{{balance}}</view>
+								</view>
+								<view class="amount">
+									<text>Orders</text>
+									<view>{{totalOrders}}</view>
+								</view>
+							</view>
 					</view>
 				</view>
 			</view>
-			<view class="my-vip-box" >
-				<image :src="vipImg" mode='widthFix'></image>
-				<view :class="statusClass">{{ statusClass }}</view>
-			</view>
-			
 		</view>
 		<view class="myPage-listTable">
 			<view class="myPage-listTable-box">
@@ -94,6 +93,7 @@
 			</view>
 		</view>
 	</view>
+	<uni-popup ref="popup" type="center" :animation="false">中间弹出 Popup</uni-popup>
 </template>
 
 <script>
@@ -166,8 +166,13 @@ export default {
 	    sizeType: ['original', 'compressed'],  // 可以选择原图或压缩图
 	    success: (res) => {
 	      this.userLogo = res.tempFilePaths;  // 获取选中的图片路径
+		  // try{
+		  // }
 	    }
 	  })
+	},
+	open() {
+		this.$refs.popup.open()
 	},
 	async getprofile(){
 		const token = String(uni.getStorageSync('token'));
@@ -378,12 +383,12 @@ export default {
 </script>
 <style lang="scss" scoped>
 	.page {
-		background: #f5f5f5;
+		// background: #f5f5f5;
 		min-height: 100vh;
 	}
 	.my-vip-box {
 		display: flex;
-		width: 670rpx;
+		width: 400rpx;
 		margin: 0 auto;
 		height: 100rpx;
 		margin-top: 60rpx;
@@ -400,23 +405,27 @@ export default {
 	.my-info-box {
 		display: flex;
 		justify-content: space-between;
-		padding: 0 40rpx;
-
-		.my-logo-box {
+		align-items: center;
+		padding: 30rpx;
+		margin: 20rpx;
+	
+		.left {
 			display: flex;
-			> view {
-				display: flex;
+			align-items: center;
+			flex-direction: column;
+	
+			.my-logo-box {
 				position: relative;
-				justify-content: flex-start; 
-				width: 180rpx;
-				height: 180rpx;
-
+				margin-right: 20rpx;
+	
 				.user-logo {
-					width: 180rpx;
-					height: 180rpx;
+					width: 160rpx;
+					height: 160rpx;
 					border-radius: 50%;
+					border: 4rpx solid #eee;
+					box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 				}
-
+	
 				.user-vip {
 					position: absolute;
 					bottom: 0;
@@ -425,58 +434,67 @@ export default {
 					height: 40rpx;
 				}
 			}
+	
+			.my-nickName {
+				color: #333;
+				font-size: 34rpx;
+				font-weight: 600;
+				// max-width: 400rpx;
+				word-break: break-word;
+			}
 		}
-
-		.my-nickName {
-			color: #333;
-			font-size: 36rpx;
-			max-width: 400rpx;
-			font-weight: bold;
-			margin-bottom: 6rpx;
-		}
-		.Student {
-		  background-color: lightblue;
-		  color: black;
-		}
-		.Senior {
-		  background-color: lightgreen;
-		  color: darkgreen;
-		}
-		.Frequent {
-		  background-color: lightyellow;
-		  color: darkorange;
-		}
-		.Frequent_student .Frequent_senior {
-		  background-color: lightcoral;
-		  color: white;
-		}
-
-		.my-vip-num {
-			color: #999;
-			font-size: 24rpx;
-		}
-
-		.my-amount-box {
-			margin-top: 50rpx;
-			overflow: hidden;
-
-			> view {
-				float: left;
-				margin-right: 80rpx;
-
-				> view:first-child {
-					color: #333;
-					font-size: 48rpx;
-					margin-bottom: 14rpx;
+	
+		.right {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: flex-end;
+	
+			.my-vip-box {
+				display: flex;
+				align-items: center;
+				margin-bottom: 20rpx;
+	
+				image {
+					width: 50rpx;
+					height: 50rpx;
+					margin-right: 10rpx;
 				}
-
-				> view:last-child {
-					font-size: 24rpx;
-					color: #666;
+	
+				view {
+					font-size: 26rpx;
+					color: #e6a23c;
+					font-weight: bold;
+					background-color: #fff7e6;
+					padding: 6rpx 14rpx;
+					border-radius: 30rpx;
+				}
+			}
+	
+			.my-amount-box {
+				display: flex;
+				gap: 40rpx;
+	
+				.amount {
+					text-align: center;
+	
+					text {
+						display: block;
+						color: #2c3e50;
+						font-size: 24rpx;
+						margin-bottom: 8rpx;
+					}
+	
+					view {
+						font-size: 30rpx;
+						font-weight: bold;
+						color: #333;
+					}
 				}
 			}
 		}
 	}
+
 
 	.myPage-listTable {
 		padding: 80rpx 0 80rpx 0;

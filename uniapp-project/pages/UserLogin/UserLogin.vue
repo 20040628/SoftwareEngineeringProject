@@ -1,7 +1,7 @@
 <template>
 	<view class="page">
 		<view class="header">
-			<text>Welcome to E-Scooter Rental System</text>
+			<text>Welcome to ScootGo</text>
 		</view>
 		<view class="container">
 			<view class="title">
@@ -59,7 +59,9 @@ export default {
     // 页面加载时获取验证码
     this.getCaptcha();
   },
-
+  onPullDownRefresh() {
+		  uni.stopPullDownRefresh()
+  },
   methods: {
     // 获取验证码
     async getCaptcha() {
@@ -183,6 +185,7 @@ export default {
     
         uni.showToast({
           title: 'Login successful!',
+		  icon: 'none',
           duration: 2000
         });
 		// this.$refs.toast.showToast('Login successful!');
@@ -252,4 +255,5 @@ export default {
 		font-size: 12px;
 		color: #999;
 	}
+	
 </style>

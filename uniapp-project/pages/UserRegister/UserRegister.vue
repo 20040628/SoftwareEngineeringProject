@@ -1,7 +1,7 @@
 <template>
 	<view class="page">
 		<view class="header">
-			<text>Welcome to E-Scooter Rental System</text>
+			<text>Welcome to ScootGo</text>
 		</view>
 		<view class="container">
 			<view class="title">
@@ -34,8 +34,8 @@
 				
 				<view class="form-group">
 				  <label>Card</label>
-				  <input v-model="form.card" type="text" placeholder="Enter Card number" class="input-field"/>
-				  <span v-if="errors.card" class="error-message">{{ errors.card }}</span>
+				  <input v-model="form.bankCard" type="text" placeholder="Enter Card number" class="input-field"/>
+				  <span v-if="errors.bankCard" class="error-message">{{ errors.bankCard }}</span>
 				</view>
 				
 				<view class="form-group">
@@ -75,6 +75,7 @@ export default {
         password: '',
         email: '',
         mobile: '',
+		bankCard:'',
         birthday: '',
         userType: 0,  // default: normal user
       },
@@ -147,6 +148,14 @@ export default {
       } else if (!mobileRegex.test(this.form.mobile)) {
         this.errors.mobile = 'Mobile number must be between 10-13 digits';
       }
+	  
+	  const cardRegex = /^[0-9]{13,16}$/;
+	  if (!this.form.bankCard) {
+	    this.errors.bankCard = 'Card number is required';
+	  } else if (!cardRegex.test(this.form.bankCard)) {
+	    this.errors.bankCard = 'Card number must be between 13-16 digits';
+	  }
+	  
 
       // Birthday validation: valid date format and must be in the past
       const today = new Date();
@@ -212,7 +221,7 @@ export default {
            // 显示成功提示
            uni.showToast({
              title: 'Registration successful!',
-             icon: 'success',
+             icon: 'none',
              duration: 2000
            });
        
@@ -222,6 +231,7 @@ export default {
              password: '',
              email: '',
              mobile: '',
+			 bankCard:'',
              birthday: '',
              userType: 0,
            };

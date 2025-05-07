@@ -1,45 +1,35 @@
 <template>
-  <view>
-    <!-- 地图容器 -->
-    <map 
-      id="map"
-      :latitude="mapCenter.latitude"
-      :longitude="mapCenter.longitude"
-      :markers="stores"
-      :show-location="true"
-      style="width: 100%; height: 90vh;"
-      @markertap="handleMarkerTap"
-    > 
-      <!-- 自定义定位按钮 -->
-      <cover-view class="custom-controls">
-        <cover-image 
-          src="/static/icons/current_location.png"
-          @tap="centerToUser"
-          class="control-btn"
-        />
-      </cover-view> 
-    </map>
-
-    <!-- 推荐地点的下拉框 -->
-    <picker 
-          mode="selector" 
-          :range="locationNames" 
-          @change="onLocationChange"
-          class="location-picker"
-        >
-          <view class="picker-btn">
-            <text>{{ selectedLocation }}</text>
-          </view>
-    </picker>
-    <!-- 地址信息卡片 -->
-    <cover-view v-if="selectedStore" class="address-card">
-      <view class="card-content">
-        <text class="store-name">{{ selectedStore.name }}</text>
-        <text class="store-location">{{ selectedStore.locationName }}</text>
-        <button class="choose-btn" @tap="chooseStore">Choose</button>
-      </view>
-    </cover-view>
-  </view>
+  <view class="canvas-wrap">
+	<map 
+	      id="map"
+	      :latitude="mapCenter.latitude"
+	      :longitude="mapCenter.longitude"
+	      :markers="stores"
+	      :show-location="true"
+	      style="width: 100%; height: 90vh; z-index: 10;"
+	      @markertap="handleMarkerTap"
+	    > 
+			<cover-view class="picker-btn" @click="open">
+			  {{ selectedLocation }}
+			</cover-view>
+			
+		
+			<cover-view v-show="showDialog" class="dialog-seletion">
+				<cover-view class="selection-item">Recommended Stores:</cover-view>
+				<cover-view v-for="(item, index) in locationNames" class="selection-item" @click="selectOneLocation(item, index)">{{item}}</cover-view>
+			</cover-view>
+			<!-- 地址信息卡片 -->
+			  <cover-view v-if="showSelectedStore" class="address-card">
+			    <cover-view class="card-content">
+			      <cover-view class="store-name">{{ selectedStore ? selectedStore.name : '' }}</cover-view>
+			      <cover-view class="store-location">{{ selectedStore ? selectedStore.locationName : '' }}</cover-view>
+			      <cover-view class="choose-btn" @tap="chooseStore">Choose</cover-view>
+			    </cover-view>
+			  </cover-view>
+		</map>
+		
+	</view>
+	
 </template>
 
 <script>
@@ -47,20 +37,25 @@ export default {
   data() {
     return {
       stores: [],
-      userLocation: null,
+      userLocation: {
+        latitude: 30.7656,  
+        longitude: 103.9799
+      },
       mapCenter: {
         latitude: 30.7656,  
         longitude: 103.9799
       },
+	  showDialog: false,
       recommendedLocations: [],
-      selectedLocation: 'near stores',
+      selectedLocation: 'Recommended Stores',
+	  showSelectedStore: false,
       selectedStore: null, // 用于显示地址信息卡片
 	   locationNames: [] ,
     };
   },
   async mounted() {
     await this.loadScooters();
-    await this.getUserLocation();
+    // await this.getUserLocation();
 	await this.recommendStore();
 	this.stores.forEach(store => {
 	    this.reverseGeocode(store);
@@ -85,8 +80,8 @@ export default {
           this.stores = res.data.map(store => ({
             ...store,
             iconPath: "/static/icons/available_scooter.png",
-            width: 40,
-            height: 40
+            width: 20,
+            height: 20
           }));
         } else {
           uni.showToast({ title: '数据加载失败', icon: 'none' });
@@ -95,7 +90,9 @@ export default {
         uni.showToast({ title: '网络错误', icon: 'none' });
       }
     },
-
+	open() {
+		this.showDialog = true
+	},
     // 获取用户位置
     async getUserLocation() {
       try {
@@ -113,7 +110,18 @@ export default {
       const store = this.stores.find(s => s.id === markerId);
       this.selectedStore = store;
     },
-
+	selectOneLocation(item, index) {
+		const selected = this.recommendedLocations[index];
+		this.selectedStore = selected.store;
+		this.reverseGeocode(this.selectedStore)
+		this.showDialog = false
+		this.selectedLocation = selected.store.name;
+		this.showSelectedStore = true
+		this.mapCenter = {
+		  latitude: selected.store.latitude,
+		  longitude: selected.store.longitude
+		};
+	},
     // 选择推荐地点时更新地图位置
     onLocationChange(e) {
       const index = e.detail.value;
@@ -121,6 +129,7 @@ export default {
 	  this.selectedStore = selected.store;
 	  this.reverseGeocode(this.selectedStore)
       this.selectedLocation = selected.store.name;
+	  this.showSelectedStore = true
       this.mapCenter = {
         latitude: selected.store.latitude,
         longitude: selected.store.longitude
@@ -183,60 +192,48 @@ export default {
 		      this.locationNames = this.recommendedLocations.map(item => {
 		        return `${item.store.name} : ${item.distance.toFixed(2)} km`; // 拼接名称和距离
 		      });
-		      this.selectedLocation = this.locationNames[0]; // 默认选择第一个地点
-		    },
+		    }
   },
 };
 </script>
 
 <style scoped>
-.custom-controls {
-  position: absolute;
-  right: 30rpx;
-  bottom: 200rpx;
-}
-
-.control-btn {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
-}
-
-.location-picker {
-  position: absolute;
-  top: 50rpx;  /* 调整位置，使其从顶部下移 */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  width: 85%;  /* 调整宽度，确保适应不同屏幕 */
-  background-color: rgba(255, 255, 255, 0.9);  /* 提高透明度，使背景色稍微深一点 */
-  padding: 20rpx 10rpx;  /* 添加上下内边距，增加点击区域 */
-  border-radius: 10rpx;  /* 增加圆角 */
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);  /* 添加阴影效果 */
-}
-
 .picker-btn {
-   font-size: 18px;  /* 增大字体 */
-    color: #333;  /* 保持文字颜色为深色 */
-    text-align: center;
-    padding: 12rpx;  /* 增加上下内边距，增大按钮点击区域 */
-    border-radius: 8rpx;  /* 圆角按钮 */
-  }
-  
-  .picker-btn text {
-    font-weight: 500;  /* 加粗文字 */
-  }
-
-
+	   position: absolute;
+	   top: 50rpx;  /* 调整位置，使其从顶部下移 */
+	   left: 50%;
+	   transform: translateX(-50%);
+	   width: 85%;  /* 调整宽度，确保适应不同屏幕 */
+	   background-color: rgba(255, 255, 255, 0.9);  /* 提高透明度，使背景色稍微深一点 */
+	   border-radius: 10rpx;  /* 增加圆角 */
+	   /* box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);  /* 添加阴影效果 */ 
+		text-align: center;
+		font-size: 30rpx;
+		border: 8rpx solid #2c3e50;
+		font-weight: bold;
+}
+.dialog-seletion {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	background-color: rgba(255, 255, 255, 0.9);
+	padding: 30rpx;
+	width: 80%; /* 调整宽度为80% */
+	border-radius: 10rpx;
+	box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1);
+}
+.selection-item {
+	color: #333;
+	font-size: 16px;
+}
 .address-card {
   position: absolute;
     bottom: 120rpx;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 50rpx;
+    right: 50rpx;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 30rpx;
-    width: 80%; /* 调整宽度为80% */
     border-radius: 10rpx;
     box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1);
 }
@@ -245,25 +242,27 @@ export default {
   font-size: 16px;
   color: #333;
   text-align: left;
-  display: block; 
 }
 
 .store-name {
   font-weight: bold;
   font-size: 18px;
-   display: block; 
+  display: block; 
 }
 
 .store-location {
   font-size: 14px;
   color: #777;
   margin-top: 5rpx;
+  line-height: normal;
+  white-space: normal;
 }
 
 .choose-btn {
+  text-align: center;
   margin-top: 15rpx;
-  padding: 10rpx 20rpx;
-  background-color: #aaaaff;
+  line-height: 60rpx;
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 5rpx;

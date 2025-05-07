@@ -1,0 +1,247 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+body {
+  background-color: #f7f7f7;
+}
+.page-order-det {
+  position: relative;
+}
+.page-order-det .top {
+  width: 100%;
+  height: 17.125rem;
+  margin-top: -44px;
+  background: linear-gradient(180deg, #2c3e50 80%, #f7f7f7 100%);
+}
+.page-order-det .body {
+  position: absolute;
+  top: 4.6875rem;
+  width: 100%;
+  padding-bottom: 4.375rem;
+}
+.page-order-det .body .status {
+  display: flex;
+  align-items: center;
+  width: calc(100% - 2rem);
+  margin: 0 1rem 1.5625rem 1rem;
+  padding: 1.625rem 0.9375rem;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 0.25rem;
+}
+.page-order-det .body .status .s-img {
+  display: block;
+  width: 1.8125rem;
+  height: 1.8125rem;
+  margin-right: 0.75rem;
+}
+.page-order-det .body .status .status-name {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #565656;
+}
+.page-order-det .body .status .tips {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #ababab;
+}
+.page-order-det .body .goods-info {
+  width: calc(100% - 2rem);
+  margin: 0 1rem 0.625rem 1rem;
+  padding: 1.625rem 0.9375rem 1.125rem 0.9375rem;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 0.25rem;
+}
+.page-order-det .body .goods-info .title {
+  padding-bottom: 0.625rem;
+  border-bottom: solid 0.0625rem #e8e8e8;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #333333;
+}
+.page-order-det .body .goods-info .list {
+  margin-bottom: 1.125rem;
+  border-bottom: solid 0.0625rem #e8e8e8;
+}
+.page-order-det .body .goods-info .list .item {
+  display: flex;
+  position: relative;
+  padding: 0.9375rem 0;
+}
+.page-order-det .body .goods-info .list .item .preview {
+  display: block;
+  width: 5.875rem;
+  height: 5.875rem;
+  margin-right: 0.625rem;
+}
+.page-order-det .body .goods-info .list .item .main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.page-order-det .body .goods-info .list .item .main .info .name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #333333;
+}
+.page-order-det .body .goods-info .list .item .main .info .size {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #8e8e8e;
+}
+.page-order-det .body .goods-info .list .item .main .price {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #343434;
+}
+.page-order-det .body .goods-info .list .item .buy-num {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #8e8e8e;
+}
+.page-order-det .body .goods-info .delivery {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.9375rem;
+}
+.page-order-det .body .goods-info .delivery .label {
+  display: block;
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #333333;
+}
+.page-order-det .body .goods-info .delivery .value {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #8e8e8e;
+}
+.page-order-det .body .goods-info .discount {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.1875rem;
+}
+.page-order-det .body .goods-info .discount .name {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #333333;
+}
+.page-order-det .body .goods-info .discount .price {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: red;
+}
+.page-order-det .body .goods-info .pay {
+  display: flex;
+  justify-content: center;
+}
+.page-order-det .body .goods-info .pay .name {
+  display: block;
+  flex: 1;
+  margin-right: 0.3125rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #343434;
+}
+.page-order-det .body .goods-info .pay .price {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: red;
+}
+.page-order-det .body .order-info {
+  width: calc(100% - 2rem);
+  margin: 0 1rem 0.625rem 1rem;
+  padding: 1.625rem 0.9375rem 0.03125rem 0.9375rem;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-radius: 0.25rem;
+}
+.page-order-det .body .order-info .title {
+  margin-bottom: 1.125rem;
+  padding-bottom: 0.625rem;
+  border-bottom: solid 0.0625rem #e8e8e8;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #333333;
+}
+.page-order-det .body .order-info .list .item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.page-order-det .body .order-info .list .item .label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #333333;
+}
+.page-order-det .body .order-info .list .item .value {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #8e8e8e;
+}
+.page-order-det .body .order-pay {
+  display: flex;
+  align-items: center;
+  position: fixed;
+  left: 0;
+  bottom: calc(0.03125rem + env(safe-area-inset-bottom));
+  width: 100%;
+  height: 50px;
+  padding: 0 1rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+.page-order-det .body .order-pay .total {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.page-order-det .body .order-pay .total .name {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #333333;
+}
+.page-order-det .body .order-pay .btn {
+  display: flex;
+}
+.page-order-det .body .order-pay .btn .cancel {
+  margin-right: 0.5rem;
+}
+.page-order-det .body .order-pay .btn .cancel uni-button {
+  background-color: #343434;
+  color: #ffffff;
+}
+.page-order-det .body .order-pay .btn .go-pay uni-button {
+  background-color: #343434;
+  color: #ffffff;
+}

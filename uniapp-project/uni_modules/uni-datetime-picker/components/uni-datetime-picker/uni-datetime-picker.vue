@@ -7,12 +7,12 @@
           :class="{'uni-date-editor--x__disabled': disabled,'uni-date-x--border': border}"
         >
 					<view v-if="!isRange" class="uni-date-x uni-date-single">
-						<uni-icons class="icon-calendar" type="calendar" color="#c0c4cc" size="22"></uni-icons>
+						<uni-icons class="icon-calendar" type="calendar" color="#000000" size="22"></uni-icons>
 						<view class="uni-date__x-input">{{ displayValue || singlePlaceholderText }}</view>
 					</view>
 
 					<view v-else class="uni-date-x uni-date-range">
-            <uni-icons class="icon-calendar" type="calendar" color="#c0c4cc" size="22"></uni-icons>
+            <uni-icons class="icon-calendar" type="calendar" color="#000000" size="22"></uni-icons>
             <view class="uni-date__x-input text-center">{{ displayRangeValue.startDate || startPlaceholderText }}</view>
 
             <view class="range-separator">{{rangeSeparator}}</view>
@@ -21,7 +21,7 @@
 					</view>
 
 					<view v-if="showClearIcon" class="uni-date__icon-clear" @click.stop="clear">
-						<uni-icons type="clear" color="#c0c4cc" size="22"></uni-icons>
+						<uni-icons type="clear" color="#000000" size="22"></uni-icons>
 					</view>
 				</view>
 			</slot>
@@ -69,7 +69,7 @@
           </time-picker>
         </view>
 
-        <uni-icons type="arrowthinright" color="#999" style="line-height: 40px;"></uni-icons>
+        <uni-icons type="arrowthinright" color="#000000" style="line-height: 40px;"></uni-icons>
 
 					<view class="popup-x-header--datetime">
 						<input class="uni-date__input uni-date-range__input" type="text" v-model="tempRange.endDate"

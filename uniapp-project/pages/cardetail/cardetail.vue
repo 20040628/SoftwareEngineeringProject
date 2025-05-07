@@ -247,11 +247,10 @@ export default {
 					this.showMessage('book successfully', 'success');
 					uni.showToast({
 						title: 'Book successful!',
-					    icon: 'success',
+					    icon: 'none',
 					    duration: 2000  // 2秒后自动关闭
 					});
 					await this.handlePay(res.data);
-					await this.refreshTimeline();
 				} else {
 					uni.showToast({
 					  title: res.data|| 'Scheduled failure',
@@ -375,7 +374,7 @@ export default {
 
 /* note 样式 */
 .note {
-  font-size: 14px;
+  font-size: 10px;
   color: #ff4d4f;
   margin-left: 10px; /* 图标和文字之间的间距 */
   line-height: 1.5;
@@ -423,7 +422,7 @@ export default {
 
 /* time-range样式 */
 .time-range {
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 500;
   color: #333;
 }
@@ -435,7 +434,7 @@ export default {
   right: 0;
   padding: 20rpx;
   button{
-	  background-color: #2E7D32;
+	  background-color: #2c3e50;
 	  color: white;
   }
 }

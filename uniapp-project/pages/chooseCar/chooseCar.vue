@@ -121,6 +121,7 @@
 		        "Authorization": `Bearer ${token}`
 		      },
 		    });
+			console.log("scooter",res.data)
 		
 		    if (res.statusCode === 200) {
 		      this.scooters = res.data;
@@ -185,9 +186,9 @@
 	  justify-content: center;
 	  align-items: center;
 	  padding: 20rpx;
-	  border: 3px solid #aaaaff; /* 细边框 */
-	  border-radius: 15rpx; /* 圆角效果，稍微圆润一点 */
-	  background-color: #ffffff; /* 背景色 */
+	  /* border: 2px solid var(--bg-color); /* 细边框 */ 
+	  /* border-radius: 15rpx; */
+	  /* background-color: #ffffff; /* 背景色 */ 
 	  margin: 20rpx 5rpx; /* 上下间距 */
 	  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1); /* 阴影效果 */
 	  transition: transform 0.2s ease; /* 动画效果 */
@@ -263,7 +264,7 @@
   align-items: flex-start;
 }
 .reserve-btn {
-    background-color: #aaaaff;
+    background-color: #014d87;
     color: white;
     padding: 5px ;  /* 调整按钮的内边距 */
     border: none;
@@ -276,7 +277,7 @@
 }
 
 .reserve-btn:hover {
-  background-color: #aa55ff;
+  background-color:#014d87;
 }
 
 .listA-content {
@@ -329,11 +330,11 @@
 }
 
 .speed-text {
-  color: #7F669D;
+  color: #1c315e;
 }
 
 .battery-text {
-  color: #7F669D;
+  color: #1c315e;
 }
 
 .price-item {

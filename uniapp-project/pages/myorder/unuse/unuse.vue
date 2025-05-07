@@ -1,5 +1,8 @@
 <template>
 	<view class="content">
+		<view class="none" v-if="!data">
+			<text>There has no order!</text>
+		</view>
 		<view class="me-center">
 			<view class="list-tab">
 				<ul class="item-ul" v-for="(item, index) in orderList" :key="index">
@@ -13,7 +16,7 @@
 						<view class="dashed-line"></view>
 						<view class="item-content">
 							<view  class="item-left">
-								 <img :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;">
+								 <image :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;"></image>
 							</view>
 							<view class="item-right"  @click="goDetail(item)">
 								<!-- <view class="item-right-v1">
@@ -35,20 +38,12 @@
 						</view>
 						
 						<view class="dashed-line"></view>
-						<!-- <view class="item-btom" v-if="item.status == 1">
-							<view @click="cancelClick(item)">
-								<view class="item-btom-btn">cancel</view>
-							</view>
-							<view  @click="payClick(item)">
-								<view class="item-btom-btn pay">pay</view>
-							</view>
-						</view> -->
 						
 						<view class="item-btom">
 							<button class="item-btom-btn" @click="item.showModal = true">Extend</button>
 							<view class="modal" v-if="item.showModal">
 								<view class="modal-content">
-									<view>Extend the order</view>
+									<view>Extend the Order</view>
 									<view class="section-title">Select Duration</view>
 									<view class="duration-section">
 										  <view class="duration-grid">
@@ -93,6 +88,7 @@
 			        { label: '1 Week', value: "WEEK"} ,
 				],
 				showModal: false,
+				data:false,
 			}
 		},
 		async mounted() {
@@ -120,6 +116,9 @@
 			           ...order,
 			           showModal: false, // 为每个订单项添加showModal字段
 			    }));
+				if(this.orderList.length>0){
+					this.data= true
+				}
 			    } else {
 			      uni.showToast({ title: '数据加载失败', icon: 'none' });
 			    }
@@ -404,9 +403,9 @@
 				font-size: 28upx;
 				
 				.item-btom-btn{
-					padding: 6upx 40upx ;
-					border: 1px solid #d2d3d4;
-					border-radius: 40upx;
+					padding: 6rpx 40rpx ;
+					border: 1px solid #2c3e50;
+					border-radius: 30rpx;
 					margin-right: 20upx;
 					align-items: center;
 				}
@@ -446,8 +445,8 @@
 	  height: 100rpx;
 	  
 	  &.active {
-	    // border-color: #aa55ff;
-	    background: #e3e2ff;
+	    border-color: #2c3e50;
+	    // background: #e3e2ff;
 	  }
 	  
 	  .label {
@@ -473,20 +472,22 @@
 			background-color: white;
 			/* padding: 20px; */
 			width: 600rpx;
-			height: 800rpx;
+			height: 700rpx;
 			border-radius: 8rpx;
 			position: relative;
 			//modal-content下的第一个view
 			view:first-child{
 				padding:20rpx;
-				font-size:60rpx;
+				font-size:40rpx;
 				font-weight:bold;
+				text-align: center;
 			}
 			//modal-content下的第二个view
 			view:nth-child(2){
 				padding:20rpx;
 				font-size:30rpx;
-				color: #4891d9;
+				color: #000000;
+				text-align: center;
 			}
 		}
 		/* 按钮 */
@@ -501,16 +502,20 @@
 			border: none;
 		}
 	.modal-buttons button:first-child {
-			background-color: #74bfe7;
+			background-color: #014d87;
 			color: #fff;
 			border-radius: 0;
 		}
 	.modal-buttons button:last-child {
 			width: 100%;
-			border: 2rpx solid #74bfe7;
+			border: 3rpx solid #014d87;
 			border-radius: 0px;
 			background-color: #fff;
-			color: #74bfe7;
+			color: #014d87;
+	}
+	.none{
+		color: #B9B9B9;
+		text-align: center;
 	}
 	
 </style>

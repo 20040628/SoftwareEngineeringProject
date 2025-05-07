@@ -1,0 +1,67 @@
+
+.text-black {
+		color: #303133;
+		font-size: 1rem;
+}
+.text-grey {
+		color: #BCBCBC;
+		font-size: 0.75rem;
+		margin-left: 0.46875rem;
+}
+.feedback-quick {
+		padding-right: 0.3125rem;
+		color: #606266;
+		font-size: 1rem;
+}
+.feedback-body {
+		padding: 0.9375rem;
+}
+.feedback-textare {
+		margin-top: 0.9375rem;
+		margin-bottom: 0.9375rem;
+		height: 8.3125rem;
+		color: #303133;
+		font-size: 0.875rem;
+		line-height: 2em;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0.625rem 0.9375rem;
+		border-radius: 0.625rem;
+		background-color: #F5F6F8;
+}
+.feedback-input {
+		font-size: 0.875rem;
+		color: #303133;
+		background-color: #F5F6F8;
+		border-radius: 0.625rem;
+		height: 3.125rem;
+		min-height: 3.125rem;
+		padding: 0 0.9375rem;
+		margin-top: 0.9375rem;
+		margin-bottom: 1.875rem;
+}
+.btn-submit {
+		border-radius: 0.625rem;
+		color: #FFFFFF;
+		margin-top: 3.125rem;
+		background-color: #007AFF;
+		margin-bottom: 2.1875rem;
+}
+.image-title {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		color: #606266;
+}
+.filepicker {
+		margin-top: 0.9375rem;
+		margin-bottom: 0.9375rem;
+}
+.btn {
+		position: fixed;
+		bottom: 0;
+		left: 0 ;
+		right: 0;
+		margin: 0.9375rem 0.9375rem 1.875rem 0.9375rem;
+}

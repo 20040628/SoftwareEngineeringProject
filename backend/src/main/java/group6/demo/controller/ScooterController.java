@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/scooters")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://118.24.22.77"})
 public class ScooterController {
     @Autowired
     private ScooterService scooterService;
@@ -165,5 +165,24 @@ public class ScooterController {
         }
         
         return dto;
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateScooter(@PathVariable Long id,
+                                           @Valid @RequestBody ScooterAddDTO scooterAddDTO) {
+        try {
+            Optional<Scooter> scooterOptional = scooterService.getScooterById(id);
+            if (scooterOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("Scooter not found");
+            }
+            boolean updated = scooterService.updateScooter(id, scooterAddDTO);
+            if (updated) {
+                return ResponseEntity.ok("Scooter updated successfully");
+            } else {
+                return ResponseEntity.badRequest().body("No changes detected");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to update scooter: " + e.getMessage());
+        }
     }
 }

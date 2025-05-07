@@ -219,4 +219,28 @@ class BookingControllerTest {
         assertEquals("您已成功归还电动车，并且电量大于90%，押金已退还。", responseBody.get("depositMessage"));
         verify(bookingService, times(1)).returnScooter(any(ReturnScooterDTO.class));
     }
+
+    @Test
+    void testStartRental_Valid() {
+        Long orderId = 1L;
+        Order order = new Order();
+        order.setId(orderId);
+        order.setStatus(3); // 使用中状态
+        order.setStartTime(new Date());
+        order.setEndTime(new Date());
+
+        when(bookingService.startRental(orderId)).thenReturn(order);
+
+        ResponseEntity<?> response = bookingController.startRental(orderId);
+
+        assertEquals(200, response.getStatusCodeValue());
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+        assertNotNull(responseBody);
+        assertEquals("租赁已开始", responseBody.get("message"));
+        assertEquals(orderId, responseBody.get("orderId"));
+        assertEquals(3, responseBody.get("status"));
+        assertNotNull(responseBody.get("startTime"));
+        assertNotNull(responseBody.get("endTime"));
+        verify(bookingService, times(1)).startRental(orderId);
+    }
 }

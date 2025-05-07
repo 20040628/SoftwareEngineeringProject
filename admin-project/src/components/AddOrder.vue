@@ -66,20 +66,6 @@
           <button class="button button-submit" @click="createBooking">Create Order</button>
         </div>
       </div>
-
-      <!-- Success message -->
-<!--      <div class="success-message" v-if="successMessage">-->
-<!--        {{ successMessage }}-->
-<!--        <div v-if="bookingResult" class="booking-details">-->
-<!--          <p>Order ID: {{ bookingResult.orderId }}</p>-->
-<!--          <p>Original Price: ${{ bookingResult.priceBeforeDiscount.toFixed(2) }}</p>-->
-<!--          <p>Final Price: ${{ bookingResult.price.toFixed(2) }}</p>-->
-<!--          <p>Start Time: {{ formatDateTime(bookingResult.startTime) }}</p>-->
-<!--          <p>End Time: {{ formatDateTime(bookingResult.endTime) }}</p>-->
-<!--        </div>-->
-<!--      </div>-->
-
-
     </div>
   </div>
 </template>
@@ -110,18 +96,13 @@ export default {
         startTime: '',
       };
     },
-    formatDateTime(dateTimeString) {
-      if (!dateTimeString) return '';
-      const date = new Date(dateTimeString);
-      return date.toLocaleString();
-    },
     async createBooking() {
-      // 重置错误和消息
+      // 清空错误和消息
       this.errors = {};
       this.successMessage = '';
       this.bookingResult = null;
 
-      // 基本验证
+      // 表单基本验证
       if (!this.bookingData.userId) {
         this.errors.userId = 'User ID is required';
       }
@@ -140,12 +121,13 @@ export default {
       }
 
       try {
-        // 从localStorage或sessionStorage获取token
+        // 获取 token 和 admin
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         const admin = localStorage.getItem('admin');
+
         if (!token) {
           alert('Please login first');
-          this.$router.push('/login'); // 重定向到登录页
+          this.$router.push('/login');
           return;
         }
 
@@ -154,13 +136,11 @@ export default {
           return;
         }
 
-        // 格式化开始时间
-        // const formattedStartTime = new Date(this.bookingData.startTime).replace('T', ' ')+":00"
+        // 格式化时间
         const date = new Date(this.bookingData.startTime);
         const formattedStartTime = date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).replace(/\//g, '-').replace(',', '') + ":00";
 
-
-        // 准备请求数据
+        // 构造请求体
         const payload = {
           userId: this.bookingData.userId,
           scooterId: this.bookingData.scooterId,
@@ -169,7 +149,7 @@ export default {
           staffId: admin
         };
 
-        // 发送请求
+        // 创建订单
         const res = await axios.post('http://localhost:8080/api/bookings/forUnregistered', payload, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -178,31 +158,32 @@ export default {
         });
 
         if (res.status === 200) {
+          const orderId = res.data.orderId;
           this.successMessage = 'Booking created successfully';
           this.bookingResult = res.data;
-          // 重置表单
+
+          // 清空表单
           this.bookingData = {
             userId: '',
             scooterId: '',
             hireType: 'HOUR',
             startTime: ''
           };
-          alert("Add Order successfully");
+
+          // 跳转到支付页面
+          this.$router.push({ name: 'Payment', params: { orderId } });
         }
+
       } catch (error) {
         if (error.response) {
-          // 处理不同的错误状态码
-          switch(error.response.status) {
+          switch (error.response.status) {
             case 400:
               this.errors = error.response.data || {};
               alert('Error response: ' + JSON.stringify(error.response.data));
-              console.error('Error response:', error.response.data);
               break;
             case 401:
-              // token可能已过期，清除并重定向
               localStorage.removeItem('token');
               sessionStorage.removeItem('token');
-              this.$store.commit('logout');
               alert('Session expired. Please login again.');
               this.$router.push('/login');
               break;
@@ -220,7 +201,6 @@ export default {
     }
   },
   mounted() {
-    // 组件加载时检查登录状态
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) {
       alert('Please login first');
@@ -237,7 +217,7 @@ export default {
   padding-left: 20px;
   padding-bottom: 20px;
   padding-top: 20px;
-  border-bottom: 2px solid #58c4c9;
+  border-bottom: 2px solid #003c51;
 }
 
 .form {
@@ -282,8 +262,8 @@ label {
 
 .input:focus {
   outline: none;
-  border-color: #58c4c9;
-  box-shadow: 0 0 1px #58c4c9;
+  border-color: #003c51;
+  box-shadow: 0 0 1px #003c51;
 }
 
 .button-group {
@@ -304,19 +284,19 @@ label {
 }
 
 .button-submit {
-  background: #58c4c9;
+  background: #003c51;
   color: white;
 }
 
 .button-submit:hover {
-  background: #3bb7bd;
+  background: #003c51;
 }
 
 .button-reset {
   background: white;
-  color: #58c4c9;
+  color: #003c51;
   font-weight: bold;
-  border: 3px solid #58c4c9;
+  border: 3px solid #003c51;
 }
 
 .button-reset:hover {
@@ -347,6 +327,7 @@ label {
 .booking-details p {
   margin: 5px 0;
 }
+
 
 @media (max-width: 767px) {
   .form-row {

@@ -31,7 +31,7 @@ public class ScooterAddDTO {
 
     @NotNull(message = "The battery of the scooter is required")
     @Digits(integer = 3, fraction = 2,
-            message = "battery must be a decimal with up to 3 digits and 2 decimal places")
+            message = "battery must be a decimal with up to 3 digits and 2 decimal places, and between 0 and 100")
     private BigDecimal battery;
 
     @NotNull(message = "The speed of the scooter is required")

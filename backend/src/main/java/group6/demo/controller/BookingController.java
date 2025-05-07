@@ -15,7 +15,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/bookings")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://118.24.22.77"}, allowCredentials = "true")
 public class BookingController {
 
     @Autowired
@@ -149,7 +149,32 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("归还电动车失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to return the scooter: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 开始租赁 - 将订单状态从"已支付未开始"(2)转换为"使用中"(3)
+     * @param orderId 订单ID
+     * @return 更新后的订单状态
+     */
+    @PostMapping("/start/{orderId}")
+    public ResponseEntity<?> startRental(@PathVariable Long orderId) {
+        try {
+            Order order = bookingService.startRental(orderId);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "租赁已开始");
+            response.put("orderId", order.getId());
+            response.put("status", order.getStatus());
+            response.put("startTime", order.getStartTime());
+            response.put("endTime", order.getEndTime());
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to start rental: " + e.getMessage());
         }
     }
 }

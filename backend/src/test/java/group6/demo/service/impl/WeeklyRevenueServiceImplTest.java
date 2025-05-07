@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.domain.PageRequest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -17,6 +19,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class WeeklyRevenueServiceImplTest {
 
     @InjectMocks
@@ -30,6 +33,9 @@ class WeeklyRevenueServiceImplTest {
 
     @Mock
     private DailyRevenueRepository dailyRevenueRepository;
+    
+    @Captor
+    private ArgumentCaptor<WeeklyRevenue> weeklyRevenueCaptor;
 
     @BeforeEach
     void setUp() {
@@ -133,5 +139,70 @@ class WeeklyRevenueServiceImplTest {
         weeklyRevenueService.updateWeeklyRevenue();
 
         verify(weeklyRevenueRepository).save(existingRevenue);
+    }
+
+    @Test
+    void testCalculateWeeklyRevenue_WithCompletedOrders() {
+        // Setup test data
+        WeeklyRevenue weeklyRevenue = new WeeklyRevenue();
+        weeklyRevenue.setWeekStartDate(new Date());
+        weeklyRevenue.setWeekEndDate(new Date());
+        
+        List<Order> testOrders = new ArrayList<>();
+        
+        // Create test orders with different hire periods
+        Order hourlyOrder = new Order();
+        hourlyOrder.setStatus(4); // Completed
+        hourlyOrder.setStartTime(new Date());
+        hourlyOrder.setHirePeriod("HOUR");
+        hourlyOrder.setPrice(BigDecimal.TEN);
+        testOrders.add(hourlyOrder);
+        
+        Order fourHoursOrder = new Order();
+        fourHoursOrder.setStatus(4); // Completed
+        fourHoursOrder.setStartTime(new Date());
+        fourHoursOrder.setHirePeriod("FOUR_HOURS");
+        fourHoursOrder.setPrice(BigDecimal.valueOf(20));
+        testOrders.add(fourHoursOrder);
+        
+        Order dailyOrder = new Order();
+        dailyOrder.setStatus(4); // Completed
+        dailyOrder.setStartTime(new Date());
+        dailyOrder.setHirePeriod("DAY");
+        dailyOrder.setPrice(BigDecimal.valueOf(30));
+        testOrders.add(dailyOrder);
+        
+        Order weeklyOrder = new Order();
+        weeklyOrder.setStatus(4); // Completed
+        weeklyOrder.setStartTime(new Date());
+        weeklyOrder.setHirePeriod("WEEK");
+        weeklyOrder.setPrice(BigDecimal.valueOf(100));
+        testOrders.add(weeklyOrder);
+        
+        // Create an order with invalid status
+        Order invalidStatusOrder = new Order();
+        invalidStatusOrder.setStatus(3); // Active, not completed
+        invalidStatusOrder.setStartTime(new Date());
+        invalidStatusOrder.setHirePeriod("HOUR");
+        invalidStatusOrder.setPrice(BigDecimal.valueOf(5));
+        testOrders.add(invalidStatusOrder);
+        
+        when(orderRepository.findAll()).thenReturn(testOrders);
+        when(weeklyRevenueRepository.save(any(WeeklyRevenue.class))).thenReturn(weeklyRevenue);
+        
+        // Call the method
+        weeklyRevenueService.updateWeeklyRevenue();
+        
+        // Verify the revenue calculation
+        verify(weeklyRevenueRepository).save(weeklyRevenueCaptor.capture());
+        WeeklyRevenue savedRevenue = weeklyRevenueCaptor.getValue();
+        
+        // Assert the values (only completed orders with status 4 should be counted)
+        assertEquals(BigDecimal.TEN, savedRevenue.getHourlyRevenue());
+        assertEquals(BigDecimal.valueOf(20), savedRevenue.getFourHoursRevenue());
+        assertEquals(BigDecimal.valueOf(30), savedRevenue.getDailyRevenue());
+        assertEquals(BigDecimal.valueOf(100), savedRevenue.getWeeklyRevenue());
+        assertEquals(BigDecimal.valueOf(160), savedRevenue.getTotalRevenue()); // 10 + 20 + 30 + 100
+        assertEquals(4, savedRevenue.getOrdersCount()); // 5 orders, but 1 is invalid
     }
 }

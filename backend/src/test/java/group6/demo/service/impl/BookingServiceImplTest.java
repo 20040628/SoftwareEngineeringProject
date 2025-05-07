@@ -6,9 +6,11 @@ import group6.demo.repository.*;
 import group6.demo.service.PriceDiscountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -19,6 +21,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
 
     @Mock
@@ -43,6 +46,9 @@ class BookingServiceImplTest {
     private Scooter testScooter;
     private Order testOrder;
     private Date futureDate;
+    private final Long orderId = 1L;
+    private final Long userId = 1L;
+    private final Long scooterId = 1L;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -50,13 +56,13 @@ class BookingServiceImplTest {
 
         // Setup test data
         testUser = new User();
-        testUser.setId(1L);
+        testUser.setId(userId);
         testUser.setEmail("test@example.com");
         testUser.setUsername("Test User");
         testUser.setBankBalance(new BigDecimal("1000.00"));
 
         testScooter = new Scooter();
-        testScooter.setId(1L);
+        testScooter.setId(scooterId);
         testScooter.setPriceHour(new BigDecimal("5.00"));
         testScooter.setPriceFourHour(new BigDecimal("15.00"));
         testScooter.setPriceDay(new BigDecimal("30.00"));
@@ -64,7 +70,7 @@ class BookingServiceImplTest {
         testScooter.setBattery(new BigDecimal("95"));
 
         testOrder = new Order();
-        testOrder.setId(1L);
+        testOrder.setId(orderId);
         testOrder.setUser(testUser);
         testOrder.setScooter(testScooter);
         testOrder.setStatus(1); // active
@@ -170,5 +176,49 @@ class BookingServiceImplTest {
 
         assertTrue(result.isPresent());
         assertEquals(testOrder.getId(), result.get().getId());
+    }
+
+    @Test
+    void testStartRental_Success() {
+        // Arrange
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+
+        // Act
+        Order result = bookingService.startRental(orderId);
+
+        // Assert
+        assertEquals(3, result.getStatus()); // 验证状态已更新为使用中(3)
+        verify(orderRepository).findById(orderId);
+        verify(orderRepository).save(testOrder);
+    }
+
+    @Test
+    void testStartRental_OrderNotFound() {
+        // Arrange
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            bookingService.startRental(orderId);
+        });
+        assertEquals("订单不存在", exception.getMessage());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(orderRepository);
+    }
+
+    @Test
+    void testStartRental_InvalidStatus() {
+        // Arrange
+        testOrder.setStatus(1); // 已创建状态，不是已支付未开始
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            bookingService.startRental(orderId);
+        });
+        assertEquals("只有已支付未开始的订单才能开始使用", exception.getMessage());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(orderRepository);
     }
 }

@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
         Order order = new Order();
         order.setOrderTime(new Date());
         order.setStartTime(startTime);
-        order.setStatus(1); // active
+        order.setStatus(1); // CREATED (已创建)
         order.setUser(user);
         order.setScooter(scooter);
         order.setHirePeriod(bookingDTO.getHireType());
@@ -153,7 +153,7 @@ public class BookingServiceImpl implements BookingService {
         Order order = new Order();
         order.setOrderTime(new Date());
         order.setStartTime(startTime);
-        order.setStatus(1); // active
+        order.setStatus(1); // CREATED (已创建)
         order.setUser(user);
         order.setScooter(scooter);
         order.setHirePeriod(bookingDTO.getHireType());
@@ -162,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
         // Calculate end time and price based on hire type
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startTime);
-
+        
         BigDecimal price;
         switch (bookingDTO.getHireType()) {
             case "HOUR":
@@ -188,7 +188,7 @@ public class BookingServiceImpl implements BookingService {
 
         // 应用折扣价格
         BigDecimal discountedPrice = priceDiscountService.calculateDiscountedPrice(price, user.getId());
-
+        
         // Check for booking conflicts
         Date endTime = calendar.getTime();
         List<Order> conflictingOrders = orderRepository.findConflictingOrders(scooter.getId(), startTime, endTime);
@@ -202,7 +202,7 @@ public class BookingServiceImpl implements BookingService {
         Order savedOrder = orderRepository.save(order);
 
         sendConfirmationEmail(savedOrder);
-
+        
         return savedOrder;
     }
 
@@ -328,16 +328,16 @@ public class BookingServiceImpl implements BookingService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
 
-        // 检查订单状态，如果已经取消则无需再次取消 status=2代表订单已经取消
-        if (order.getStatus() == 2) {
-            throw new IllegalArgumentException("Order is already cancelled");
+        // 检查订单状态，如果已经完成或已取消则不能再取消
+        if (order.getStatus() == 4 || order.getStatus() == 5) {
+            throw new IllegalArgumentException("Order has been completed or cancelled, cannot cancel again");
         }
 
-        // 更新订单状态为已取消
-        order.setStatus(3);
+        // 更新订单状态为已取消(5)
+        order.setStatus(5);
         orderRepository.save(order);
 
-        // 发送取消预订的邮件通知用户 待添加
+        // 发送取消预订的邮件通知用户
         sendCancellationEmail(order);
     }
 
@@ -438,7 +438,7 @@ public class BookingServiceImpl implements BookingService {
         Order order = new Order();
         order.setOrderTime(new Date());
         order.setStartTime(newStartTime);
-        order.setStatus(1);
+        order.setStatus(1); // CREATED (已创建)
         order.setUser(user);
         order.setScooter(scooter);
         order.setHirePeriod(extendBookingDTO.getHireType());
@@ -494,11 +494,11 @@ public class BookingServiceImpl implements BookingService {
     public Order returnScooter(ReturnScooterDTO returnScooterDTO) {
         // 查找订单
         Order order = orderRepository.findById(returnScooterDTO.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        // 验证订单状态必须为活跃状态(1)才能还车
-        if (order.getStatus() != 1) {
-            throw new IllegalArgumentException("只有活跃订单才能进行还车操作");
+        // 验证订单状态必须为使用中(3)才能还车
+        if (order.getStatus() != 3) {
+            throw new IllegalArgumentException("Only orders in use can be returned");
         }
 
         // 获取用户和电动车信息
@@ -509,8 +509,8 @@ public class BookingServiceImpl implements BookingService {
         Date returnTime = new Date();
         order.setReturnTime(returnTime);
         
-        // 更新订单状态为已完成(2)
-        order.setStatus(2);
+        // 更新订单状态为已完成(4)
+        order.setStatus(4);
 
         // 如果是银行卡支付且电量大于90%，退还押金
         if ("BANK_CARD".equals(order.getPaymentMethod()) && order.getDepositPaid()) {
@@ -563,5 +563,24 @@ public class BookingServiceImpl implements BookingService {
             // 记录邮件发送失败，但不影响主要业务流程
             System.err.println("发送押金退还邮件失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional
+    public Order startRental(Long orderId) {
+        // 查找订单
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        
+        // 验证订单状态必须为已支付未开始(2)
+        if (order.getStatus() != 2) {
+            throw new IllegalArgumentException("Only paid orders that have not started can begin rental");
+        }
+        
+        // 更新订单状态为使用中(3)
+        order.setStatus(3);
+        
+        // 保存更新后的订单
+        return orderRepository.save(order);
     }
 } 

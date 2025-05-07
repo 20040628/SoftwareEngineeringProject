@@ -166,4 +166,52 @@ public class ScooterServiceImlp implements ScooterService {
         }
         return Scooter;
     }
+
+    @Override
+    public boolean updateScooter(Long id, ScooterAddDTO dto){
+        Optional<Scooter> optionalScooter = scooterRepository.findById(id);
+        if (optionalScooter.isEmpty()) {
+            return false;
+        }
+
+        Scooter scooter = optionalScooter.get();
+        boolean changed = false;
+
+        // 判断每个字段是否有变化，有就更新
+        if (dto.getPriceHour() != null && !dto.getPriceHour().equals(scooter.getPriceHour())) {
+            scooter.setPriceHour(dto.getPriceHour());
+            changed = true;
+        }
+        if (dto.getPriceFourHour() != null && !dto.getPriceFourHour().equals(scooter.getPriceFourHour())) {
+            scooter.setPriceFourHour(dto.getPriceFourHour());
+            changed = true;
+        }
+        if (dto.getPriceDay() != null && !dto.getPriceDay().equals(scooter.getPriceDay())) {
+            scooter.setPriceDay(dto.getPriceDay());
+            changed = true;
+        }
+        if (dto.getPriceWeek() != null && !dto.getPriceWeek().equals(scooter.getPriceWeek())) {
+            scooter.setPriceWeek(dto.getPriceWeek());
+            changed = true;
+        }
+        if (dto.getBattery() != null && !dto.getBattery().equals(scooter.getBattery())) {
+            scooter.setBattery(dto.getBattery());
+            changed = true;
+        }
+        if (dto.getSpeed() != null && !dto.getSpeed().equals(scooter.getSpeed())) {
+            scooter.setSpeed(dto.getSpeed());
+            changed = true;
+        }
+        if (dto.getStoreId() != null && (scooter.getStore() == null || !dto.getStoreId().equals(scooter.getStore().getId()))) {
+            Store store = storeRepository.findById(dto.getStoreId()).orElseThrow(() -> new IllegalArgumentException("Invalid store ID"));
+            scooter.setStore(store);
+            changed = true;
+        }
+
+        if (changed) {
+            scooterRepository.save(scooter);
+        }
+
+        return changed;
+    }
 }

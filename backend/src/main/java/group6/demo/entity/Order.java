@@ -16,7 +16,11 @@ public class Order {
     @Column(name = "order_time", nullable = false)
     private Date orderTime;
 
-    // 1: active, 2: completed, 3: cancelled
+    // 1: CREATED (已创建)
+    // 2: PAID (已支付未开始)
+    // 3: ACTIVE (使用中)
+    // 4: COMPLETED (已完成)
+    // 5: CANCELLED (已取消)
     @Column(nullable = false)
     private Integer status;
     

@@ -18,4 +18,5 @@ public interface ScooterService {
 
     Optional<Scooter> changeScooterStatus(Long id);
 
+    boolean updateScooter(Long id, ScooterAddDTO dto);
 }

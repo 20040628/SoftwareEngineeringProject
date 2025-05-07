@@ -132,7 +132,6 @@ const login = async () => {
     <!-- 按钮 -->
     <el-form-item>
       <el-button type="primary" :loading="loading" native-type="submit" @click="login">Login</el-button>
-      <router-link to="/register" class="btn-link">Register</router-link>
     </el-form-item>
   </el-form>
 </template>
@@ -252,9 +251,9 @@ label {
 }
 
 .form-control:focus {
-  border-color: #009688; /* Element Plus 主题的高亮色 */
+  border-color: #003c51; /* Element Plus 主题的高亮色 */
   outline: none;
-  box-shadow: 0 0 1px #009688;
+  box-shadow: 0 0 1px #003c51;
 }
 
 .input-wrapper {
@@ -304,17 +303,17 @@ label {
 
 
 .el-button--primary {
-  background-color: #009688 !important;
+  background-color: #003c51 !important;
   border: none !important;
   color: white !important;
 }
 
 .el-button--primary:hover {
-  background-color: #00796b !important; /* 让 hover 颜色稍微不同 */
+  background-color: #003c51 !important; /* 让 hover 颜色稍微不同 */
 }
 
 .btn-link {
-  color: #009688;
+  color: #003c51;
   text-decoration: none;
 }
 

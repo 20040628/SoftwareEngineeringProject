@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bank-payment")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://118.24.22.77"}, allowCredentials = "true")
 public class BankCardPaymentController {
     
     @Autowired
@@ -82,7 +82,8 @@ public class BankCardPaymentController {
             user.setBankBalance(newBalance);
             userRepository.save(user);
             
-            // 更新订单状态（保持为1-活跃状态，只有还车后才变为2-已完成）
+            // 更新订单状态为已支付未开始(2)
+            order.setStatus(2);
             orderRepository.save(order);
             
             // 构建响应
@@ -101,7 +102,7 @@ public class BankCardPaymentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("支付失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Payment failed: " + e.getMessage());
         }
     }
     
@@ -137,7 +138,7 @@ public class BankCardPaymentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("查询银行卡失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Failed to query bank card: " + e.getMessage());
         }
     }
 } 

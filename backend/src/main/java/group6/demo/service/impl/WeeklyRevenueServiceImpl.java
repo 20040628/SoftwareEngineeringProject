@@ -133,10 +133,10 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
      * create the weekly revenue statistics
      */
     private WeeklyRevenueDTO createWeeklyRevenue(Date weekStartDate, Date weekEndDate) {
-        // query all the completed orders in the specified week (status=2 means completed)
+        // query all the completed orders in the specified week (status=4 means completed)
         // use start_time as the criterion
         List<Order> orders = orderRepository.findAll().stream()
-                .filter(order -> order.getStatus() == 2 && 
+                .filter(order -> order.getStatus() == 4 && 
                         order.getStartTime().after(weekStartDate) && 
                         order.getStartTime().before(weekEndDate))
                 .collect(Collectors.toList());
@@ -306,7 +306,7 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
         
         // query all the completed orders in the specified week
         List<Order> orders = orderRepository.findAll().stream()
-                .filter(order -> order.getStatus() == 2 && 
+                .filter(order -> order.getStatus() == 4 && 
                         order.getStartTime().after(weekStartDate) && 
                         order.getStartTime().before(weekEndDate))
                 .collect(Collectors.toList());

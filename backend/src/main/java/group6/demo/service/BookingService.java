@@ -32,4 +32,11 @@ public interface BookingService {
      * @return 更新后的订单
      */
     Order returnScooter(ReturnScooterDTO returnScooterDTO);
+    
+    /**
+     * 开始租赁功能 - 将订单状态从"已支付未开始"(2)转换为"使用中"(3)
+     * @param orderId 订单ID
+     * @return 更新后的订单
+     */
+    Order startRental(Long orderId);
 } 

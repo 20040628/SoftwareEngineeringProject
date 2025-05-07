@@ -76,7 +76,7 @@ public class AuthController {
         // 验证验证码
         if (!captchaService.validateCaptcha(loginDTO.getCaptchaKey(), loginDTO.getCaptcha())) {
             Map<String, String> errors = new HashMap<>();
-            errors.put("captcha", "验证码错误或已过期");
+            errors.put("captcha", "Verification code is incorrect or expired");
             return ResponseEntity.badRequest().body(errors);
         }
 
@@ -202,9 +202,9 @@ public class AuthController {
         
         boolean sent = passwordResetService.sendResetCode(forgotPasswordDTO.getEmail());
         if (sent) {
-            return ResponseEntity.ok().body(Map.of("message", "重置验证码已发送到您的邮箱"));
+            return ResponseEntity.ok().body(Map.of("message", "Reset verification code has been sent to your email"));
         } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "邮箱不存在"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Email does not exist"));
         }
     }
     
@@ -229,9 +229,9 @@ public class AuthController {
         );
         
         if (reset) {
-            return ResponseEntity.ok().body(Map.of("message", "密码重置成功"));
+            return ResponseEntity.ok().body(Map.of("message", "Password reset successful"));
         } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "验证码错误或已过期"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Reset code is incorrect or expired"));
         }
     }
 } 

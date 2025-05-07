@@ -45,23 +45,23 @@ public class BankCardPaymentController {
         try {
             // 查找订单
             Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("The order does not exist"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
                 
             // 验证订单状态
-            if (order.getStatus() != 1) {
-                throw new IllegalArgumentException("订单状态不正确，无法支付");
+            if (order.getStatus() != 1) { // 状态必须是CREATED(已创建)
+                throw new IllegalArgumentException("Invalid order status, cannot process payment");
             }
             
             // 获取用户信息和银行卡
             User user = order.getUser();
             if (user.getBankCard() == null || user.getBankCard().isEmpty()) {
-                throw new IllegalArgumentException("未找到银行卡信息，请先绑定银行卡");
+                throw new IllegalArgumentException("Bank card information not found, please bind your bank card first");
             }
             
             // 检查银行卡余额是否足够（原价+押金）
             BigDecimal totalAmount = order.getPrice().add(DEPOSIT_AMOUNT);
             if (user.getBankBalance() == null || user.getBankBalance().compareTo(totalAmount) < 0) {
-                throw new IllegalArgumentException("银行卡余额不足，无法完成支付");
+                throw new IllegalArgumentException("Insufficient bank card balance, payment failed");
             }
             
             // 模拟银行卡支付验证 (验证安全码)
@@ -82,14 +82,14 @@ public class BankCardPaymentController {
             user.setBankBalance(newBalance);
             userRepository.save(user);
             
-            // 更新订单状态为已支付未开始(2)
-            order.setStatus(2);
+            // 更新订单状态为已支付
+            order.setStatus(2); // PAID (已支付)
             orderRepository.save(order);
             
             // 构建响应
             BankCardPaymentResponse response = new BankCardPaymentResponse();
             response.setSuccess(true);
-            response.setMessage("支付成功");
+            response.setMessage("Bank card payment successful");
             response.setOrderId(order.getId());
             // 获取银行卡后4位显示
             String bankCard = user.getBankCard();
@@ -116,7 +116,7 @@ public class BankCardPaymentController {
         try {
             // 查找用户
             User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("用户不存在"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 
             // 检查银行卡信息
             boolean hasBankCard = user.getBankCard() != null && !user.getBankCard().isEmpty();

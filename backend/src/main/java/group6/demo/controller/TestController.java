@@ -11,8 +11,15 @@ public class TestController {
     @GetMapping("/api/test")
     public Map<String, String> test() {
         Map<String, String> response = new HashMap<>();
-        response.put("message", "后端连接成功！");
+        response.put("message", "Backend connection successful!");
         response.put("timestamp", String.valueOf(System.currentTimeMillis()));
+        return response;
+    }
+
+    @GetMapping("/hello")
+    public Map<String, String> hello() {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Backend connection successful!");
         return response;
     }
 } 

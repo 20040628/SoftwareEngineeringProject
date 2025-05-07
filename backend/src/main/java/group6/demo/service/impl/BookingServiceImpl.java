@@ -550,18 +550,18 @@ public class BookingServiceImpl implements BookingService {
             
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(user.getEmail());
-            message.setSubject("押金退还通知");
-            message.setText("尊敬的 " + user.getUsername() + ",\n\n" +
-                    "您好！您的订单 #" + order.getId() + " 已完成，由于归还电动车时电量大于90%，" +
-                    "我们已将押金 ¥" + order.getDepositAmount() + " 退还至您的银行卡账户。\n\n" +
-                    "感谢您使用我们的服务！\n\n" +
-                    "祝您出行愉快，\n" +
-                    "电动车租赁平台团队");
+            message.setSubject("Deposit Refund Notification");
+            message.setText("Dear " + user.getUsername() + ",\n\n" +
+                    "Hello! Your order #" + order.getId() + " has been completed. Since the scooter was returned with a battery level above 90%, " +
+                    "we have refunded your deposit of $" + order.getDepositAmount() + " to your bank card account.\n\n" +
+                    "Thank you for using our service!\n\n" +
+                    "Have a pleasant journey,\n" +
+                    "E-Scooter Rental Platform Team");
             
             emailSender.send(message);
         } catch (Exception e) {
-            // 记录邮件发送失败，但不影响主要业务流程
-            System.err.println("发送押金退还邮件失败: " + e.getMessage());
+            // Log email sending failure, but don't affect the main business process
+            System.err.println("Failed to send deposit refund email: " + e.getMessage());
         }
     }
 

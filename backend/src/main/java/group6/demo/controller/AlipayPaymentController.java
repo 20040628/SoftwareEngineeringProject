@@ -30,15 +30,12 @@ public class AlipayPaymentController {
         try {
             // 查找订单
             Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
                 
             // 验证订单状态
             if (order.getStatus() != 1) {
-                throw new IllegalArgumentException("订单状态不正确，无法支付");
+                throw new IllegalArgumentException("Invalid order status, cannot process payment");
             }
-            
-            // 模拟支付宝支付处理
-            // 在实际环境中这里会调用支付宝支付网关API
             
             // 设置支付方式为支付宝
             order.setPaymentMethod("ALIPAY");
@@ -46,13 +43,14 @@ public class AlipayPaymentController {
             // 支付宝支付不收取押金，也不需要处理押金退还
             order.setDepositPaid(false);
             
-            // 更新订单状态（保持为1-活跃状态，只有还车后才变为2-已完成）
+            // 更新订单状态为已支付
+            order.setStatus(2); // PAID (已支付)
             orderRepository.save(order);
             
             // 构建响应
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "支付宝支付成功");
+            response.put("message", "Alipay payment successful");
             response.put("orderId", order.getId());
             response.put("amount", order.getPrice());
             response.put("paymentTime", new Date());

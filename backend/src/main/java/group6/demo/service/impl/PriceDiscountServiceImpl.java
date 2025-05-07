@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -34,45 +35,48 @@ public class PriceDiscountServiceImpl implements PriceDiscountService {
     
     @Override
     public BigDecimal calculateDiscountedPrice(BigDecimal originalPrice, Long userId) {
+        // 如果原价为空或者用户ID为空，直接返回原价
         if (originalPrice == null || userId == null) {
-            System.out.println("折扣计算: 原价或用户ID为空");
+            System.out.println("Discount calculation: Original price or user ID is null");
             return originalPrice;
         }
-        
+
+        // 获取用户信息
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            System.out.println("折扣计算: 用户不存在 - " + userId);
+            System.out.println("Discount calculation: User not found - " + userId);
             return originalPrice;
         }
-        
+
         User user = userOptional.get();
         
-        // 在计算折扣前，根据用户生日更新学生和老人身份
-        updateUserDiscountStatus(user);
-        
+        // 计算折扣
         BigDecimal discountRate = BigDecimal.ONE; // 默认无折扣
+
+        // 应用折扣规则
         
-        // 判断是否为常客
+        // 1. 检查是否为常客
         if (user.getIsFrequentUser() != null && user.getIsFrequentUser() == 1) {
             discountRate = discountRate.multiply(FREQUENT_USER_DISCOUNT);
-            System.out.println("应用常客折扣: " + FREQUENT_USER_DISCOUNT);
+            System.out.println("Applying frequent customer discount: " + FREQUENT_USER_DISCOUNT);
         }
         
-        // 判断是否为学生
+        // 2. 检查是否为学生
         if (user.getIsStudent() != null && user.getIsStudent() == 1) {
             discountRate = discountRate.multiply(STUDENT_DISCOUNT);
-            System.out.println("应用学生折扣: " + STUDENT_DISCOUNT);
+            System.out.println("Applying student discount: " + STUDENT_DISCOUNT);
         }
         
-        // 判断是否为老年人
+        // 3. 检查是否为老年人
         if (user.getIsSenior() != null && user.getIsSenior() == 1) {
             discountRate = discountRate.multiply(SENIOR_DISCOUNT);
-            System.out.println("应用老年人折扣: " + SENIOR_DISCOUNT);
+            System.out.println("Applying senior discount: " + SENIOR_DISCOUNT);
         }
         
-        // 计算折扣价格
-        BigDecimal discountedPrice = originalPrice.multiply(discountRate).setScale(2, BigDecimal.ROUND_HALF_UP);
-        System.out.println("折扣计算: 原价=" + originalPrice + ", 折扣率=" + discountRate + ", 折后价=" + discountedPrice);
+        // 计算折扣后价格
+        BigDecimal discountedPrice = originalPrice.multiply(discountRate).setScale(2, RoundingMode.HALF_UP);
+        System.out.println("Discount calculation: Original price=" + originalPrice + ", Discount rate=" + discountRate + ", Discounted price=" + discountedPrice);
+        
         return discountedPrice;
     }
     
@@ -81,68 +85,82 @@ public class PriceDiscountServiceImpl implements PriceDiscountService {
      * @param user 用户信息
      */
     private void updateUserDiscountStatus(User user) {
+        if (user == null) return;
+        
+        System.out.println("Starting to check discount eligibility for user ID=" + user.getId());
+        System.out.println("User birthday information: " + (user.getBirthday() != null ? user.getBirthday().toString() : "null"));
+        
         boolean updated = false;
         
-        System.out.println("开始检查用户ID=" + user.getId() + "的折扣资格");
-        System.out.println("用户生日信息: " + (user.getBirthday() != null ? user.getBirthday().toString() : "null"));
-        
+        // 如果有生日信息，计算年龄并更新学生和老人状态
         if (user.getBirthday() != null) {
-            Calendar now = Calendar.getInstance();
             Calendar birthCal = Calendar.getInstance();
             birthCal.setTime(user.getBirthday());
             
-            System.out.println("当前日期: " + now.getTime());
-            System.out.println("生日日期: " + birthCal.getTime());
-            System.out.println("当前年份: " + now.get(Calendar.YEAR));
-            System.out.println("生日年份: " + birthCal.get(Calendar.YEAR));
-            System.out.println("当前一年中的日期: " + now.get(Calendar.DAY_OF_YEAR));
-            System.out.println("生日一年中的日期: " + birthCal.get(Calendar.DAY_OF_YEAR));
+            Calendar now = Calendar.getInstance();
+            
+            System.out.println("Current date: " + now.getTime());
+            System.out.println("Birth date: " + birthCal.getTime());
+            System.out.println("Current year: " + now.get(Calendar.YEAR));
+            System.out.println("Birth year: " + birthCal.get(Calendar.YEAR));
+            System.out.println("Current day of year: " + now.get(Calendar.DAY_OF_YEAR));
+            System.out.println("Birth day of year: " + birthCal.get(Calendar.DAY_OF_YEAR));
             
             // 计算年龄
             int age = now.get(Calendar.YEAR) - birthCal.get(Calendar.YEAR);
-            System.out.println("初步计算年龄: " + age);
             
+            System.out.println("Initial age calculation: " + age);
+            
+            // 检查是否已经过了今年的生日
             if (now.get(Calendar.DAY_OF_YEAR) < birthCal.get(Calendar.DAY_OF_YEAR)) {
-                age--;
-                System.out.println("当前日期小于生日日期，年龄调整为: " + age);
+                age--; // 如果还没到生日，年龄减1
+                System.out.println("Current date is before birthday, adjusted age: " + age);
             }
             
-            // 判断是否为学生（18-25岁）
-            boolean isStudent = (age >= STUDENT_MIN_AGE && age <= STUDENT_MAX_AGE);
-            System.out.println("是否为学生年龄(18-25): " + isStudent);
-            System.out.println("当前学生状态: " + (user.getIsStudent() != null ? user.getIsStudent() : "null"));
+            // 更新学生状态 (18-25岁为学生年龄段)
+            boolean isStudent = age >= 18 && age <= 25;
+            System.out.println("Is student age (18-25): " + isStudent);
+            System.out.println("Current student status: " + (user.getIsStudent() != null ? user.getIsStudent() : "null"));
             
-            if ((user.getIsStudent() == null) || (user.getIsStudent() == 1) != isStudent) {
+            // 只有当状态需要变更时才更新
+            if ((isStudent && (user.getIsStudent() == null || user.getIsStudent() != 1)) || 
+                (!isStudent && user.getIsStudent() != null && user.getIsStudent() == 1)) {
                 user.setIsStudent(isStudent ? 1 : 0);
+                System.out.println("Updating user ID=" + user.getId() + " student status: " + (isStudent ? "Yes" : "No") + ", Age=" + age);
                 updated = true;
-                System.out.println("更新用户ID=" + user.getId() + "的学生状态: " + (isStudent ? "是" : "否") + ", 年龄=" + age);
             } else {
-                System.out.println("无需更新学生状态，保持为: " + (user.getIsStudent() == 1 ? "是" : "否"));
+                System.out.println("No need to update student status, keeping as: " + (user.getIsStudent() == 1 ? "Yes" : "No"));
             }
             
-            // 判断是否为老人（60岁以上）
-            boolean isSenior = (age >= SENIOR_MIN_AGE);
-            System.out.println("是否为老人年龄(60+): " + isSenior);
-            System.out.println("当前老人状态: " + (user.getIsSenior() != null ? user.getIsSenior() : "null"));
+            // 更新老人状态 (60岁以上为老人)
+            boolean isSenior = age >= 60;
+            System.out.println("Is senior age (60+): " + isSenior);
+            System.out.println("Current senior status: " + (user.getIsSenior() != null ? user.getIsSenior() : "null"));
             
-            if ((user.getIsSenior() == null) || (user.getIsSenior() == 1) != isSenior) {
+            // 只有当状态需要变更时才更新
+            if ((isSenior && (user.getIsSenior() == null || user.getIsSenior() != 1)) || 
+                (!isSenior && user.getIsSenior() != null && user.getIsSenior() == 1)) {
                 user.setIsSenior(isSenior ? 1 : 0);
+                System.out.println("Updating user ID=" + user.getId() + " senior status: " + (isSenior ? "Yes" : "No") + ", Age=" + age);
                 updated = true;
-                System.out.println("更新用户ID=" + user.getId() + "的老人状态: " + (isSenior ? "是" : "否") + ", 年龄=" + age);
             } else {
-                System.out.println("无需更新老人状态，保持为: " + (user.getIsSenior() == 1 ? "是" : "否"));
+                System.out.println("No need to update senior status, keeping as: " + (user.getIsSenior() == 1 ? "Yes" : "No"));
             }
         } else {
-            System.out.println("警告: 用户ID=" + user.getId() + "没有生日信息，无法计算折扣资格");
+            System.out.println("Warning: User ID=" + user.getId() + " has no birthday information, cannot calculate discount eligibility");
         }
         
-        // 如果状态有更新，保存到数据库
+        // 如果有更新，保存用户信息
         if (updated) {
-            System.out.println("用户折扣状态已变更，正在保存到数据库...");
-            userRepository.save(user);
-            System.out.println("保存成功, 更新后状态: 学生=" + user.getIsStudent() + ", 老人=" + user.getIsSenior());
+            System.out.println("User discount status has changed, saving to database...");
+            try {
+                userRepository.save(user);
+                System.out.println("Save successful, updated status: Student=" + user.getIsStudent() + ", Senior=" + user.getIsSenior());
+            } catch (Exception e) {
+                System.err.println("Failed to update user discount status, user ID=" + user.getId() + ": " + e.getMessage());
+            }
         } else {
-            System.out.println("用户折扣状态未变更，不需要保存");
+            System.out.println("User discount status unchanged, no need to save");
         }
     }
     
@@ -195,7 +213,7 @@ public class PriceDiscountServiceImpl implements PriceDiscountService {
                 userRepository.save(user);
             } catch (Exception e) {
                 // 记录错误日志但不中断处理
-                System.err.println("更新用户折扣状态失败，用户ID=" + user.getId() + ": " + e.getMessage());
+                System.err.println("Updating user discount status failed, user ID=" + user.getId() + ": " + e.getMessage());
             }
         });
     }
@@ -207,7 +225,7 @@ public class PriceDiscountServiceImpl implements PriceDiscountService {
             User user = userOptional.get();
             updateUserDiscountStatus(user);
         } else {
-            System.err.println("无法更新折扣状态，用户不存在: " + userId);
+            System.err.println("Cannot update discount status, user not found: " + userId);
         }
     }
 } 

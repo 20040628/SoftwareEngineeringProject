@@ -212,11 +212,11 @@ class BookingControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
         assertNotNull(responseBody);
-        assertEquals("电动车归还成功", responseBody.get("message"));
+        assertEquals("Scooter returned successfully", responseBody.get("message"));
         assertEquals(1L, responseBody.get("orderId"));
         assertEquals(true, responseBody.get("depositRefunded"));
         assertEquals(new BigDecimal("50.00"), responseBody.get("depositAmount"));
-        assertEquals("您已成功归还电动车，并且电量大于90%，押金已退还。", responseBody.get("depositMessage"));
+        assertEquals("You have successfully returned the scooter with battery level above 90%, your deposit has been refunded.", responseBody.get("depositMessage"));
         verify(bookingService, times(1)).returnScooter(any(ReturnScooterDTO.class));
     }
 
@@ -236,7 +236,7 @@ class BookingControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
         assertNotNull(responseBody);
-        assertEquals("租赁已开始", responseBody.get("message"));
+        assertEquals("Rental has started", responseBody.get("message"));
         assertEquals(orderId, responseBody.get("orderId"));
         assertEquals(3, responseBody.get("status"));
         assertNotNull(responseBody.get("startTime"));

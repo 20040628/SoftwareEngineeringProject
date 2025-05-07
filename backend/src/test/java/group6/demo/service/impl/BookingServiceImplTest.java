@@ -202,7 +202,7 @@ class BookingServiceImplTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.startRental(orderId);
         });
-        assertEquals("订单不存在", exception.getMessage());
+        assertEquals("Order not found", exception.getMessage());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(orderRepository);
     }
@@ -217,7 +217,7 @@ class BookingServiceImplTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bookingService.startRental(orderId);
         });
-        assertEquals("只有已支付未开始的订单才能开始使用", exception.getMessage());
+        assertEquals("Only paid orders that have not started can begin rental", exception.getMessage());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(orderRepository);
     }

@@ -66,7 +66,7 @@ class AlipayPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("订单不存在", response.getBody());
+        assertEquals("Order not found", response.getBody());
     }
 
     @Test
@@ -84,7 +84,7 @@ class AlipayPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("订单状态不正确，无法支付", response.getBody());
+        assertEquals("Invalid order status, cannot process payment", response.getBody());
     }
 
     @Test
@@ -98,6 +98,6 @@ class AlipayPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertTrue(response.getBody().toString().contains("支付失败"));
+        assertTrue(response.getBody().toString().contains("Payment failed"));
     }
 }

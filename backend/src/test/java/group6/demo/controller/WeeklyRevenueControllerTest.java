@@ -224,7 +224,7 @@ class WeeklyRevenueControllerTest {
         ResponseEntity<?> response = weeklyRevenueController.getDailyRevenuesInWeek(token, weekStartDate);
 
         assertEquals(401, response.getStatusCodeValue());
-        assertEquals("无效的令牌: invalid token", response.getBody());
+        assertEquals("invalid token: invalid token", response.getBody());
         verify(jwtUtil, times(1)).extractRole("invalidToken");
         verify(weeklyRevenueService, times(0)).getDailyRevenuesInWeek(any(Date.class));
     }

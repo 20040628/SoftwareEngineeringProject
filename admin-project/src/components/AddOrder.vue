@@ -240,7 +240,7 @@ export default {
               if (error.response.data.message) {
                 this.errorMessage = 'Error: ' + error.response.data.message;
               } else {
-                this.errorMessage = 'Invalid data provided';
+                this.errorMessage = this.errors;
               }
               break;
             case 401:

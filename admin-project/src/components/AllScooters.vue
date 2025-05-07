@@ -302,7 +302,7 @@ export default {
           ElNotification({
             title: "Error",
             message: 'Status updated successfully',
-            type: "error"
+            type: "success"
           });
         } else {
           ElNotification({

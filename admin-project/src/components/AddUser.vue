@@ -263,7 +263,7 @@ export default {
           this.resetForm();
           ElNotification({
             title: "Add Successfully",
-            message: `User: ${this.newUser.username}`,
+            message: `User: ${res.data.userId}`,
             type: "success"
           });
         }

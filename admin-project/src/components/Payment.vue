@@ -82,7 +82,7 @@ export default {
           ElNotification({
             title: "Successfully",
             message: 'Payment successful',
-            type: "error"
+            type: "success"
           });
           this.$router.push('/add_order');
         }

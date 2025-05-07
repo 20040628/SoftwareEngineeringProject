@@ -31,7 +31,7 @@
               v-model="storeData.latitude"
               type="number"
               step="0.000001"
-              placeholder="Enter latitude"
+              placeholder="Enter latitude (-90 to 90)"
               class="input"
           />
           <el-alert
@@ -53,7 +53,7 @@
               v-model="storeData.longitude"
               type="number"
               step="0.000001"
-              placeholder="Enter longitude"
+              placeholder="Enter longitude (-180 to 180)"
               class="input"
           />
           <el-alert
@@ -128,9 +128,18 @@ export default {
       // Basic validation
       if (!this.storeData.latitude) {
         this.errors.latitude = 'Latitude is required';
+      } else if (isNaN(this.storeData.latitude)) {
+        this.errors.latitude = 'Latitude must be a number';
+      } else if (this.storeData.latitude < -90 || this.storeData.latitude > 90) {
+        this.errors.latitude = 'Latitude must be between -90 and 90 degrees';
       }
+
       if (!this.storeData.longitude) {
         this.errors.longitude = 'Longitude is required';
+      } else if (isNaN(this.storeData.longitude)) {
+        this.errors.longitude = 'Longitude must be a number';
+      } else if (this.storeData.longitude < -180 || this.storeData.longitude > 180) {
+        this.errors.longitude = 'Longitude must be between -180 and 180 degrees';
       }
 
       if (Object.keys(this.errors).length > 0) {
@@ -194,7 +203,7 @@ export default {
               } else if (error.response.data.longitude) {
                 this.errorMessage = 'Error: ' + error.response.data.longitude;
               } else {
-                this.errorMessage = 'Invalid data provided';
+                this.errorMessage = this.errors;
               }
               break;
             case 401:

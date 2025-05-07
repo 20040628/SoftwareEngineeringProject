@@ -365,10 +365,6 @@ export default {
   border-radius: 30px;
 }
 
-.store-location {
-
-}
-
 /* Search Box Styles */
 .search-box {
   position: relative;
@@ -485,7 +481,7 @@ export default {
 }
 
 .status-unavailable {
-  background-color: #f56c6c;
+  background-color: #950202;
   color: white;
 }
 

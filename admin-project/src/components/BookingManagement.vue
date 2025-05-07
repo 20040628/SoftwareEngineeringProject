@@ -5,9 +5,11 @@
       <div class="status-filter">
         <label for="status-select">Filter by Status:</label>
         <select id="status-select" v-model="statusFilter" @change="filterBookings">
-          <option value="1">Active</option>
-          <option value="2">Completed</option>
-          <option value="3">Cancelled</option>
+          <option value="1">CREATED</option>
+          <option value="2">PAID</option>
+          <option value="3">ACTIVE</option>
+          <option value="4">COMPLETED</option>
+          <option value="5">CANCELLED</option>
         </select>
       </div>
       <div class="search-box">
@@ -104,7 +106,7 @@
           <button
               v-else
               class="pagination-page"
-              :class="{ 'pagination-active': page === currentPage }"
+              :class="{ 'pagination-status-cancelled': page === currentPage }"
               @click="goToPage(page)"
           >
             {{ page }}
@@ -352,15 +354,21 @@ export default {
     },
 
     getStatusLabel(status) {
-      const statusMap = { 1: 'Active', 2: 'Completed', 3: 'Cancelled' };
+      const statusMap = { 1: 'CREATED' ,
+        2: 'PAID' ,
+        3: 'ACTIVE' ,
+        4: 'COMPLETED' ,
+        5: 'CANCELLED' };
       return statusMap[status] || 'Unknown';
     },
 
     getStatusClass(status) {
       const statusClassMap = {
-        1: 'status-active',
-        2: 'status-completed',
-        3: 'status-cancelled'
+        1: 'CREATED' ,
+        2: 'PAID' ,
+        3: 'ACTIVE' ,
+        4: 'COMPLETED' ,
+        5: 'CANCELLED' ,
       };
       return statusClassMap[status] || 'status-unknown';
     }
@@ -524,18 +532,28 @@ export default {
   text-transform: uppercase;
 }
 
-.status-active {
+.CREATED {
   background-color: #016025;
   color: white;
 }
 
-.status-completed {
-  background-color: #033161;
+.PAID {
+  background-color: #10026e;
   color: white;
 }
 
-.status-cancelled {
-  background-color: #6e0202;
+.ACTIVE {
+  background-color: #950202;
+  color: white;
+}
+
+.COMPLETED {
+  background-color: #026e6a;
+  color: white;
+}
+
+.CANCELLED {
+  background-color: #033161;
   color: white;
 }
 
@@ -607,7 +625,7 @@ export default {
 
 .pagination-prev:hover:not(:disabled),
 .pagination-next:hover:not(:disabled),
-.pagination-page:hover:not(.pagination-active) {
+.pagination-page:hover:not(.pagination-status-cancelled) {
   color: #003c51;
   border-color: #003c51;
 }
@@ -620,7 +638,7 @@ export default {
   cursor: not-allowed;
 }
 
-.pagination-active {
+.pagination-status-cancelled {
   background-color: #003c51;
   color: #fff !important;
   border-color: #003c51 !important;

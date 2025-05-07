@@ -13,7 +13,14 @@
               placeholder="Enter user ID"
               class="input"
           />
-          <span class="error-message" v-if="errors.userId">{{ errors.userId }}</span>
+          <el-alert
+              v-if="errors.userId"
+              :title="errors.userId"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -28,7 +35,14 @@
               placeholder="Enter scooter ID"
               class="input"
           />
-          <span class="error-message" v-if="errors.scooterId">{{ errors.scooterId }}</span>
+          <el-alert
+              v-if="errors.scooterId"
+              :title="errors.scooterId"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -42,7 +56,14 @@
             <option value="DAY">Day</option>
             <option value="WEEK">Week</option>
           </select>
-          <span class="error-message" v-if="errors.hireType">{{ errors.hireType }}</span>
+          <el-alert
+              v-if="errors.hireType"
+              :title="errors.hireType"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -55,8 +76,25 @@
               type="datetime-local"
               class="input"
           />
-          <span class="error-message" v-if="errors.startTime">{{ errors.startTime }}</span>
+          <el-alert
+              v-if="errors.startTime"
+              :title="errors.startTime"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
+      </div>
+
+      <!-- Error message -->
+      <div class="form-row" v-if="hasError && errorMessage">
+        <el-alert
+            :title="errorMessage"
+            type="error"
+            :closable="false"
+            show-icon
+        />
       </div>
 
       <!-- Buttons row -->
@@ -72,6 +110,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -83,7 +122,8 @@ export default {
         startTime: '',
       },
       errors: {},
-      successMessage: '',
+      hasError: false,
+      errorMessage: '',
       bookingResult: null
     };
   },
@@ -95,28 +135,49 @@ export default {
         hireType: 'HOUR',
         startTime: '',
       };
-    },
-    async createBooking() {
-      // 清空错误和消息
       this.errors = {};
-      this.successMessage = '';
+      this.hasError = false;
+      this.errorMessage = '';
       this.bookingResult = null;
+    },
+    validateForm() {
+      this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
 
-      // 表单基本验证
       if (!this.bookingData.userId) {
         this.errors.userId = 'User ID is required';
+      } else if (this.bookingData.userId <= 0) {
+        this.errors.userId = 'User ID must be greater than 0';
       }
+
       if (!this.bookingData.scooterId) {
         this.errors.scooterId = 'Scooter ID is required';
+      } else if (this.bookingData.scooterId <= 0) {
+        this.errors.scooterId = 'Scooter ID must be greater than 0';
       }
+
       if (!this.bookingData.hireType) {
         this.errors.hireType = 'Hire type is required';
       }
+
       if (!this.bookingData.startTime) {
         this.errors.startTime = 'Start time is required';
       }
 
-      if (Object.keys(this.errors).length > 0) {
+      this.hasError = Object.keys(this.errors).length > 0;
+      if (this.hasError) {
+        ElNotification({
+          title: "Input Error",
+          message: `Please fix the errors above`,
+          type: "error"
+        });
+      }
+
+      return !this.hasError;
+    },
+    async createBooking() {
+      if (!this.validateForm()) {
         return;
       }
 
@@ -126,13 +187,14 @@ export default {
         const admin = localStorage.getItem('admin');
 
         if (!token) {
-          alert('Please login first');
+          this.errorMessage = 'Please login first';
           this.$router.push('/login');
           return;
         }
 
         if (!admin) {
-          alert('User information not available. Please login again.');
+          this.errorMessage = 'User information not available. Please login again.';
+          this.hasError = true;
           return;
         }
 
@@ -158,17 +220,13 @@ export default {
         });
 
         if (res.status === 200) {
+          ElNotification({
+            title: "Create Order Successfully",
+            message: `New Order ID: ${res.data.orderId}`,
+            type: "success"
+          });
           const orderId = res.data.orderId;
-          this.successMessage = 'Booking created successfully';
-          this.bookingResult = res.data;
-
-          // 清空表单
-          this.bookingData = {
-            userId: '',
-            scooterId: '',
-            hireType: 'HOUR',
-            startTime: ''
-          };
+          this.resetForm();
 
           // 跳转到支付页面
           this.$router.push({ name: 'Payment', params: { orderId } });
@@ -179,23 +237,28 @@ export default {
           switch (error.response.status) {
             case 400:
               this.errors = error.response.data || {};
-              alert('Error response: ' + JSON.stringify(error.response.data));
+              if (error.response.data.message) {
+                this.errorMessage = 'Error: ' + error.response.data.message;
+              } else {
+                this.errorMessage = 'Invalid data provided';
+              }
               break;
             case 401:
               localStorage.removeItem('token');
               sessionStorage.removeItem('token');
-              alert('Session expired. Please login again.');
+              this.errorMessage = 'Session expired. Please login again.';
               this.$router.push('/login');
               break;
             case 403:
-              alert('Forbidden: You do not have permission to perform this action');
+              this.errorMessage = 'Forbidden: You do not have permission to perform this action';
               break;
             default:
-              alert(`Error: ${error.response.data?.message || 'Unknown error occurred'}`);
+              this.errorMessage = `Error: ${error.response.data?.message || 'Unknown error occurred'}`;
           }
         } else {
-          alert('Network error: Please check your connection');
+          this.errorMessage = 'Network error: Please check your connection';
         }
+        this.hasError = true;
         console.error('Booking error:', error);
       }
     }
@@ -203,7 +266,7 @@ export default {
   mounted() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) {
-      alert('Please login first');
+      this.errorMessage = 'Please login first';
       this.$router.push('/login');
     }
   }
@@ -303,31 +366,12 @@ label {
   background: #f4f4f4;
 }
 
-.error-message {
-  color: #f56c6c;
-  font-size: 12px;
-  margin-top: 4px;
+.custom-alert {
+  font-size: 16px;
+  width: 99%;
+  margin-top: 3px;
+  height: 30px;
 }
-
-.success-message {
-  color: #67c23a;
-  font-weight: bold;
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: #f0f9eb;
-}
-
-.booking-details {
-  margin-top: 10px;
-  font-weight: normal;
-  color: #333;
-}
-
-.booking-details p {
-  margin: 5px 0;
-}
-
 
 @media (max-width: 767px) {
   .form-row {

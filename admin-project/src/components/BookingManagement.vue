@@ -27,14 +27,6 @@
         </button>
       </div>
     </div>
-
-    <div v-if="bookings.length === 0" style="color: red; padding: 10px;">
-      <p>Debug Info:</p>
-      <p>isAdmin: {{ isAdmin }}</p>
-      <p>Token: {{ $store.getters.token ? 'Exists' : 'Missing' }}</p>
-      <p>Bookings count: {{ bookings.length }}</p>
-      <p>Error: {{ error || 'None' }}</p>
-    </div>
     <div class="table-container">
       <table class="booking-table">
         <thead>
@@ -135,11 +127,11 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -344,7 +336,11 @@ export default {
             }
         );
         if (res.status === 200) {
-          alert('Booking cancelled successfully');
+          ElNotification({
+            title: "Action successfully",
+            message: 'Booking cancelled successfully',
+            type: "success"
+          });
           this.fetchBookings();
         }
       } catch (error) {

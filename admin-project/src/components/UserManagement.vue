@@ -136,6 +136,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -244,7 +245,11 @@ export default {
         );
 
         if (res.status === 200) {
-          alert('User status changed successfully');
+          ElNotification({
+            title: "Successful Action",
+            message: 'User status changed successfully',
+            type: "success"
+          });
           this.fetchUsers();
         }
       } catch (error) {

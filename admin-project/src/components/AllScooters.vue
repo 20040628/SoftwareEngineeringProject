@@ -133,6 +133,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -203,7 +204,11 @@ export default {
         const res = await axios.get('http://localhost:8080/api/stores/getAll');
         this.stores = res.data;
       } catch (error) {
-        alert('Failed to load stores');
+        ElNotification({
+          title: "Error",
+          message: 'Failed to load stores',
+          type: "error"
+        });
       }
     },
     async fetchScooters() {
@@ -212,7 +217,11 @@ export default {
         this.scooters = res.data;
         this.filteredScooters = [...res.data];
       } catch (error) {
-        alert('Failed to load scooters');
+        ElNotification({
+          title: "Error",
+          message: 'Failed to load scooters',
+          type: "error"
+        });
       }
     },
     handleSearch() {
@@ -290,12 +299,24 @@ export default {
         const res = await axios.get(`http://localhost:8080/api/scooters/changeStatus/${id}`);
         if (res.status === 200) {
           this.fetchScooters();
-          alert('Status updated successfully');
+          ElNotification({
+            title: "Error",
+            message: 'Status updated successfully',
+            type: "error"
+          });
         } else {
-          alert('Failed to update status');
+          ElNotification({
+            title: "Error",
+            message: 'Failed to update status',
+            type: "error"
+          });
         }
       } catch (error) {
-        alert('Network error');
+        ElNotification({
+          title: "Error",
+          message: 'Network error',
+          type: "error"
+        });
       }
     }
   }

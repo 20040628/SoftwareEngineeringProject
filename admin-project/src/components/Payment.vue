@@ -30,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -78,8 +79,11 @@ export default {
         });
 
         if (res.status === 200) {
-          this.successMessage = 'Payment successful';
-          alert(this.successMessage);
+          ElNotification({
+            title: "Successfully",
+            message: 'Payment successful',
+            type: "error"
+          });
           this.$router.push('/add_order');
         }
 

@@ -9,6 +9,14 @@
           <select v-model.number="newScooter.storeId" class="input custom-select">
             <option v-for="store in stores" :key="store.id" :value="store.id">{{ store.name }}</option>
           </select>
+          <el-alert
+              v-if="errors.storeId"
+              :title="errors.storeId"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -17,10 +25,26 @@
         <div class="form-group col-12 col-md-6">
           <label>Price per Hour</label>
           <input v-model.number="newScooter.priceHour" type="number" step="0.01" min="0" placeholder="Enter the price per hour (price > 0)" class="input" />
+          <el-alert
+              v-if="errors.priceHour"
+              :title="errors.priceHour"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
         <div class="form-group col-12 col-md-6">
           <label>Price for Four Hours</label>
           <input v-model.number="newScooter.priceFourHour" type="number" step="0.01" min="0" placeholder="Enter the price for every 4 hours (price > 0)" class="input" />
+          <el-alert
+              v-if="errors.priceFourHour"
+              :title="errors.priceFourHour"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -28,10 +52,26 @@
         <div class="form-group col-12 col-md-6">
           <label>Price per Day</label>
           <input v-model.number="newScooter.priceDay" type="number" step="0.01" min="0" placeholder="Enter the daily price (price > 0)" class="input" />
+          <el-alert
+              v-if="errors.priceDay"
+              :title="errors.priceDay"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
         <div class="form-group col-12 col-md-6">
           <label>Price per Week</label>
           <input v-model.number="newScooter.priceWeek" type="number" step="0.01" min="0" placeholder="Enter the weekly price (price > 0)" class="input" />
+          <el-alert
+              v-if="errors.priceWeek"
+              :title="errors.priceWeek"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -40,6 +80,14 @@
         <div class="form-group col-12 col-md-6">
           <label>Battery</label>
           <input v-model.number="newScooter.battery" type="number" step="0.01" min="0" max="100" placeholder="Enter battery level (From 0 to 100)" class="input" />
+          <el-alert
+              v-if="errors.battery"
+              :title="errors.battery"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -48,6 +96,14 @@
         <div class="form-group col-12 col-md-6">
           <label>Speed</label>
           <input v-model.number="newScooter.speed" type="number" step="0.01" min="0" placeholder="Enter speed (speed > 0)" class="input" />
+          <el-alert
+              v-if="errors.speed"
+              :title="errors.speed"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -81,6 +137,17 @@
           </div>
         </div>
       </div>
+
+      <!-- Error message -->
+      <div class="form-row" v-if="hasError && errorMessage">
+        <el-alert
+            :title="errorMessage"
+            type="error"
+            :closable="false"
+            show-icon
+        />
+      </div>
+
       <!-- Buttons row -->
       <div class="form-row">
         <div class="button-group">
@@ -88,13 +155,13 @@
           <button class="button button-submit" @click="addScooter">Add Scooter</button>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -110,6 +177,9 @@ export default {
         storeId: null,
       },
       stores: [],
+      errors: {},
+      hasError: false,
+      errorMessage: ''
     };
   },
   methods: {
@@ -124,6 +194,9 @@ export default {
         speed: null,
         storeId: null,
       };
+      this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
     },
     async fetchStores() {
       try {
@@ -131,49 +204,137 @@ export default {
         this.stores = res.data;
         console.log(this.stores);
       } catch (error) {
-        alert('Failed to fetch stores');
+        ElNotification({
+          title: "Error",
+          message: 'Failed to fetch stores',
+          type: "error"
+        });
       }
     },
-    async addScooter() {
+    validateForm() {
+      this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
+
       // Validate required fields
-      if (!this.newScooter.storeId ||
-          this.newScooter.priceHour === null ||
-          this.newScooter.priceDay === null ||
-          this.newScooter.battery === null ||
-          this.newScooter.speed === null) {
-        alert('Please fill in all required fields (Store, Price per Hour, Price per Day, Battery, and Speed)');
-        return;
+      if (!this.newScooter.storeId) {
+        this.errors.storeId = 'Store is required';
+      }
+      if (this.newScooter.priceHour === null || this.newScooter.priceHour === '') {
+        this.errors.priceHour = 'Price per hour is required';
+      } else if (this.newScooter.priceHour <= 0) {
+        this.errors.priceHour = 'Price must be greater than 0';
       }
 
-      // Validate numeric values
-      if (this.newScooter.priceHour <= 0 ||
-          this.newScooter.priceDay <= 0 ||
-          this.newScooter.battery < 0 ||
-          this.newScooter.battery > 100 ||
-          this.newScooter.speed <= 0) {
-        alert('Please enter valid values (Prices and Speed must be > 0, Battery must be between 0-100)');
+      if (this.newScooter.priceFourHour === null || this.newScooter.priceFourHour === '') {
+        this.errors.priceFourHour = 'Price must be greater than 0';
+      } else if (this.newScooter.priceFourHour <= 0) {
+        this.errors.priceFourHour = 'Price must be greater than 0';
+      }
+
+      if (this.newScooter.priceDay === null || this.newScooter.priceDay === '') {
+        this.errors.priceDay = 'Daily price is required';
+      } else if (this.newScooter.priceDay <= 0) {
+        this.errors.priceDay = 'Price must be greater than 0';
+      }
+
+      if (this.newScooter.priceWeek === null && this.newScooter.priceWeek === '') {
+        this.errors.priceWeek = 'Price must be greater than 0';
+      } else if (this.newScooter.priceWeek <= 0){
+        this.errors.priceWeek = 'Price must be greater than 0';
+      }
+
+      if (this.newScooter.battery === null || this.newScooter.battery === '') {
+        this.errors.battery = 'Battery level is required';
+      } else if (this.newScooter.battery < 0 || this.newScooter.battery > 100) {
+        this.errors.battery = 'Battery must be between 0 and 100';
+      }
+
+      if (this.newScooter.speed === null || this.newScooter.speed === '') {
+        this.errors.speed = 'Speed is required';
+      } else if (this.newScooter.speed <= 0) {
+        this.errors.speed = 'Speed must be greater than 0';
+      }
+
+      this.hasError = Object.keys(this.errors).length > 0;
+      if (this.hasError) {
+        ElNotification({
+          title: "Input Error",
+          message: `Please fix the errors above`,
+          type: "error"
+        });
+      }
+
+      return !this.hasError;
+    },
+    async addScooter() {
+      if (!this.validateForm()) {
         return;
       }
 
       try {
-        const res = await axios.post('http://localhost:8080/api/scooters/add', this.newScooter);
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+          this.errorMessage = 'Please login first';
+          this.$router.push('/login');
+          return;
+        }
+
+        const res = await axios.post('http://localhost:8080/api/scooters/add', this.newScooter, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
         if (res.status === 200) {
-          alert(`Scooter Added with ID: ${res.data.scooterId}`);
+          ElNotification({
+            title: "Add Scooter Successfully",
+            message: `New Scooter ID: ${res.data.scooterId}`,
+            type: "success"
+          });
           this.resetForm();
           this.$emit('scooter-added');
         }
       } catch (error) {
-        if (error.response && error.response.data && error.response.data.message) {
-          alert(`Failed to add scooter: ${error.response.data.message}`);
+        if (error.response) {
+          switch(error.response.status) {
+            case 400:
+              this.errors = error.response.data || {};
+              if (error.response.data.message) {
+                this.errorMessage = 'Error: ' + error.response.data.message;
+              } else {
+                this.errorMessage = 'Invalid data provided';
+              }
+              break;
+            case 401:
+              localStorage.removeItem('token');
+              sessionStorage.removeItem('token');
+              this.errorMessage = 'Session expired. Please login again.';
+              this.$router.push('/login');
+              break;
+            case 403:
+              this.errorMessage = 'Forbidden: You do not have permission to perform this action';
+              break;
+            default:
+              this.errorMessage = `Error: ${error.response.data?.message || 'Unknown error occurred'}`;
+          }
         } else {
-          alert('Failed to add scooter');
+          this.errorMessage = 'Network error: Please check your connection';
         }
+        this.hasError = true;
+        console.error('Add scooter error:', error);
       }
-    },
+    }
   },
   mounted() {
     this.fetchStores();
-  },
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) {
+      this.errorMessage = 'Please login first';
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
@@ -265,10 +426,6 @@ label {
   color: white;
 }
 
-.button-submit:hover {
-  background: #3bb7bd;
-}
-
 .button-reset {
   background: white;
   color: #003c51;
@@ -346,6 +503,13 @@ label {
 
 .checkbox-label {
   margin-left: 8px;
+}
+
+.custom-alert {
+  font-size: 16px;
+  width: 99%;
+  margin-top: 3px;
+  height: 30px;
 }
 
 @media (max-width: 767px) {

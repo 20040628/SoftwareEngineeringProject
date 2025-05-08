@@ -411,7 +411,7 @@
 - **Request Body**:
   ```json
   {
-    "securityCode": "string"  // 6 digits security code
+    "bankCard": "string"  // 卡号
   }
   ```
 - **Success Response** (200 OK):

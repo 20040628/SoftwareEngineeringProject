@@ -55,7 +55,7 @@ class BankCardPaymentControllerTest {
         testOrder.setStatus(1); // Active status
 
         validRequest = new BankCardPaymentRequest();
-        validRequest.setSecurityCode("123456");
+        validRequest.setBankCard("1234567890123456");
     }
 
 
@@ -123,9 +123,9 @@ class BankCardPaymentControllerTest {
     }
 
     @Test
-    void processBankCardPayment_InvalidSecurityCode() {
+    void processBankCardPayment_InvalidBankCard() {
         // Arrange
-        validRequest.setSecurityCode("123"); // Invalid length
+        validRequest.setBankCard("123"); // Invalid length
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
 
         // Act
@@ -133,7 +133,7 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Invalid security code", response.getBody());
+        assertEquals("Invalid bank card", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }

@@ -577,6 +577,10 @@ export default {
   transition: all 0.2s;
 }
 
+.update-button:hover {
+  background: #4ab0b5;
+  transform: translateY(-1px);
+}
 
 /* Pagination Styles */
 .pagination-container {

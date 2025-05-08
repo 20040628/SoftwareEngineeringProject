@@ -220,6 +220,11 @@ export default {
         });
 
         if (res.status === 200) {
+          ElNotification({
+            title: "Create Order Successfully",
+            message: `New Order ID: ${res.data.orderId}`,
+            type: "success"
+          });
           const orderId = res.data.orderId;
           this.resetForm();
 

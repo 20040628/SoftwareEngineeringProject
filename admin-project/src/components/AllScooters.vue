@@ -51,7 +51,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="scooter in filteredPaginatedScooters" :key="scooter.id">
+        <tr
+            v-for="scooter in filteredPaginatedScooters"
+            :key="scooter.id"
+            @click="navigateToEdit(scooter.id)"
+            class="clickable-row"
+        >
           <td>{{ scooter.id }}</td>
           <td>
               <span :class="['status-label', getStatusClass(scooter.status)]">
@@ -67,7 +72,7 @@
           <td>{{ scooter.speed }}</td>
           <td>{{ scooter.store.id }}</td>
           <td>
-            <button class="status-btn" @click="changeScooterStatus(scooter.id)">
+            <button class="status-btn" @click.stop="changeScooterStatus(scooter.id)">
               Change Status
             </button>
           </td>
@@ -193,6 +198,24 @@ export default {
     await this.fetchScooters();
   },
   methods: {
+    navigateToEdit(scooterId) {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (!token) {
+        this.errorMessage = 'Please login first';
+        this.$router.push('/login');
+        return;
+      }
+
+      // Get user ID if available (from your auth system)
+      const userId = localStorage.getItem('userId') || null;
+
+      // Navigate to edit page with scooter ID and user ID as query params
+      this.$router.push({
+        name: 'EditScooter',
+        params: { id: scooterId },
+        query: { userId: userId }
+      });
+    },
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = 'all';
@@ -517,6 +540,20 @@ export default {
   transition: background 0.2s ease-in-out;
   font-size: 16px;
   font-weight: bold;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+  background-color: #f0f8ff !important;
+}
+
+/* Prevent the status button from triggering row click */
+.status-btn {
+  pointer-events: auto;
 }
 
 /* Pagination Styles */

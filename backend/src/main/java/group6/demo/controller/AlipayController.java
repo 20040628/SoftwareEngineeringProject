@@ -87,10 +87,12 @@ public class AlipayController {
             alipayRequest.setReturnUrl(url);
 
             String result = alipayClient.sdkExecute(alipayRequest).getBody();
-            response.setContentType("text/html;charset=utf-8");
-            response.getWriter().println(result);
+            response.setContentType("application/json;charset=utf-8");
+            response.getWriter().write("{\"orderString\": \"" + result + "\"}");
+            response.getWriter().flush();
+            response.getWriter().close();
 
-            // mark the status of order as has been paid 还要改一下 没有完成支付也会变成2
+
             order.setStatus(2);
             orderRepository.save(order);
         } catch (Exception e) {

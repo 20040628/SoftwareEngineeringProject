@@ -52,7 +52,7 @@
 					    uni.showToast({ title: '数据加载失败', icon: 'none' });
 					  }
 				} catch (err) {
-					  uni.showToast({ title: '网络错误', icon: 'none' });
+					  uni.showToast({ title: 'Network Error', icon: 'none' });
 				} finally {
 					  this.isLoading = false;
 				}

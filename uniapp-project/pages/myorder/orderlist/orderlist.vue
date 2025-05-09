@@ -24,7 +24,7 @@
 								<text>{{item.id}}</text>
 							</view>
 							<view class="pay-type" :class="getStatusClass(item.status)">
-								<text>{{allList[item.status].name}}</text>
+								<text>{{list[item.status-1].name}}</text>
 							</view>
 						</view>
 						<view class="dashed-line"></view>
@@ -32,7 +32,7 @@
 							<view  class="item-left">
 								 <image src="@/static/images/car.jpg" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;"></image>
 							</view>
-							<view class="item-right"  @click="goDetail(item)">
+							<view class="item-right">
 								<!-- <view class="item-right-v1">
 									<text class="item-title">{{item.odName}}</text>
 								</view> -->
@@ -85,7 +85,14 @@
 					{tabId: 0,name: 'All'},
 					{tabId: 1,name: 'Unpaid'},
 					{tabId: 2,name: 'Paid'},
-					{tabId: 3,name: 'Canceled'},
+					{tabId: 5,name: 'Canceled'},
+				],
+				list:[
+					{name:'Unpaid'},
+					{name:'Paid'},
+					{name:'Active'},
+					{name:'Completed'},
+					{name:'Cancelled'},
 				],
 				orderList: [],
 				userInfo: uni.getStorageSync('userInfo'),
@@ -116,6 +123,7 @@
 			
 			    if (res.statusCode === 200) {
 			      this.orderList = res.data; 
+				  console.log(res.data)
 				  if(this.orderList.length>0){
 					  this.data= true
 				  }
@@ -123,7 +131,7 @@
 			      uni.showToast({ title: '数据加载失败', icon: 'none' });
 			    }
 			  } catch (err) {
-			    uni.showToast({ title: '网络错误', icon: 'none' });
+			    uni.showToast({ title: 'Network Error', icon: 'none' });
 			  } finally {
 			    this.isLoading = false;
 			  }
@@ -145,7 +153,9 @@
 			    return {
 			        'status-red': status == 1,
 					'status-2': status == 2,
-			        'status-green': status == 3,
+					'status-3': status ==3,
+					'status-4': status ==4,
+			        'status-green': status == 5,
 			    };
 			},
 				
@@ -185,7 +195,7 @@
 			                        });
 			                    }
 			                } catch (err) {
-			                    uni.showToast({ title: '网络错误', icon: 'none' });
+			                    uni.showToast({ title: 'Network Error', icon: 'none' });
 			                } finally {
 			                    uni.hideLoading();
 			                    this.isLoading = false;
@@ -294,6 +304,12 @@
 				}
 				.status-2{
 					color: #4891d9;
+				}
+				.status-3{
+					color: #014d87;
+				}
+				.status-4{
+					color: #2c3e50;
 				}
 				.status-green{
 					color: #00d500;

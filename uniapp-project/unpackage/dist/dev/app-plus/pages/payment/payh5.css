@@ -108,11 +108,14 @@ body {
   font-size: 1rem;
   font-weight: 400;
   color: #333333;
+  margin: 0.625rem;
 }
 .page-order-det .body .goods-info .list .item .main .info .size {
-  font-size: 0.75rem;
+  display: block;
+  font-size: 1rem;
   font-weight: 400;
-  color: #8e8e8e;
+  color: #333333;
+  margin: 0.625rem;
 }
 .page-order-det .body .goods-info .list .item .main .price {
   font-size: 1rem;

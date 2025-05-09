@@ -68,7 +68,7 @@
 							});
 						}
 					} catch (err) {
-					    uni.showToast({ title: '网络错误', icon: 'none' })
+					    uni.showToast({ title: 'Network Error', icon: 'none' })
 					} finally {
 						uni.hideLoading();
 					} 
@@ -108,7 +108,7 @@
 						errorMessage = res.data.newPassword
 					}
 				} else if (err) {
-					  errorMessage = err.message || '网络错误，请稍后重试'
+					  errorMessage = err.message || 'Network Error，请稍后重试'
 				}
 		
 		        // 显示错误信息

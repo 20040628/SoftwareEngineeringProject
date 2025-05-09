@@ -1,0 +1,15 @@
+
+.terms-container {
+		padding: 0.9375rem;
+}
+.title {
+		font-size: 1.125rem;
+		font-weight: bold;
+		margin-bottom: 0.9375rem;
+}
+.terms-content {
+		font-size: 0.875rem;
+		color: #333;
+		line-height: 1.8;
+		padding: 0.625rem;
+}

@@ -23,6 +23,7 @@
     "Maps": {
       "coordType": "gcj02"
     },
+    "Geolocation": {},
     "UniNView": {
       "description": "UniNView原生渲染"
     }
@@ -78,8 +79,8 @@
               "ios",
               "android"
             ],
-            "appkey_ios": "",
-            "appkey_android": ""
+            "appkey_ios": "364932a64abf6eca15c81338d198a8fd",
+            "appkey_android": "364932a64abf6eca15c81338d198a8fd"
           }
         },
         "payment": {
@@ -116,7 +117,7 @@
     "uni-app": {
       "control": "uni-v3",
       "vueVersion": "3",
-      "compilerVersion": "4.57",
+      "compilerVersion": "4.64",
       "nvueCompiler": "uni-app",
       "renderer": "auto",
       "nvue": {

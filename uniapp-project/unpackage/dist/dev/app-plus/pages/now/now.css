@@ -1,79 +1,91 @@
 
+.container[data-v-37a58fb7] {
+	  display: flex;
+	  flex-direction: column;
+	  height: 100vh;
+}
+.bottom[data-v-37a58fb7] {
+	  flex: 1;
+	  overflow: auto;
+	  height: 30vh;
+}
 .car-card[data-v-37a58fb7] {
-  position: absolute;
-  bottom: 5.9375rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 0.9375rem;
-  width: 80%; /* 调整宽度为80% */
-  border-radius: 0.3125rem;
-  box-shadow: 0 0 0.3125rem rgba(0, 0, 0, 0.1);
+		position: absolute;
+		bottom: 5.9375rem;
+		left: 50%;
+		transform: translateX(-50%);
+		/* background-color: rgba(255, 255, 255, 0.9); */
+		padding: 0.9375rem;
+		width: 80%;
+		border-radius: 0.3125rem;
+		/* box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1); */
 }
 .card-content[data-v-37a58fb7] {
-	position: absolute;
-	bottom: 5.9375rem;
-	left: 50%;
-	transform: translateX(-50%);
-	background-color: rgba(255, 255, 255, 0.9);
-	padding: 0.9375rem;
-	width: 80%; /* 调整宽度为80% */
-	border-radius: 0.3125rem;
-	box-shadow: 0 0 0.3125rem rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+		position: absolute;
+		bottom: 5.9375rem;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: rgba(255, 255, 255, 0.9);
+		padding: 0.9375rem;
+		width: 80%;
+		/* 调整宽度为80% */
+		border-radius: 0.3125rem;
+		box-shadow: 0 0 0.3125rem rgba(0, 0, 0, 0.1);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 }
 .hint[data-v-37a58fb7] {
-	font-size: 16px;
-	color: #000;
+		font-size: 16px;
+		color: #000;
+		text-align: center;
 }
 .choose-btn-appointment[data-v-37a58fb7] {
-	text-align: center;
-	margin-top: 0.46875rem;
-	line-height: 1.875rem;
-	background-color: #014d87;
-	color: white;
-	border: none;
-	border-radius: 0.15625rem;
-	font-size: 16px;
+		text-align: center;
+		margin-top: 0.46875rem;
+		line-height: 1.875rem;
+		background-color: #014d87;
+		color: white;
+		border: none;
+		border-radius: 0.15625rem;
+		font-size: 16px;
 }
 .item-left[data-v-37a58fb7] {
-  width: 70px;
-  height: 70px;
+		width: 70px;
+		height: 70px;
 }
 .item-right[data-v-37a58fb7] {
-  flex-grow: 1;
-  margin-left: 0.625rem;
+		flex-grow: 1;
+		margin-left: 0.625rem;
 }
 .car-info[data-v-37a58fb7] {
-	display: flex;
-	justify-content:space-between;
-  font-size: 0.875rem;
-  color: #333;
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.875rem;
+		color: #333;
 }
 .time-info[data-v-37a58fb7] {
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 0.3125rem;
+		font-size: 0.75rem;
+		color: #666;
+		margin-top: 0.3125rem;
 }
 .overtime-info[data-v-37a58fb7] {
-  margin-top: 0.3125rem;
-  color: red;
-  font-size: 0.8125rem;
+		margin-top: 0.3125rem;
+		color: red;
+		font-size: 0.8125rem;
 }
 .choose-btn[data-v-37a58fb7] {
-  margin-top: 0.625rem;
-  width: 100%;
-  background-color: #014d87;
-  color: white;
-  font-size: 16px;
-  border: none;
-  border-radius: 0.25rem;
-  text-align: center;
-  line-height: 1.875rem;
+		margin-top: 0.625rem;
+		width: 100%;
+		background-color: #014d87;
+		color: white;
+		font-size: 16px;
+		border: none;
+		border-radius: 0.25rem;
+		text-align: center;
+		line-height: 1.875rem;
 }
 .blurred[data-v-37a58fb7] {
-  filter: blur(5px);
-  pointer-events: none;
+		filter: blur(5px);
+		pointer-events: none;
 }

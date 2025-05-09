@@ -1,9 +1,17 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/JudeLoginPage/JudeLoginPage",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/index",
 			"style": {
-				"navigationStyle": "custom", //隐藏头部
+				"navigationStyle": "custom", 
 				"enablePullDownRefresh": false,
 				"onReachBottomDistance": 100
 			}
@@ -11,16 +19,16 @@
 		{
 			"path": "pages/UserLogin/UserLogin",
 			"style": {
-				"navigationStyle": "custom", //隐藏头部
+				"navigationStyle": "custom", 
 				"enablePullDownRefresh": true,
 				"onReachBottomDistance": 100
 			}
 		},
-		
+
 		{
 			"path": "pages/information/terms/terms"
 		},
-		
+
 		{
 			"path": "pages/UserRegister/UserRegister"
 		},
@@ -28,20 +36,20 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "E-scooter",
+				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
 		},
 		{
-		  "path": "pages/map/map",
-		  "style": {
-		  	"enablePullDownRefresh": false
-		  }
-		  
+			"path": "pages/map/map",
+			"style": {
+				"enablePullDownRefresh": false
+			}
+
 		},
 		{
-		  "path": "pages/now/now"
-		
+			"path": "pages/now/now"
+
 		},
 		{
 			"path": "pages/cardetail/cardetail"
@@ -55,39 +63,39 @@
 				"navigationBarTitleText": "Feedback",
 				"enablePullDownRefresh": false
 			}
-		
+
 		}, {
 			"path": "pages/feedback/feedbackList/feedbackList",
 			"style": {
 				"navigationBarTitleText": "Feedback",
 				"enablePullDownRefresh": false
 			}
-		
+
 		}, {
 			"path": "pages/feedback/feedback/feedback",
 			"style": {
 				"navigationBarTitleText": "Feedback",
 				"enablePullDownRefresh": false,
-				"backgroundColor":"#FFFFFF"
+				"backgroundColor": "#FFFFFF"
 			}
-		
+
 		},
-		
+
 		{
 			"path": "pages/feedback/helpDetail/helpDetail",
 			"style": {
 				"navigationBarTitleText": "HelpDetail",
 				"enablePullDownRefresh": false
 			}
-		
+
 		}, {
 			"path": "pages/feedback/feedbackDetail/feedbackDetail",
 			"style": {
 				"navigationBarTitleText": "FeedbackDetail",
 				"enablePullDownRefresh": false
 			}
-		
-		}, 
+
+		},
 		{
 			"path": "pages/feedback/showImage/showImage",
 			"style": {
@@ -102,56 +110,56 @@
 			}
 		},
 		{
-			"path":"pages/myorder/orderlist/orderlist"
+			"path": "pages/myorder/orderlist/orderlist"
 		},
 		{
-			"path":"pages/payment/payh5"
+			"path": "pages/payment/payh5"
 		},
 		{
-		  "path": "pages/webview/webview",
-		  "style": {
-		        "navigationBarTitleText": "",
-		        "enablePullDownRefresh": false
-				}
+			"path": "pages/webview/webview",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
 		},
 		{
-			"path":"pages/myorder/unuse/unuse"
+			"path": "pages/myorder/unuse/unuse"
 		},
 		{
-			"path":"pages/myorder/doing/doing"
+			"path": "pages/myorder/doing/doing"
 		},
 		{
-			"path":"pages/myorder/done/done"
+			"path": "pages/myorder/done/done"
 		},
 		{
-			"path":"pages/payment/choosePay/choosePay"
+			"path": "pages/payment/choosePay/choosePay"
 		},
 		{
 			"path": "pages/information/findPassword/findPassword"
 		},
 		{
-			"path":"pages/payment/card/card"
+			"path": "pages/payment/card/card"
 		},
 		{
-			"path":"pages/payment/addCard/addCard"
+			"path": "pages/payment/addCard/addCard"
 		},
 		{
-			"path":"pages/chooseCar/chooseCar"
+			"path": "pages/chooseCar/chooseCar"
 		},
 		{
-			"path":"pages/information/instruction/instruction"
+			"path": "pages/information/instruction/instruction"
 		},
 		{
-			"path":"pages/information/set/set"
+			"path": "pages/information/set/set"
 		},
 		{
-			"path":"pages/information/change/changeInfo"
+			"path": "pages/information/change/changeInfo"
 		},
 		{
-			"path":"pages/information/change/changeAccount"
+			"path": "pages/information/change/changeAccount"
 		},
 		{
-			"path":"pages/information/app/app"
+			"path": "pages/information/app/app"
 		},
 		{
 			"path": "pages/information/resetPassword/resetPassword"
@@ -159,7 +167,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "E-scooter",
+		"navigationBarTitleText": "ScootGo",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},

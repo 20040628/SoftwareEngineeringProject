@@ -43,7 +43,7 @@ export default {
 		    });
 		    this.card = res.data
 		} catch (err) {
-		    uni.showToast({ title: '网络错误', icon: 'none' })
+		    uni.showToast({ title: 'Network Error', icon: 'none' })
 		} finally {
 			uni.hideLoading();
 		    this.isLoading = false

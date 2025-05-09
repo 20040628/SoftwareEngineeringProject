@@ -691,7 +691,7 @@
 }
 .uni-datetime-picker-btn-text[data-v-1d532b70] {
   font-size: 14px;
-  color: #0066cc;
+  color: #007aff;
 }
 .uni-datetime-picker-btn-group[data-v-1d532b70] {
   display: flex;
@@ -723,7 +723,7 @@
   z-index: 999;
 }
 .uni-datetime-picker-time[data-v-1d532b70] {
-  color: black;
+  color: grey;
 }
 .uni-datetime-picker-column[data-v-1d532b70] {
   height: 50px;
@@ -749,7 +749,7 @@
   position: absolute;
   top: 53px;
   /* 减掉 10px 的元素高度，兼容nvue */
-  color: #000000;
+  color: #999;
 }
 .sign-left[data-v-1d532b70] {
   left: 86px;

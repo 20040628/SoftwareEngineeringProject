@@ -81,10 +81,16 @@
 </template>
 
 <script>
-	import { initVueI18n } from '@dcloudio/uni-i18n'
+	import {
+		initVueI18n
+	} from '@dcloudio/uni-i18n'
 	import i18nMessages from './i18n/index.js'
-	const {	t	} = initVueI18n(i18nMessages)
-  import { fixIosDateFormat } from './util'
+	const {
+		t
+	} = initVueI18n(i18nMessages)
+	import {
+		fixIosDateFormat
+	} from './util'
 
 	/**
 	 * DatetimePicker 时间选择器
@@ -134,6 +140,14 @@
 				endSecond: 59,
 			}
 		},
+		options: {
+			// #ifdef MP-TOUTIAO
+			virtualHost: false,
+			// #endif
+			// #ifndef MP-TOUTIAO
+			virtualHost: true
+			// #endif
+		},
 		props: {
 			type: {
 				type: String,
@@ -176,11 +190,11 @@
 			// #ifndef VUE3
 			value: {
 				handler(newVal) {
-          if (newVal) {
-            this.parseValue(fixIosDateFormat(newVal))
+					if (newVal) {
+						this.parseValue(fixIosDateFormat(newVal))
 						this.initTime(false)
 					} else {
-            this.time = ''
+						this.time = ''
 						this.parseValue(Date.now())
 					}
 				},
@@ -189,8 +203,8 @@
 			// #endif
 			// #ifdef VUE3
 			modelValue: {
-        handler(newVal) {
-          if (newVal) {
+				handler(newVal) {
+					if (newVal) {
 						this.parseValue(fixIosDateFormat(newVal))
 						this.initTime(false)
 					} else {
@@ -649,14 +663,6 @@
 				return new Date(year, month, 0).getDate();
 			},
 
-			//兼容 iOS、safari 日期格式
-			fixIosDateFormat(value) {
-				if (typeof value === 'string') {
-					value = value.replace(/-/g, '/')
-				}
-				return value
-			},
-
 			/**
 			 * 生成时间戳
 			 * @param {Object} time
@@ -775,7 +781,7 @@
 </script>
 
 <style lang="scss">
-	$uni-primary: #0066cc !default;
+	$uni-primary: #007aff !default;
 
 	.uni-datetime-picker {
 		/* #ifndef APP-NVUE */
@@ -861,7 +867,7 @@
 	}
 
 	.uni-datetime-picker-time {
-		color: black;
+		color: grey;
 	}
 
 	.uni-datetime-picker-column {
@@ -902,7 +908,7 @@
 		position: absolute;
 		top: 53px;
 		/* 减掉 10px 的元素高度，兼容nvue */
-		color: #000000;
+		color: #999;
 		/* #ifdef APP-NVUE */
 		font-size: 16px;
 		/* #endif */

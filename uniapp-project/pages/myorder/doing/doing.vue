@@ -120,18 +120,19 @@
 			    });
 			
 			    if (res.statusCode === 200) {
+					if(res.data.length > 0){
+						this.data= true
+					}
 			     this.orderList = res.data.map(order => ({
 			           ...order,
-			           showModal: false, // 为每个订单项添加showModal字段
+			           showModal: false, 
 			    }));
-				if(this.orderList.length>0){
-					this.data= true
-				}
+				
 			    } else {
 			      uni.showToast({ title: '数据加载失败', icon: 'none' });
 			    }
 			  } catch (err) {
-			    uni.showToast({ title: '网络错误', icon: 'none' });
+			    uni.showToast({ title: 'Network Error', icon: 'none' });
 			  } finally {
 			    this.isLoading = false;
 			  }
@@ -146,9 +147,9 @@
 			    return `${day}-${month}-${year} ${hours}:${minutes}`;
 			  },
 			  
-			tabClick(item){
-				this.tabsIndex = item.tabId;
-			},
+			// tabClick(item){
+			// 	this.tabsIndex = item.tabId;
+			// },
 			getStatusClass(status) {
 			    return {
 			        'status-red': status == 1,
@@ -193,7 +194,7 @@
 			                        });
 			                    }
 			                } catch (err) {
-			                    uni.showToast({ title: '网络错误', icon: 'none' });
+			                    uni.showToast({ title: 'Network Error', icon: 'none' });
 			                } finally {
 			                    uni.hideLoading();
 			                    this.isLoading = false;
@@ -247,7 +248,7 @@
 				    });
 				  }
 				} catch (err) {
-				  uni.showToast({ title: '网络错误', icon: 'none' });
+				  uni.showToast({ title: 'Network Error', icon: 'none' });
 				} finally {
 				  this.isLoading = false;
 				}

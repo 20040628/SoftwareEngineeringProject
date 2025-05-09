@@ -1,0 +1,24 @@
+
+.container {
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		display: flex;
+		height: 100vh;
+		background-color: #ffffff;
+}
+.logo {
+		width: 4.6875rem;
+		height: 4.6875rem;
+		margin-bottom: 0.9375rem;
+}
+.title {
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 0.625rem;
+}
+.loading-text {
+		font-size: 0.875rem;
+		color: #888888;
+}

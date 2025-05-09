@@ -17,7 +17,7 @@
 						<view class="main">
 							<view class="info">
 								<text class="name">ID: {{ order.scooter.id }}</text>
-								<text class="size">Location:{{ order.scooter.location }}</text>
+								<text class="size">Store: {{ order.scooter.store.name }}</text>
 							</view>
 							<view class="price">
 								<text class="unit">£</text>
@@ -67,7 +67,7 @@
 				</view>
 				<view class="btn">
 					<view class="cancel" @click="cancel()"><button size="mini">Cancel Order</button></view>
-					<view class="go-pay"  @click="pay()"><button size="mini">Pay</button></view>
+					<view class="go-pay" @click="pay()"><button size="mini">Pay</button></view>
 				</view>
 			</view>
 		</view>
@@ -75,101 +75,116 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      orderInfo: {},
-	  orderId : null,
-	  order:[],
-	  payFormHtml: '',
-	  discount: 0,
-    }
-  },
-  async onLoad(options){
-    this.orderId = options.id;
-	await this.loadOrderDetail();
-  },
-
-  methods:{
-	  async pay() {
-		  uni.navigateTo({
-		  	url:`/pages/payment/choosePay/choosePay?id=${this.orderId}`
-		  })
-	  },
-
-		async loadOrderDetail() {
-			  const token = String(uni.getStorageSync('token'));
-		      try {
-		  		uni.showLoading({ title: "Loading...", mask: true });
-		        const res = await uni.request({
-		            url: `${this.$baseURL}/api/bookings/${this.orderId}`,
-		            method: 'GET',
-					header: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json'
-					},
-		        });
-				if (res.statusCode === 200) {
-				  this.order = res.data 
-				  console.log(this.order.priceBeforeDiscount)
-				  this.discount= this.order.priceBeforeDiscount - this.order.price
-				} else {
-				  uni.showToast({ title: '数据加载失败', icon: 'none' });
-				}
-				
-		      } catch (err) {
-				   console.error('请求失败:', err);
-		          uni.showToast({ title: '网络错误', icon: 'none' })
-		      } finally {
-		  		uni.hideLoading();
-		      }
+	export default {
+		data() {
+			return {
+				orderInfo: {},
+				orderId: null,
+				order: [],
+				payFormHtml: '',
+				discount: 0,
+			}
 		},
-		formatDate(dateString) {
-		     const date = new Date(dateString);
-		     const year = date.getFullYear();
-		     const month = String(date.getMonth() + 1).padStart(2, '0');
-		     const day = String(date.getDate()).padStart(2, '0');
-		     const hours = String(date.getHours()).padStart(2, '0');
-		     const minutes = String(date.getMinutes()).padStart(2, '0');
-		     return ` ${day}/${month}/${year} ${hours}:${minutes}`;
+		async onLoad(options) {
+			this.orderId = options.id;
+			await this.loadOrderDetail();
 		},
-		async cancel(){
-			const token = String(uni.getStorageSync('token'));
-			try {
-				uni.showLoading({ title: "Loading...", mask: true });
-			    const res = await uni.request({
-			      url: `${this.$baseURL}/api/bookings/cancel/${this.orderId}`,
-			      method: 'POST',
-				  header: {
+
+		methods: {
+			async pay() {
+				uni.navigateTo({
+					url: `/pages/payment/choosePay/choosePay?id=${this.orderId}`
+				})
+			},
+
+			async loadOrderDetail() {
+				const token = String(uni.getStorageSync('token'));
+				try {
+					uni.showLoading({
+						title: "Loading...",
+						mask: true
+					});
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bookings/${this.orderId}`,
+						method: 'GET',
+						header: {
 							'Authorization': `Bearer ${token}`,
 							'Content-Type': 'application/json'
-				   },
-				});
-				if (res.statusCode === 200) {
+						},
+					});
+					if (res.statusCode === 200) {
+						this.order = res.data
+						console.log(this.order.priceBeforeDiscount)
+						this.discount = this.order.priceBeforeDiscount - this.order.price
+					} else {
+						uni.showToast({
+							title: 'Data loading failed',
+							icon: 'none'
+						});
+					}
+
+				} catch (err) {
+					console.error('request failed:', err);
 					uni.showToast({
-					   title: res.data.message,
-					   icon: 'none',
-					   duration: 2000
-					 }); 
-				} else {
-					uni.showToast({
-					   title: res.data.message,
-					   icon: 'none',
-					   duration: 2000
-					 });
+						title: 'Network Error',
+						icon: 'none'
+					})
+				} finally {
+					uni.hideLoading();
 				}
-				uni.reLaunch({
-				    url: '/pages/myorder/orderlist'  // 确保路径正确
-				}); 	
-			} catch (err) {
-			    uni.showToast({ title: '网络错误', icon: 'none' })
-			} finally {
-			  uni.hideLoading();
+			},
+			formatDate(dateString) {
+				const date = new Date(dateString);
+				const year = date.getFullYear();
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const day = String(date.getDate()).padStart(2, '0');
+				const hours = String(date.getHours()).padStart(2, '0');
+				const minutes = String(date.getMinutes()).padStart(2, '0');
+				return ` ${day}/${month}/${year} ${hours}:${minutes}`;
+			},
+			async cancel() {
+				const token = String(uni.getStorageSync('token'));
+				try {
+					uni.showLoading({
+						title: "Loading...",
+						mask: true
+					});
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bookings/cancel/${this.orderId}`,
+						method: 'POST',
+						header: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+					});
+					if (res.statusCode === 200) {
+						uni.showToast({
+							title: res.data.message,
+							icon: 'none',
+							duration: 1000
+						});
+					} else {
+						uni.showToast({
+							title: res.data.message,
+							icon: 'none',
+							duration: 1000
+						});
+					}
+					uni.reLaunch({
+						url: '/pages/myorder/orderlist/orderlist',
+					});
+				} catch (err) {
+					uni.showToast({
+						title: 'Network Error',
+						icon: 'none'
+					})
+				} finally {
+					uni.hideLoading();
+				}
 			}
 		}
-  }
-  
-};
+
+	};
 </script>
 
 <style lang="scss">
@@ -267,12 +282,15 @@ export default {
 									font-size: 32rpx;
 									font-weight: 400;
 									color: #333333;
+									margin: 20rpx;
 								}
 
 								.size {
-									font-size: 24rpx;
+									display: block;
+									font-size: 32rpx;
 									font-weight: 400;
-									color: #8e8e8e;
+									color: #333333;
+									margin: 20rpx;
 								}
 							}
 
@@ -336,7 +354,7 @@ export default {
 				.pay {
 					display: flex;
 					justify-content: center;
-		
+
 
 					.name {
 						display: block;
@@ -423,6 +441,7 @@ export default {
 
 					.cancel {
 						margin-right: 16rpx;
+
 						button {
 							background-color: #343434;
 							color: #ffffff;

@@ -613,34 +613,23 @@
   margin-left: 0.625rem;
   font-size: 0.875rem;
 }
-
-/* address-section样式 */
 .address-section[data-v-a91970b9] {
   padding: 20px 15px;
 }
 .notification-wrapper[data-v-a91970b9] {
   display: flex;
   align-items: center;
-  /* 垂直居中图标和文字 */
   background-color: #fff3f0;
-  /* 半弧方框的背景色 */
   padding: 12px 20px;
   border-radius: 25px 25px 0 0;
-  /* 上半部分为圆弧形 */
   border: 1px solid #ffccc7;
-  /* 边框颜色 */
 }
-
-/* note 样式 */
 .note[data-v-a91970b9] {
   font-size: 10px;
   color: #ff4d4f;
   margin-left: 10px;
-  /* 图标和文字之间的间距 */
   line-height: 1.5;
 }
-
-/* information样式 */
 .information[data-v-a91970b9] {
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -651,13 +640,9 @@
   line-height: 1.6;
   padding: 20px 15px;
 }
-
-/* label样式 */
 .label[data-v-a91970b9] {
   margin-bottom: 15px;
 }
-
-/* label-text样式 */
 .label-text[data-v-a91970b9] {
   font-size: 14px;
   color: #555;
@@ -665,23 +650,17 @@
   margin-bottom: 5px;
   display: block;
 }
-
-/* store-name样式 */
 .store-name[data-v-a91970b9] {
   font-size: 18px;
   font-weight: bold;
   color: #333;
   margin-top: 5px;
 }
-
-/* store-location样式 */
 .store-location[data-v-a91970b9] {
   font-size: 14px;
   color: #888;
   line-height: 1.4;
 }
-
-/* time-range样式 */
 .time-range[data-v-a91970b9] {
   font-size: 12px;
   font-weight: 500;

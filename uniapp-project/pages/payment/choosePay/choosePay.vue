@@ -1,324 +1,454 @@
 <template>
 	<view class="payment-container">
-	  <view class="payment-header">
-	    <text class="title">Select Payment Method</text>
-	  </view>
-	
-	    <!-- 支付方式选择 -->
-	    <view class="payment-method-section">
-	      <view class="payment-options">
-	        <view class="payment-option":class="{ selected: selectedPaymentMethod === 'card' }" @click="selectPaymentMethod('card')">
-			  <view class="left">
-			  	<image src="/static/icons/card.png" class="payment-icon" mode="aspectFill"></image>
-			  	<text>Card</text>
-			  </view>
-	          <view class="check-icon" v-if="selectedPaymentMethod === 'card'">✔</view>
-	        </view>
-	        <view class="payment-option":class="{ selected: selectedPaymentMethod === 'Alipay' }" @click="selectPaymentMethod('Alipay')">
-			  <view class="left">
-				  <image src="/static/icons/alipay.png" class="payment-icon" mode="aspectFill"></image>
-				  <text>Alipay</text>
-			  </view>
-	          <view class="check-icon" v-if="selectedPaymentMethod === 'Alipay'">✔</view>
-	        </view>
-			
-	      </view>
-		  <view class="payment-btn">
-		      <button @click="submitPayment">Payment</button>
-		  </view>
-	  </view>
+		<view class="payment-header">
+			<text class="title">Select Payment Method</text>
+		</view>
+
+		<!-- Payment method selection -->
+		<view class="payment-method-section">
+			<view class="payment-options">
+				<view class="payment-option" :class="{ selected: selectedPaymentMethod === 'card' }"
+					@click="selectPaymentMethod('card')">
+					<view class="left">
+						<image src="/static/icons/card.png" class="payment-icon" mode="aspectFill"></image>
+						<text>Card</text>
+					</view>
+					<view class="check-icon" v-if="selectedPaymentMethod === 'card'">✔</view>
+				</view>
+				<view class="payment-option" :class="{ selected: selectedPaymentMethod === 'Alipay' }"
+					@click="selectPaymentMethod('Alipay')">
+					<view class="left">
+						<image src="/static/icons/alipay.png" class="payment-icon" mode="aspectFill"></image>
+						<text>Alipay</text>
+					</view>
+					<view class="check-icon" v-if="selectedPaymentMethod === 'Alipay'">✔</view>
+				</view>
+
+			</view>
+			<view class="payment-btn">
+				<button @click="submitPayment">Payment</button>
+			</view>
+		</view>
 	</view>
-	<!-- 卡号选择框弹窗 -->
 	<view class="card-select-modal" v-if="showCardSelectModal">
-	  <view class="card-options">
-	    <view class="card-option"  @click="selectCard(card)">
-	      <text>{{ bankCards.maskedCard }}</text>
-	    </view>
-		<button @click="closeCardSelectModal">Close</button>
-	  </view>
-	  
+		<view class="card-options">
+			<view class="form-group" v-for="(item, index) in fields" :key="index">
+				<text class="label">{{ item.label }} <text class="required">*</text></text>
+				<input class="input-field" :placeholder="item.placeholder" v-model="form[item.key]" />
+			</view>
+			<view class="form-group">
+				<text class="label">Start Date<text class="required">*</text></text>
+				<picker mode="date" fields="month" @change="onStartChange">
+					<view class="picker">{{ startDate || 'Select MM/YYYY' }}</view>
+				</picker>
+			</view>
+
+			<view class="form-group">
+				<text class="label">Expiry Date <text class="required">*</text></text>
+				<picker mode="date" fields="month" @change="onExpiryChange">
+					<view class="picker">{{ expiryDate || 'Select MM/YYYY' }}</view>
+				</picker>
+			</view>
+
+			<button @click="submit()">submit</button>
+			<button @click="closeCardSelectModal">Close</button>
+		</view>
+
 	</view>
-	<!-- 底部弹出支付密码输入框 -->
-	<!-- <view class="payment-password-modal" v-if="showPasswordModal"> -->
-	  <!-- <view class="password-container">
-	    <text>Please enter your payment password</text>
-	    <input type="password" v-model="password" placeholder="Enter password" />
-	    <button @click="submitPaymentPassword">Submit Payment</button>
-	    <button @click="cancelPayment">Cancel</button>
-	  </view> -->
-	  <pay-keyboard :show_key="show_key" @hideFun="hideFun" @getPassword="getPassword"></pay-keyboard>
-	<!-- </view> -->
+	<!-- <pay-keyboard :show_key="show_key" @hideFun="hideFun" @getPassword="getPassword"></pay-keyboard> -->
 
 </template>
 
 <script>
 	import payKeyboard from '../../../components/keyboard.vue'
 	export default {
-		components:{
+		components: {
 			payKeyboard
 		},
-	  data() {
-	    return {
-	      selectedPaymentMethod: null,
-	      paymentSuccessful: false,
-		  bankCards: null,                   // 模拟的银行卡数据
-		        showCardSelectModal: false,  // 控制银行卡选择弹窗显示
-		        showPasswordModal: false,   // 控制支付密码输入框显示
-		        password: '',
-				orderId:null,
-				show_key:false
-	    };
-	  },
-	  async onLoad(options){
-	  	console.log('Query params:', options);
-	    this.orderId = options.id;
-		this.getCard();
-	},
-	  methods: {
-		async getCard(){
-			const token = String(uni.getStorageSync('token'));
-			this.user = uni.getStorageSync('userInfo');
-			try {
-				uni.showLoading({ title: "加载中...", mask: true });
-			    const res = await uni.request({
-			        url: `${this.$baseURL}/api/bank-payment/check-card/${this.user.userId}`,
-			        method: 'GET',
-					header: {
-					  'Content-Type': 'application/json',
-					  "Authorization": `Bearer ${token}`
+		data() {
+			return {
+				selectedPaymentMethod: null,
+				paymentSuccessful: false,
+				bankCards: null,
+				cardNumber: null,
+				showCardSelectModal: false,
+				showPasswordModal: false,
+				password: '',
+				orderId: null,
+				show_key: false,
+				form: {
+					number: '',
+					code: ''
+				},
+				expiryDate: '',
+				startDate: '',
+				fields: [{
+						key: 'number',
+						label: 'Card Number',
+						placeholder: 'Enter card number'
 					},
-					
-			    });
-			    this.bankCards = res.data
-			} catch (err) {
-			    uni.showToast({ title: '网络错误', icon: 'none' })
-			} finally {
-				uni.hideLoading();
-			    this.isLoading = false
-			}
+					{
+						key: 'code',
+						label: 'Card Security Code',
+						placeholder: 'CVV'
+					}
+				]
+			};
 		},
-	    selectPaymentMethod(method) {
-	      this.selectedPaymentMethod = method;
-	    },
-	    submitPayment() {
-	      if (this.selectedPaymentMethod) {
-				this.paymentSuccessful = true;
-		    if (this.selectedPaymentMethod === 'card') {
-				this.showCardSelectModal = true;
-			} 
-			if(this.selectedPaymentMethod === 'Alipay'){
-				const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
-				uni.navigateTo({
-					url:targetUrl
-				})
-			}
-	      } else {
-	        alert('Please select a payment method');
-	      }
-	    },
-	    continueShopping() {
-	      // Logic to continue shopping
-	      this.paymentSuccessful = false;
-	    },
-		selectCard(card) {
-		      this.selectedCard = card;
-		      this.showCardSelectModal = false;
-		      this.show_key=true;
-		    },
-		    // 关闭银行卡选择框
-		    closeCardSelectModal() {
-		      this.showCardSelectModal = false;
-		    },
-		
-		    // 提交支付密码
-		    submitPaymentPassword() {
-		      if (this.password) {
-		        // 处理支付逻辑
-		        alert('Payment Successful');
-		        this.showPasswordModal = false;
-		      } else {
-		        alert('Please enter a valid password');
-		      }
-		    },
-		
-		    // 取消支付
-		    cancelPayment() {
-		      this.showPasswordModal = false;
-		    },
-			hideFun(){
-				this.show_key = false
-			},
-			async getPassword(n){
+		async onLoad(options) {
+			this.orderId = options.id;
+			this.getCard();
+		},
+		methods: {
+			async getCard() {
 				const token = String(uni.getStorageSync('token'));
 				this.user = uni.getStorageSync('userInfo');
 				try {
-					//uni.showLoading({ title: "加载中...", mask: true });
-				    const res = await uni.request({
-				        url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
-				        method: 'POST',
-						data:{
-							securityCode:String(n.password)
+					uni.showLoading({
+						title: "Loadinh...",
+						mask: true
+					});
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bank-payment/check-card/${this.user.userId}`,
+						method: 'GET',
+						header: {
+							'Content-Type': 'application/json',
+							"Authorization": `Bearer ${token}`
+						},
+
+					});
+					this.bankCards = res.data
+				} catch (err) {
+					uni.showToast({
+						title: 'Network Error',
+						icon: 'none'
+					})
+					uni.hideLoading();
+				} finally {
+					uni.hideLoading();
+				}
+			},
+			selectPaymentMethod(method) {
+				this.selectedPaymentMethod = method;
+			},
+			submitPayment() {
+				if (this.selectedPaymentMethod) {
+					this.paymentSuccessful = true;
+					if (this.selectedPaymentMethod === 'card') {
+						this.showCardSelectModal = true;
+					}
+					if (this.selectedPaymentMethod === 'Alipay') {
+						const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
+						uni.navigateTo({
+							url: targetUrl
+						})
+					}
+				} else {
+					alert('Please select a payment method');
+				}
+			},
+
+			onExpiryChange(e) {
+				this.expiryDate = e.detail.value;
+			},
+			onStartChange(e) {
+				this.startDate = e.detail.value;
+			},
+			async submit() {
+				// const user = uni.getStorageSync('userInfo');
+				// console.log(user)
+				// this.cardNumber = user.bank_card
+				// console.log(this.cardNumber )
+				// if (this.form.number !== this.cardNumber) {
+				// 	uni.showToast({
+				// 		title: 'The card number does not match the user',
+				// 		icon: 'none'
+				// 	});
+				// 	return;
+				// }
+
+				if (!/^\d{3}$/.test(this.form.code)) {
+					uni.showToast({
+						title: 'The security code should be three digits',
+						icon: 'none'
+					});
+					return;
+				}
+
+				if (!this.startDate || !this.expiryDate) {
+					uni.showToast({
+						title: 'Please select the date.',
+						icon: 'none'
+					});
+					return;
+				}
+				const now = new Date();
+				const start = new Date(this.startDate + '-01');
+				const expiry = new Date(this.expiryDate + '-01');
+				if (start >= expiry) {
+					uni.showToast({
+						title: 'The start date cannot be later than or equal to the end date',
+						icon: 'none'
+					});
+					return;
+				}
+				if (expiry < new Date(now.getFullYear(), now.getMonth(), 1)) {
+					uni.showToast({
+						title: 'The start date cannot be earlier than the current month',
+						icon: 'none'
+					});
+					return;
+				}
+				const token = String(uni.getStorageSync('token'));
+				this.user = uni.getStorageSync('userInfo');
+				try {
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
+						method: 'POST',
+						data: {
+							bankCard: this.form.number
 						},
 						header: {
-						  'Content-Type': 'application/json',
-						  "Authorization": `Bearer ${token}`
+							'Content-Type': 'application/json',
+							"Authorization": `Bearer ${token}`
 						},
-						
-				    });
-					
-				    if (res.statusCode === 200) {
-				      uni.showToast({
-				        title: res.data.message,
-				        icon: 'none',
-				      });
-					  uni.navigateTo({
-					  	url:"/pages/myorder/orderlist/orderlist"
-					  })
-				    } else {
-				      uni.showToast({
-				        title: res.data.message || 'Update failed',
-				        icon: 'none',
-				      });
-				    }
+					});
+					console.log(this.form.number)
+					if (res.statusCode === 200) {
+						uni.showToast({
+							title: 'Payment successful',
+							icon: 'none',
+						});
+						this.closeCardSelectModal();
+						uni.navigateTo({
+							url: "/pages/myorder/orderlist/orderlist"
+						})
+					} else {
+						uni.showToast({
+							title: res.data || 'Update failed',
+							icon: 'none',
+						});
+					}
 				} catch (err) {
-				    uni.showToast({ title: '网络错误', icon: 'none' })
-				} finally {
-					//uni.hideLoading();
-				    this.isLoading = false
-				}
-			}
-	  }
-	};
+					uni.showToast({
+						title: 'Network Error',
+						icon: 'none'
+					})
+				} finally {}
+				// this.show_key = true
 
+
+			},
+			closeCardSelectModal() {
+				this.showCardSelectModal = false;
+			},
+
+			submitPaymentPassword() {
+				if (this.password) {
+					alert('Payment Successful');
+					this.showPasswordModal = false;
+				} else {
+					alert('Please enter a valid password');
+				}
+			},
+
+			cancelPayment() {
+				this.showPasswordModal = false;
+			},
+			// hideFun() {
+			// 	this.show_key = false
+			// },
+			// async getPassword(n) {
+			// const token = String(uni.getStorageSync('token'));
+			// this.user = uni.getStorageSync('userInfo');
+			// try {
+			// 	const res = await uni.request({
+			// 		url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
+			// 		method: 'POST',
+			// 		data: {
+			// 			securityCode: String(n.password)
+			// 		},
+			// 		header: {
+			// 			'Content-Type': 'application/json',
+			// 			"Authorization": `Bearer ${token}`
+			// 		},
+
+			// 	});
+
+			// 	if (res.statusCode === 200) {
+			// 		uni.showToast({
+			// 			title: res.data.message,
+			// 			icon: 'none',
+			// 		});
+			// 		uni.navigateTo({
+			// 			url: "/pages/myorder/orderlist/orderlist"
+			// 		})
+			// 	} else {
+			// 		uni.showToast({
+			// 			title: res.data.message || 'Update failed',
+			// 			icon: 'none',
+			// 		});
+			// 	}
+			// } catch (err) {
+			// 	uni.showToast({
+			// 		title: 'Network Error',
+			// 		icon: 'none'
+			// 	})
+			// } finally {
+			// }
+			// }
+		}
+	};
 </script>
 
 <style>
 	.payment-container {
-	   padding: 20px;
+		padding: 40rpx 30rpx;
 		background: #fff;
-	    border-radius: 8px;
-	    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		border-radius: 20rpx;
+		box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.08);
 		margin: 30rpx 20rpx;
 	}
-	.payment-method-section {
-	  margin-bottom: 30px;
-	}
-	
+
 	.payment-header .title {
-	  font-size: 18px;
-	  font-weight: bold;
-	  margin-bottom: 10rpx;
+		font-size: 36rpx;
+		font-weight: 600;
+		margin-bottom: 20rpx;
+		color: #2c3e50;
+		text-align: center;
 	}
-	
+
+	.payment-method-section {
+		margin-top: 20rpx;
+	}
+
+	.payment-options {
+		display: flex;
+		flex-direction: column;
+		gap: 20rpx;
+	}
+
 	.payment-option {
-	  display: flex;
-	  align-items: center;
-	  justify-content: space-between;
-	  padding: 12px;
-	  border: 1px solid #ddd;
-	  border-radius: 8px;
-	  margin-top: 10px;
-	  cursor: pointer;
-	}
-	.left{
 		display: flex;
 		align-items: center;
-		justify-content: flex-start;
+		justify-content: space-between;
+		padding: 30rpx;
+		border: 2rpx solid #e0e0e0;
+		border-radius: 20rpx;
+		background-color: #f9f9f9;
+		transition: all 0.3s ease;
 	}
-	.payment-option.selected {
-	  font-weight: bold; /* 选中时加粗文本 */
-	  border: #014d87 solid 2rpx;
-	}
-	.check-icon {
-	  font-size: 18px;
-	  color: #55557f; /* 勾选标记的颜色 */
-	  margin-left: 10px; /* 勾选标记和文本之间的间距 */
-	}
-	
+
 	.payment-option:hover {
-	 border: #014d87 solid 2rpx; 
+		border-color: #3498db;
+		background-color: #f0f8ff;
 	}
-	
+
+	.payment-option.selected {
+		border-color: #3498db;
+		background-color: #e6f2fc;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+	}
+
+	.left {
+		display: flex;
+		align-items: center;
+	}
+
 	.payment-icon {
-	  width: 24px; /* 设置图标的宽度 */
-	  height: 24px; /* 设置图标的高度 */
-	  margin-right: 10px; /* 图标和文本之间的间距 */
+		width: 40rpx;
+		height: 40rpx;
+		margin-right: 20rpx;
 	}
-	
-	.payment-text {
-	  font-size: 16px;
-	  color: #333;
-	} 
-	
+
+	.check-icon {
+		font-size: 28rpx;
+		color: #3498db;
+		font-weight: bold;
+	}
+
 	.payment-btn button {
-	  width: 100%;
-	  padding: 12px;
-	  background-color: #2c3e50;
-	  color: white;
-	  font-size: 16px;
-	  border: none;
-	  border-radius: 8px;
-	  cursor: pointer;
-	  margin: 10rpx;
+		width: 100%;
+		padding: 30rpx;
+		background-color: #2c3e50;
+		color: white;
+		font-size: 32rpx;
+		font-weight: bold;
+		border: none;
+		border-radius: 20rpx;
+		margin-top: 40rpx;
+		transition: background-color 0.3s ease;
 	}
 
-	
 	.card-select-modal {
-	  position: fixed;
-	  bottom: 0;
-	  left: 0;
-	  width: 100%;
-	  background-color: rgba(0, 0, 0, 0.5);
-	  display: flex;
-	  justify-content: center;
-	  align-items: flex-end; /* 弹窗固定在底部 */
-	  padding: 20px;
-	  box-sizing: border-box;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
-	
+
 	.card-options {
-	  background-color: #fff;
-	  padding: 20px;
-	  border-radius: 8px;
-	  width: 80%; /* 弹窗宽度 */
-	  max-width: 400px; /* 最大宽度 */
-	  max-height: 400px; /* 最大高度 */
-	  overflow-y: auto; /* 超过最大高度时出现滚动条 */
-	  display: flex;
-	  flex-direction: column; /* 垂直排列卡号选项 */
+		background: #fff;
+		padding: 40rpx 30rpx;
+		border-radius: 24rpx;
+		width: 80%;
+		box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.15);
 	}
-	
-	.card-option {
-	  display: flex;
-	  justify-content: space-between; /* 水平方向上分布内容 */
-	  align-items: center;
-	  padding: 12px;
-	  border: 1px solid #ddd;
-	  border-radius: 8px;
-	  margin-bottom: 12px; /* 卡号项之间的间距 */
-	  cursor: pointer;
-	  transition: background-color 0.3s ease;
+
+	.form-group {
+		margin-bottom: 30rpx;
 	}
-	
-	.card-option:hover {
-	  background-color: #f0f0f0;
+
+	.label {
+		display: block;
+		margin-bottom: 10rpx;
+		font-size: 28rpx;
+		font-weight: bold;
+		color: #2c3e50;
 	}
-	
-	.card-option:last-child {
-	  margin-bottom: 0; /* 去掉最后一项的下边距 */
+
+	.required {
+		color: red;
+		font-weight: normal;
+		margin-left: 6rpx;
 	}
-	
+
+	.input-field {
+		box-sizing: border-box;
+		width: 100%;
+		padding: 10rpx;
+		border: 1px solid #ccc;
+		border-radius: 10rpx;
+	}
+
+	.picker {
+		padding: 20rpx;
+		border: 1px solid #ccc;
+		border-radius: 16rpx;
+		background: #f5f5f5;
+		font-size: 28rpx;
+		color: #333;
+	}
+
+	.button-group,
 	.card-options button {
-	  background-color: #2c3e50;
-	  color: #fff;
-	  padding: 12px;
-	  width: 100%;
-	  border-radius: 5px;
-	  margin-top: 15px;
-	  cursor: pointer;
-	  font-size: 10px;
-	  transition: background-color 0.3s ease;
+		margin-top: 20rpx;
 	}
 
-
+	.card-options button {
+		background-color: #2c3e50;
+		color: #fff;
+		padding: 24rpx;
+		width: 100%;
+		border: none;
+		border-radius: 16rpx;
+		font-size: 30rpx;
+		cursor: pointer;
+		transition: opacity 0.3s ease;
+	}
 </style>

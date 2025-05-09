@@ -139,117 +139,132 @@
 }
 
 .payment-container {
-	   padding: 20px;
+		padding: 1.25rem 0.9375rem;
 		background: #fff;
-	    border-radius: 8px;
-	    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		border-radius: 0.625rem;
+		box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.08);
 		margin: 0.9375rem 0.625rem;
 }
-.payment-method-section {
-	  margin-bottom: 30px;
-}
 .payment-header .title {
-	  font-size: 18px;
-	  font-weight: bold;
-	  margin-bottom: 0.3125rem;
+		font-size: 1.125rem;
+		font-weight: 600;
+		margin-bottom: 0.625rem;
+		color: #2c3e50;
+		text-align: center;
+}
+.payment-method-section {
+		margin-top: 0.625rem;
+}
+.payment-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.625rem;
 }
 .payment-option {
-	  display: flex;
-	  align-items: center;
-	  justify-content: space-between;
-	  padding: 12px;
-	  border: 1px solid #ddd;
-	  border-radius: 8px;
-	  margin-top: 10px;
-	  cursor: pointer;
-}
-.left{
 		display: flex;
 		align-items: center;
-		justify-content: flex-start;
-}
-.payment-option.selected {
-	  font-weight: bold; /* 选中时加粗文本 */
-	  border: #014d87 solid 0.0625rem;
-}
-.check-icon {
-	  font-size: 18px;
-	  color: #55557f; /* 勾选标记的颜色 */
-	  margin-left: 10px; /* 勾选标记和文本之间的间距 */
+		justify-content: space-between;
+		padding: 0.9375rem;
+		border: 0.0625rem solid #e0e0e0;
+		border-radius: 0.625rem;
+		background-color: #f9f9f9;
+		transition: all 0.3s ease;
 }
 .payment-option:hover {
-	 border: #014d87 solid 0.0625rem;
+		border-color: #3498db;
+		background-color: #f0f8ff;
+}
+.payment-option.selected {
+		border-color: #3498db;
+		background-color: #e6f2fc;
+		box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.06);
+}
+.left {
+		display: flex;
+		align-items: center;
 }
 .payment-icon {
-	  width: 24px; /* 设置图标的宽度 */
-	  height: 24px; /* 设置图标的高度 */
-	  margin-right: 10px; /* 图标和文本之间的间距 */
+		width: 1.25rem;
+		height: 1.25rem;
+		margin-right: 0.625rem;
 }
-.payment-text {
-	  font-size: 16px;
-	  color: #333;
+.check-icon {
+		font-size: 0.875rem;
+		color: #3498db;
+		font-weight: bold;
 }
 .payment-btn uni-button {
-	  width: 100%;
-	  padding: 12px;
-	  background-color: #2c3e50;
-	  color: white;
-	  font-size: 16px;
-	  border: none;
-	  border-radius: 8px;
-	  cursor: pointer;
-	  margin: 0.3125rem;
+		width: 100%;
+		padding: 0.9375rem;
+		background-color: #2c3e50;
+		color: white;
+		font-size: 1rem;
+		font-weight: bold;
+		border: none;
+		border-radius: 0.625rem;
+		margin-top: 1.25rem;
+		transition: background-color 0.3s ease;
 }
 .card-select-modal {
-	  position: fixed;
-	  bottom: 0;
-	  left: 0;
-	  width: 100%;
-	  background-color: rgba(0, 0, 0, 0.5);
-	  display: flex;
-	  justify-content: center;
-	  align-items: flex-end; /* 弹窗固定在底部 */
-	  padding: 20px;
-	  box-sizing: border-box;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
 }
 .card-options {
-	  background-color: #fff;
-	  padding: 20px;
-	  border-radius: 8px;
-	  width: 80%; /* 弹窗宽度 */
-	  max-width: 400px; /* 最大宽度 */
-	  max-height: 400px; /* 最大高度 */
-	  overflow-y: auto; /* 超过最大高度时出现滚动条 */
-	  display: flex;
-	  flex-direction: column; /* 垂直排列卡号选项 */
+		background: #fff;
+		padding: 1.25rem 0.9375rem;
+		border-radius: 0.75rem;
+		width: 80%;
+		box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.15);
 }
-.card-option {
-	  display: flex;
-	  justify-content: space-between; /* 水平方向上分布内容 */
-	  align-items: center;
-	  padding: 12px;
-	  border: 1px solid #ddd;
-	  border-radius: 8px;
-	  margin-bottom: 12px; /* 卡号项之间的间距 */
-	  cursor: pointer;
-	  transition: background-color 0.3s ease;
+.form-group {
+		margin-bottom: 0.9375rem;
 }
-.card-option:hover {
-	  background-color: #f0f0f0;
+.label {
+		display: block;
+		margin-bottom: 0.3125rem;
+		font-size: 0.875rem;
+		font-weight: bold;
+		color: #2c3e50;
 }
-.card-option:last-child {
-	  margin-bottom: 0; /* 去掉最后一项的下边距 */
+.required {
+		color: red;
+		font-weight: normal;
+		margin-left: 0.1875rem;
+}
+.input-field {
+		box-sizing: border-box;
+		width: 100%;
+		padding: 0.3125rem;
+		border: 1px solid #ccc;
+		border-radius: 0.3125rem;
+}
+.picker {
+		padding: 0.625rem;
+		border: 1px solid #ccc;
+		border-radius: 0.5rem;
+		background: #f5f5f5;
+		font-size: 0.875rem;
+		color: #333;
+}
+.button-group,
+	.card-options uni-button {
+		margin-top: 0.625rem;
 }
 .card-options uni-button {
-	  background-color: #2c3e50;
-	  color: #fff;
-	  padding: 12px;
-	  width: 100%;
-	  border-radius: 5px;
-	  margin-top: 15px;
-	  cursor: pointer;
-	  font-size: 10px;
-	  transition: background-color 0.3s ease;
+		background-color: #2c3e50;
+		color: #fff;
+		padding: 0.75rem;
+		width: 100%;
+		border: none;
+		border-radius: 0.5rem;
+		font-size: 0.9375rem;
+		cursor: pointer;
+		transition: opacity 0.3s ease;
 }
-
-

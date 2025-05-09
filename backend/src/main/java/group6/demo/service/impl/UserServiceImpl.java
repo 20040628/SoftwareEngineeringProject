@@ -1,5 +1,6 @@
 package group6.demo.service.impl;
 
+import group6.demo.constants.DefaultAvatarConstants;
 import group6.demo.dto.UserLoginDTO;
 import group6.demo.dto.UserRegistrationDTO;
 import group6.demo.dto.UpdateBankCardDTO;
@@ -72,13 +73,13 @@ public class UserServiceImpl implements UserService {
         
         // 设置生日信息（如果提供）
         if (registrationDTO.getBirthday() != null) {
-            user.setBirthday(registrationDTO.getBirthday());
+        user.setBirthday(registrationDTO.getBirthday());
         }
         System.out.println("Setting birthday: " + (user.getBirthday() != null ? user.getBirthday().toString() : "null"));
         
         // Set default values
         user.setUserType(0);  // 0: normal user
-        user.setAvatar("default_avatar.jpg");
+        user.setAvatar(DefaultAvatarConstants.DEFAULT_AVATAR_BASE64);
         user.setStatus(1);  // 1: account enabled
         user.setRole(1);    // 1: normal user
         user.setIsFrequentUser(0);  // 0: not frequent user
@@ -235,12 +236,12 @@ public class UserServiceImpl implements UserService {
         profileDTO.setAvatar(avatarData);
         
         // 直接将Base64数据设置为头像URL
-        // 如果是旧版默认头像，返回默认路径
-        if ("default_avatar.jpg".equals(avatarData)) {
-            profileDTO.setAvatarUrl("/uploads/avatars/default_avatar.jpg");
-        } else if (avatarData != null && avatarData.startsWith("data:image/")) {
+        if (avatarData != null && avatarData.startsWith("data:image/")) {
             // 对于Base64格式的图片，直接使用
             profileDTO.setAvatarUrl(avatarData);
+        } else if ("default_avatar.jpg".equals(avatarData)) {
+            // 对于旧版默认头像，使用Base64编码替代
+            profileDTO.setAvatarUrl(DefaultAvatarConstants.DEFAULT_AVATAR_BASE64);
         } else {
             // 旧数据兼容处理
             profileDTO.setAvatarUrl("/uploads/avatars/" + (avatarData != null ? avatarData : "default_avatar.jpg"));

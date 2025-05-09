@@ -125,7 +125,7 @@ class BookingServiceImplTest {
 
     @Test
     void testReturnScooter_AlreadyCompleted() {
-        testOrder.setStatus(2);
+        testOrder.setStatus(3); // 更新为新的已完成状态
         when(orderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
 
         ReturnScooterDTO returnScooterDTO = new ReturnScooterDTO();
@@ -179,46 +179,45 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void testStartRental_Success() {
-        // Arrange
+    void testStaffReturnScooter() {
+        // 准备测试数据
+        StaffReturnScooterDTO returnDTO = new StaffReturnScooterDTO();
+        returnDTO.setOrderId(orderId);
+        returnDTO.setStaffId(1L);
+        returnDTO.setBatteryLevel(new BigDecimal("95"));
+        
+        User staff = new User();
+        staff.setId(1L);
+        staff.setRole(0); // 管理员
+        
+        // 确保订单开始时间在当前时间之前
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, -1); // 开始时间是1小时前
+        testOrder.setStartTime(calendar.getTime());
+        
+        testOrder.setStatus(2); // 已支付
+        testOrder.setDepositPaid(true);
+        testOrder.setDepositAmount(new BigDecimal("50.00"));
+        testOrder.setPaymentMethod("BANK_CARD");
+        
+        when(userRepository.findById(1L)).thenReturn(Optional.of(staff));
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+        when(scooterRepository.save(any(Scooter.class))).thenReturn(testScooter);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
 
-        // Act
-        Order result = bookingService.startRental(orderId);
+        // 执行测试
+        Order result = bookingService.staffReturnScooter(returnDTO);
 
-        // Assert
-        assertEquals(3, result.getStatus()); // 验证状态已更新为使用中(3)
-        verify(orderRepository).findById(orderId);
-        verify(orderRepository).save(testOrder);
-    }
-
-    @Test
-    void testStartRental_OrderNotFound() {
-        // Arrange
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bookingService.startRental(orderId);
-        });
-        assertEquals("Order not found", exception.getMessage());
-        verify(orderRepository).findById(orderId);
-        verifyNoMoreInteractions(orderRepository);
-    }
-
-    @Test
-    void testStartRental_InvalidStatus() {
-        // Arrange
-        testOrder.setStatus(1); // 已创建状态，不是已支付未开始
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
-
-        // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bookingService.startRental(orderId);
-        });
-        assertEquals("Only paid orders that have not started can begin rental", exception.getMessage());
-        verify(orderRepository).findById(orderId);
-        verifyNoMoreInteractions(orderRepository);
+        // 验证结果
+        assertEquals(3, result.getStatus()); // 验证状态更新为已完成
+        assertNotNull(result.getReturnTime()); // 验证归还时间已设置
+        assertTrue(result.getDepositRefunded()); // 验证押金已退还
+        assertEquals(staff, result.getStaff()); // 验证操作员已记录
+        
+        // 验证方法调用
+        verify(scooterRepository).save(any(Scooter.class));
+        verify(userRepository).save(any(User.class));
+        verify(orderRepository).save(any(Order.class));
     }
 }

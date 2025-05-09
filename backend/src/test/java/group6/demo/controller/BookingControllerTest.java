@@ -4,6 +4,7 @@ import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
+import group6.demo.dto.StaffReturnScooterDTO;
 import group6.demo.entity.Order;
 import group6.demo.service.BookingService;
 import org.junit.jupiter.api.BeforeEach;
@@ -221,26 +222,28 @@ class BookingControllerTest {
     }
 
     @Test
-    void testStartRental_Valid() {
-        Long orderId = 1L;
+    void testAdminReturnScooter() {
+        StaffReturnScooterDTO returnDTO = new StaffReturnScooterDTO();
+        returnDTO.setOrderId(1L);
+        returnDTO.setStaffId(1L);
+        
         Order order = new Order();
-        order.setId(orderId);
-        order.setStatus(3); // 使用中状态
-        order.setStartTime(new Date());
-        order.setEndTime(new Date());
+        order.setId(1L);
+        order.setReturnTime(new Date());
+        order.setDepositRefunded(true);
+        order.setDepositAmount(new BigDecimal("50.00"));
 
-        when(bookingService.startRental(orderId)).thenReturn(order);
+        when(bookingService.staffReturnScooter(any(StaffReturnScooterDTO.class))).thenReturn(order);
 
-        ResponseEntity<?> response = bookingController.startRental(orderId);
+        ResponseEntity<?> response = bookingController.adminReturnScooter(returnDTO);
 
         assertEquals(200, response.getStatusCodeValue());
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
         assertNotNull(responseBody);
-        assertEquals("Rental has started", responseBody.get("message"));
-        assertEquals(orderId, responseBody.get("orderId"));
-        assertEquals(3, responseBody.get("status"));
-        assertNotNull(responseBody.get("startTime"));
-        assertNotNull(responseBody.get("endTime"));
-        verify(bookingService, times(1)).startRental(orderId);
+        assertEquals("管理员成功代表用户归还滑板车", responseBody.get("message"));
+        assertEquals(1L, responseBody.get("orderId"));
+        assertEquals(true, responseBody.get("depositRefunded"));
+        assertEquals(new BigDecimal("50.00"), responseBody.get("depositAmount"));
+        verify(bookingService, times(1)).staffReturnScooter(any(StaffReturnScooterDTO.class));
     }
 }

@@ -4,6 +4,7 @@ import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
+import group6.demo.dto.StaffReturnScooterDTO;
 import group6.demo.entity.Order;
 import group6.demo.entity.Scooter;
 import group6.demo.entity.User;
@@ -324,20 +325,20 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void cancelBooking(Long orderId) {
-        // 根据订单 ID 查找订单
+        // Find order by ID
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
 
-        // 检查订单状态，如果已经完成或已取消则不能再取消
-        if (order.getStatus() == 4 || order.getStatus() == 5) {
+        // Check order status, if already completed or cancelled then cannot cancel again
+        if (order.getStatus() == 3 || order.getStatus() == 4) {
             throw new IllegalArgumentException("Order has been completed or cancelled, cannot cancel again");
         }
 
-        // 更新订单状态为已取消(5)
-        order.setStatus(5);
+        // Update order status to CANCELLED(4)
+        order.setStatus(4);
         orderRepository.save(order);
 
-        // 发送取消预订的邮件通知用户
+        // Send cancellation email to notify user
         sendCancellationEmail(order);
     }
 
@@ -492,54 +493,54 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public Order returnScooter(ReturnScooterDTO returnScooterDTO) {
-        // 查找订单
+        // Find order
         Order order = orderRepository.findById(returnScooterDTO.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        // 验证订单状态必须为使用中(3)才能还车
-        if (order.getStatus() != 3) {
-            throw new IllegalArgumentException("Only orders in use can be returned");
+        // Validate order status must be PAID(2) and current time must be after start time
+        if (order.getStatus() != 2 || new Date().before(order.getStartTime())) {
+            throw new IllegalArgumentException("Only paid orders that have started can be returned");
         }
 
-        // 获取用户和电动车信息
+        // Get user and scooter information
         User user = order.getUser();
         Scooter scooter = order.getScooter();
 
-        // 记录还车时间
+        // Record return time
         Date returnTime = new Date();
         order.setReturnTime(returnTime);
         
-        // 更新订单状态为已完成(4)
-        order.setStatus(4);
+        // Update order status to COMPLETED(3)
+        order.setStatus(3);
 
-        // 如果是银行卡支付且电量大于90%，退还押金
+        // If paid with bank card and battery level > 90%, refund deposit
         if ("BANK_CARD".equals(order.getPaymentMethod()) && order.getDepositPaid()) {
             BigDecimal batteryLevel = scooter.getBattery();
             
-            // 如果电量大于90，退还押金
+            // If battery level > 90, refund deposit
             if (batteryLevel != null && batteryLevel.compareTo(new BigDecimal("90")) > 0) {
-                // 标记押金已退还
+                // Mark deposit as refunded
                 order.setDepositRefunded(true);
                 
-                // 退还押金到用户银行卡余额
+                // Refund deposit to user's bank card balance
                 if (user.getBankBalance() != null) {
                     BigDecimal newBalance = user.getBankBalance().add(order.getDepositAmount());
                     user.setBankBalance(newBalance);
                     userRepository.save(user);
                 }
                 
-                // 发送邮件通知押金退还
+                // Send email notification for deposit refund
                 sendDepositRefundEmail(order);
             }
         }
 
-        // 保存更新后的订单
+        // Save updated order
         return orderRepository.save(order);
     }
     
     /**
-     * 发送押金退还邮件通知
-     * @param order 订单信息
+     * Send deposit refund email notification
+     * @param order Order information
      */
     private void sendDepositRefundEmail(Order order) {
         try {
@@ -567,20 +568,66 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public Order startRental(Long orderId) {
-        // 查找订单
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        
-        // 验证订单状态必须为已支付未开始(2)
-        if (order.getStatus() != 2) {
-            throw new IllegalArgumentException("Only paid orders that have not started can begin rental");
+    public Order staffReturnScooter(StaffReturnScooterDTO staffReturnScooterDTO) {
+        // 验证管理员身份
+        User staff = userRepository.findById(staffReturnScooterDTO.getStaffId())
+                .orElseThrow(() -> new IllegalArgumentException("管理员不存在"));
+                
+        if (staff.getRole() != 0) {
+            throw new IllegalArgumentException("只有管理员才能执行此操作");
         }
         
-        // 更新订单状态为使用中(3)
+        // 查找订单
+        Order order = orderRepository.findById(staffReturnScooterDTO.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("订单不存在"));
+        
+        // 验证订单状态必须是已支付(2)且当前时间必须晚于开始时间
+        if (order.getStatus() != 2 || new Date().before(order.getStartTime())) {
+            throw new IllegalArgumentException("只有已支付且已开始的订单才能被归还");
+        }
+        
+        // 获取用户和滑板车信息
+        User user = order.getUser();
+        Scooter scooter = order.getScooter();
+        
+        // 如果提供了电池电量，更新滑板车电池电量
+        if (staffReturnScooterDTO.getBatteryLevel() != null) {
+            scooter.setBattery(staffReturnScooterDTO.getBatteryLevel());
+            scooterRepository.save(scooter);
+        }
+        
+        // 记录归还时间
+        Date returnTime = new Date();
+        order.setReturnTime(returnTime);
+        
+        // 更新订单状态为已完成(3)
         order.setStatus(3);
         
-        // 保存更新后的订单
+        // 记录由哪位管理员操作的
+        order.setStaff(staff);
+        
+        // 如果通过银行卡支付且已支付押金，根据电池电量决定是否退还押金
+        if ("BANK_CARD".equals(order.getPaymentMethod()) && order.getDepositPaid()) {
+            BigDecimal batteryLevel = scooter.getBattery();
+            
+            // 如果电池电量 > 90%，退还押金
+            if (batteryLevel != null && batteryLevel.compareTo(new BigDecimal("90")) > 0) {
+                // 标记押金已退还
+                order.setDepositRefunded(true);
+                
+                // 退还押金到用户银行卡余额
+                if (user.getBankBalance() != null) {
+                    BigDecimal newBalance = user.getBankBalance().add(order.getDepositAmount());
+                    user.setBankBalance(newBalance);
+                    userRepository.save(user);
+                }
+                
+                // 发送押金退还通知邮件
+                sendDepositRefundEmail(order);
+            }
+        }
+        
+        // 存储更新后的订单
         return orderRepository.save(order);
     }
 } 

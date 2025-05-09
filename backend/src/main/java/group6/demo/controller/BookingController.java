@@ -4,6 +4,7 @@ import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
+import group6.demo.dto.StaffReturnScooterDTO;
 import group6.demo.entity.Order;
 import group6.demo.service.BookingService;
 import jakarta.validation.Valid;
@@ -110,7 +111,7 @@ public class BookingController {
     @PostMapping("/extend/{orderId}")
     public ResponseEntity<?> exntendBooking(@PathVariable Long orderId, @Valid @RequestBody ExtendBookingDTO extendBookingDTO){
         try {
-            // 无法续订已完成的订单
+            // Cannot extend completed orders
             Order order = bookingService.extendBooking(orderId, extendBookingDTO);
 
             Map<String, Object> response = new HashMap<>();
@@ -153,28 +154,27 @@ public class BookingController {
         }
     }
 
-    /**
-     * 开始租赁 - 将订单状态从"已支付未开始"(2)转换为"使用中"(3)
-     * @param orderId 订单ID
-     * @return 更新后的订单状态
-     */
-    @PostMapping("/start/{orderId}")
-    public ResponseEntity<?> startRental(@PathVariable Long orderId) {
+    @PostMapping("/admin/return")
+    public ResponseEntity<?> adminReturnScooter(@Valid @RequestBody StaffReturnScooterDTO staffReturnScooterDTO) {
         try {
-            Order order = bookingService.startRental(orderId);
+            Order order = bookingService.staffReturnScooter(staffReturnScooterDTO);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Rental has started");
+            response.put("message", "管理员成功代表用户归还滑板车");
             response.put("orderId", order.getId());
-            response.put("status", order.getStatus());
-            response.put("startTime", order.getStartTime());
-            response.put("endTime", order.getEndTime());
+            response.put("returnTime", order.getReturnTime());
+            response.put("depositRefunded", order.getDepositRefunded());
+            
+            if (order.getDepositRefunded()) {
+                response.put("depositAmount", order.getDepositAmount());
+                response.put("depositMessage", "由于滑板车电池电量高于90%，用户押金已退还");
+            }
             
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to start rental: " + e.getMessage());
+            return ResponseEntity.badRequest().body("归还滑板车失败: " + e.getMessage());
         }
     }
 }

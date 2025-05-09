@@ -40,14 +40,14 @@ public class PriceDiscountServiceImpl implements PriceDiscountService {
             System.out.println("Discount calculation: Original price or user ID is null");
             return originalPrice;
         }
-
+        
         // 获取用户信息
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             System.out.println("Discount calculation: User not found - " + userId);
             return originalPrice;
         }
-
+        
         User user = userOptional.get();
         
         // 计算折扣
@@ -154,7 +154,7 @@ public class PriceDiscountServiceImpl implements PriceDiscountService {
         if (updated) {
             System.out.println("User discount status has changed, saving to database...");
             try {
-                userRepository.save(user);
+            userRepository.save(user);
                 System.out.println("Save successful, updated status: Student=" + user.getIsStudent() + ", Senior=" + user.getIsSenior());
             } catch (Exception e) {
                 System.err.println("Failed to update user discount status, user ID=" + user.getId() + ": " + e.getMessage());

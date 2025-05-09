@@ -33,9 +33,9 @@ VALUES
 -- 添加订单
 INSERT INTO b_order (id, order_time, status, start_time, end_time, hire_period, price_before_discount, price, user_id, scooter_id, staff_id)
 VALUES
-    (1, '2025-04-14 10:51:16', 4, '2025-04-28 22:01:00', '2025-04-28 23:01:00', 'HOUR', 5.00, 5.00, 2, 1, 1),
-    (2, '2025-04-15 11:00:02', 4, '2025-04-29 10:00:00', '2025-04-29 14:00:00', 'FOUR_HOURS', 10.00, 10.00, 2, 2, NULL),
-    (3, '2025-04-16 11:00:02', 4, '2025-05-02 00:00:00', '2025-05-03 00:00:00', 'DAY', 20.00, 20.00, 2, 3, NULL),
+    (1, '2025-04-14 10:51:16', 3, '2025-04-28 22:01:00', '2025-04-28 23:01:00', 'HOUR', 5.00, 5.00, 2, 1, 1),
+    (2, '2025-04-15 11:00:02', 3, '2025-04-29 10:00:00', '2025-04-29 14:00:00', 'FOUR_HOURS', 10.00, 10.00, 2, 2, NULL),
+    (3, '2025-04-16 11:00:02', 3, '2025-05-02 00:00:00', '2025-05-03 00:00:00', 'DAY', 20.00, 20.00, 2, 3, NULL),
     (4, '2025-04-17 11:00:02', 2, '2025-05-19 12:01:00', '2025-05-25 12:01:00', 'WEEK', 100.00, 100.00, 2, 3, NULL);
 
 INSERT INTO b_daily_revenue (revenue_date, day_of_week, day_of_week_name, hourly_revenue, four_hours_revenue, daily_revenue, weekly_revenue, total_revenue, orders_count, total_discount, created_at, updated_at)

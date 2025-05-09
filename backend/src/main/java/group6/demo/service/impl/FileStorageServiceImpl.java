@@ -1,5 +1,6 @@
 package group6.demo.service.impl;
 
+import group6.demo.constants.DefaultAvatarConstants;
 import group6.demo.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -65,7 +66,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public boolean deleteFile(String filename) {
-        if (filename == null || filename.isEmpty() || filename.equals("default_avatar.jpg")) {
+        if (filename == null || filename.isEmpty() || filename.equals("default_avatar.jpg") || 
+            filename.startsWith("data:image/")) {
             return false;
         }
         

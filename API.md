@@ -2289,3 +2289,55 @@ The application provides automatic discount calculation based on user profiles a
   ```
 
 - **Error Responses**: Same as above
+
+### Staff/Admin Operations
+
+#### Admin Return Scooter (Admin Only)
+
+- **URL**: `/api/bookings/admin/return`
+- **Method**: `POST`
+- **Headers**:
+  ```
+  Authorization: Bearer {token}
+  Content-Type: application/json
+  ```
+- **Request Body**:
+  ```json
+  {
+    "orderId": 1,        // 必填，订单ID
+    "staffId": 1,        // 必填，管理员ID
+    "batteryLevel": 95,  // 可选，电池电量
+    "remarks": "用户遗失手机，管理员代为归还"  // 可选，备注信息
+  }
+  ```
+- **Success Response** (200 OK):
+  ```json
+  {
+    "message": "管理员成功代表用户归还滑板车",
+    "orderId": 1,
+    "returnTime": "2023-05-30T14:30:00.000+00:00",
+    "depositRefunded": true,
+    "depositAmount": 50.00,
+    "depositMessage": "由于滑板车电池电量高于90%，用户押金已退还"
+  }
+  ```
+- **Error Response** (400 Bad Request):
+  ```json
+  "订单不存在"
+  ```
+  或
+  ```json
+  "只有管理员才能执行此操作"
+  ```
+  或
+  ```json
+  "只有已支付且已开始的订单才能被归还"
+  ```
+- **Error Response** (401 Unauthorized):
+  ```json
+  "No access authorization"
+  ```
+- **Error Response** (403 Forbidden):
+  ```json
+  "permission denied"
+  ```

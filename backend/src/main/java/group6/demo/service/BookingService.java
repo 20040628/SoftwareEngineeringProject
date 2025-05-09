@@ -4,6 +4,7 @@ import group6.demo.dto.BookingDTO;
 import group6.demo.dto.ExtendBookingDTO;
 import group6.demo.dto.ReturnScooterDTO;
 import group6.demo.dto.StaffBookingDTO;
+import group6.demo.dto.StaffReturnScooterDTO;
 import group6.demo.entity.Order;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +28,17 @@ public interface BookingService {
     Order extendBooking(Long id, ExtendBookingDTO extendBookingDTO);
     
     /**
-     * 还车功能
-     * @param returnScooterDTO 还车信息
-     * @return 更新后的订单
+     * Return a scooter
+     * The order must be in PAID status and current time must be after start time
+     * @param returnScooterDTO Return information
+     * @return Updated order
      */
     Order returnScooter(ReturnScooterDTO returnScooterDTO);
     
     /**
-     * 开始租赁功能 - 将订单状态从"已支付未开始"(2)转换为"使用中"(3)
-     * @param orderId 订单ID
+     * 管理员代表用户还车
+     * @param staffReturnScooterDTO 管理员还车信息
      * @return 更新后的订单
      */
-    Order startRental(Long orderId);
+    Order staffReturnScooter(StaffReturnScooterDTO staffReturnScooterDTO);
 } 

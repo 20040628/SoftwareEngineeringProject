@@ -211,9 +211,9 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
         
         // 如果按周起始日期未找到，再尝试按具体日期查找（这部分可能有重复记录）
         try {
-            Optional<WeeklyRevenue> weeklyRevenue = weeklyRevenueRepository.findByDate(date);
-            if (weeklyRevenue.isPresent()) {
-                return convertToDTO(weeklyRevenue.get());
+        Optional<WeeklyRevenue> weeklyRevenue = weeklyRevenueRepository.findByDate(date);
+        if (weeklyRevenue.isPresent()) {
+            return convertToDTO(weeklyRevenue.get());
             }
         } catch (Exception e) {
             // 如果发生异常（多个结果），记录错误但继续执行，因为我们已经在上面检查了weekStartDate

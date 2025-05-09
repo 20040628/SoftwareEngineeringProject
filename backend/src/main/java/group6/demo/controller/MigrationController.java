@@ -1,5 +1,6 @@
 package group6.demo.controller;
 
+import group6.demo.constants.DefaultAvatarConstants;
 import group6.demo.entity.User;
 import group6.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,15 +60,17 @@ public class MigrationController {
                     
                     // 默认头像特殊处理
                     if ("default_avatar.jpg".equals(avatar)) {
-                        // 仍然保持"default_avatar.jpg"的值，不做转换
-                        skipCount++;
+                        // 将旧的默认头像值更新为Base64格式
+                        user.setAvatar(DefaultAvatarConstants.DEFAULT_AVATAR_BASE64);
+                        userRepository.save(user);
+                        successCount++;
                         continue;
                     }
                     
                     // 文件不存在或为null，跳过
                     if (avatar == null || avatar.isEmpty()) {
                         // 设置为默认头像
-                        user.setAvatar("default_avatar.jpg");
+                        user.setAvatar(DefaultAvatarConstants.DEFAULT_AVATAR_BASE64);
                         userRepository.save(user);
                         skipCount++;
                         continue;
@@ -79,7 +82,7 @@ public class MigrationController {
                     
                     if (!avatarFile.exists() || !avatarFile.isFile()) {
                         // 文件不存在，设置为默认头像
-                        user.setAvatar("default_avatar.jpg");
+                        user.setAvatar(DefaultAvatarConstants.DEFAULT_AVATAR_BASE64);
                         userRepository.save(user);
                         skipCount++;
                         continue;

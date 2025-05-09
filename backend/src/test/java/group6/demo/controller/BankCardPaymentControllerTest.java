@@ -55,7 +55,7 @@ class BankCardPaymentControllerTest {
         testOrder.setStatus(1); // Active status
 
         validRequest = new BankCardPaymentRequest();
-        validRequest.setSecurityCode("123456");
+        validRequest.setBankCard("1234567890123456");
     }
 
 
@@ -69,7 +69,7 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("The order does not exist", response.getBody());
+        assertEquals("Order not found", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }
@@ -85,7 +85,7 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("订单状态不正确，无法支付", response.getBody());
+        assertEquals("Invalid order status, cannot process payment", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }
@@ -101,7 +101,7 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("未找到银行卡信息，请先绑定银行卡", response.getBody());
+        assertEquals("Bank card information not found, please bind your bank card first", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }
@@ -117,15 +117,15 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("银行卡余额不足，无法完成支付", response.getBody());
+        assertEquals("Insufficient bank card balance, payment failed", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }
 
     @Test
-    void processBankCardPayment_InvalidSecurityCode() {
+    void processBankCardPayment_InvalidBankCard() {
         // Arrange
-        validRequest.setSecurityCode("123"); // Invalid length
+        validRequest.setBankCard("123"); // Invalid length
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
 
         // Act
@@ -133,7 +133,7 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Invalid security code", response.getBody());
+        assertEquals("Invalid bank card", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }
@@ -216,7 +216,7 @@ class BankCardPaymentControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("用户不存在", response.getBody());
+        assertEquals("User not found", response.getBody());
         verify(userRepository).findById(userId);
     }
 }

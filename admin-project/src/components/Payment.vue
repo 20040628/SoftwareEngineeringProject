@@ -3,24 +3,64 @@
     <div class="payment">
       <h2 class="title">Payment</h2>
       <div class="form">
+        <!-- Card CVC (last 3 digits) -->
         <div class="form-row">
           <div class="form-group col-12 col-md-6">
-            <label>Password</label>
+            <label>Card Verification Code (CVC)</label>
             <input
-                v-model="paymentData.securityCode"
-                type="password"
-                maxlength="6"
-                placeholder="Enter Password"
+                v-model="paymentData.cvc"
+                type="text"
+                maxlength="3"
+                placeholder="Last 3 digits on back of card"
+                class="input"
+                @input="formatCVC"
+            />
+            <el-alert
+                v-if="errors.cvc"
+                :title="errors.cvc"
+                type="error"
+                :closable="false"
+                show-icon
+                class="custom-alert"
+            />
+          </div>
+        </div>
+
+        <!-- Card Expiration Date -->
+        <div class="form-row">
+          <div class="form-group col-12 col-md-6">
+            <label>Expiration Date</label>
+            <input
+                v-model="paymentData.expiryDate"
+                type="date"
+                placeholder="Select date"
                 class="input"
             />
-            <span class="error-message" v-if="errors.securityCode">{{ errors.securityCode }}</span>
+            <el-alert
+                v-if="errors.expiryDate"
+                :title="errors.expiryDate"
+                type="error"
+                :closable="false"
+                show-icon
+                class="custom-alert"
+            />
           </div>
+        </div>
+
+        <!-- Error message -->
+        <div class="form-row" v-if="hasError && errorMessage">
+          <el-alert
+              :title="errorMessage"
+              type="error"
+              :closable="false"
+              show-icon
+          />
         </div>
 
         <!-- Buttons row -->
         <div class="form-row">
           <div class="form-group col-12 col-md-6">
-            <button class="button button-submit" @click="submitPayment">Submit</button>
+            <button class="button button-submit" @click="submitPayment">Submit Payment</button>
           </div>
         </div>
       </div>
@@ -28,48 +68,88 @@
   </div>
 </template>
 
+
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
     return {
       paymentData: {
-        securityCode: ''
+        cvc: '',
+        expiryDate: ''
       },
       errors: {},
-      successMessage: ''
+      hasError: false,
+      errorMessage: '',
+      expiryDateOptions: {
+        disabledDate(date) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return date < today;
+        }
+      }
     };
   },
   methods: {
-    async submitPayment() {
-      // 清空错误和消息
+    formatCVC() {
+      // Remove non-numeric characters
+      this.paymentData.cvc = this.paymentData.cvc.replace(/\D/g, '');
+    },
+    validateForm() {
       this.errors = {};
-      this.successMessage = '';
+      this.hasError = false;
+      this.errorMessage = '';
 
-      // 表单基本验证
-      if (!this.paymentData.securityCode) {
-        this.errors.securityCode = 'Password is required';
+      // CVC validation
+      if (!this.paymentData.cvc) {
+        this.errors.cvc = 'CVC is required';
+      } else if (this.paymentData.cvc.length !== 3) {
+        this.errors.cvc = 'CVC must be 3 digits';
+      } else if (!/^\d{3}$/.test(this.paymentData.cvc)) {
+        this.errors.cvc = 'CVC must be numeric';
+      }
+
+      // Expiry date validation
+      if (!this.paymentData.expiryDate) {
+        this.errors.expiryDate = 'Expiration date is required';
+      } else {
+        const today = new Date();
+        const expiryDate = new Date(this.paymentData.expiryDate);
+        if (expiryDate < today) {
+          this.errors.expiryDate = 'Expiration date cannot be before today';
+        }
+      }
+
+      this.hasError = Object.keys(this.errors).length > 0;
+      if (this.hasError) {
+        this.errorMessage = 'Please fix the errors above';
+      }
+
+      return !this.hasError;
+    },
+    async submitPayment() {
+      if (!this.validateForm()) {
         return;
       }
 
       try {
-        // 获取 token
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         const orderId = this.$route.params.orderId;
 
         if (!token) {
-          alert('Please login first');
+          this.errorMessage = 'Please login first';
           this.$router.push('/add_order');
           return;
         }
 
-        // 构造请求体
         const payload = {
-          securityCode: this.paymentData.securityCode
+          securityCode: 123456
         };
 
-        // 提交支付请求
+        console.log('Request Payload:', payload);
+
         const res = await axios.post(`http://localhost:8080/api/bank-payment/${orderId}`, payload, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -78,45 +158,56 @@ export default {
         });
 
         if (res.status === 200) {
-          this.successMessage = 'Payment successful';
-          alert(this.successMessage);
+          ElNotification({
+            title: "Payment Successful",
+            message: 'Your payment has been processed',
+            type: "success"
+          });
           this.$router.push('/add_order');
         }
 
       } catch (error) {
+        console.error('Payment error:', error);
         if (error.response) {
+          console.error('Server Response:', error.response.data);
           switch (error.response.status) {
             case 400:
               this.errors = error.response.data || {};
-              alert('Error response: ' + JSON.stringify(error.response.data));
+              if (error.response.data.message) {
+                this.errorMessage = 'Error: ' + error.response.data.message;
+              } else {
+                this.errorMessage = 'Invalid payment details';
+              }
               break;
             case 401:
               localStorage.removeItem('token');
               sessionStorage.removeItem('token');
-              alert('Session expired. Please login again.');
+              this.errorMessage = 'Session expired. Please login again.';
               this.$router.push('/add_order');
               break;
             case 403:
-              alert('Forbidden: You do not have permission to perform this action');
+              this.errorMessage = 'Forbidden: You do not have permission to perform this action';
               break;
             default:
-              alert(`Error: ${error.response.data?.message || 'Unknown error occurred'}`);
+              this.errorMessage = `Error: ${error.response.data?.message || 'Payment failed'}`;
           }
         } else {
-          alert('Network error: Please check your connection');
+          this.errorMessage = 'Network error: Please check your connection';
         }
-        console.error('Payment error:', error);
+        this.hasError = true;
       }
     }
+
   },
   mounted() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) {
-      alert('Please login first');
+      this.errorMessage = 'Please login first';
       this.$router.push('/add_order');
     }
   }
 };
+
 </script>
 
 <style scoped>
@@ -125,12 +216,12 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f2f5;
+  background-color: #f3ffff;
 }
 
 .payment {
   width: 40vw;
-  height: 40vh;
+  min-height: 50vh;
   background-color: white;
   border: 2px solid #ccc;
   border-radius: 12px;
@@ -138,7 +229,6 @@ export default {
   padding: 20px;
   display: flex;
   flex-direction: column;
-
 }
 
 .title {
@@ -165,7 +255,7 @@ export default {
   flex-wrap: wrap;
   gap: 16px;
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .form-group {
@@ -207,6 +297,7 @@ label {
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: bold;
+  width: 100%;
 }
 
 .button-submit {
@@ -214,44 +305,26 @@ label {
   color: white;
 }
 
-.button-submit:hover {
-  background: #003c51;
+.custom-alert {
+  font-size: 16px;
+  width: 99%;
+  margin-top: 3px;
+  height: 30px;
 }
 
-.button-reset {
-  background: white;
-  color: #003c51;
-  font-weight: bold;
-  border: 3px solid #003c51;
+.date-picker {
+  width: 550px;
+  height: 56px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-right: 1%;
 }
 
-.button-reset:hover {
-  background: #f4f4f4;
-}
-
-.error-message {
-  color: #f56c6c;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-@media (max-width: 767px) {
-  .form-row {
-    flex-direction: column;
-  }
-
-  .form-group {
-    width: 100%;
-  }
-}
-
-@media (max-width: 767px) {
-  .button-group {
-    flex-direction: column;
-  }
-
-  .button {
-    width: 100%;
-  }
+:deep(.el-input__inner) {
+  height: 56px;
+  padding: 10px;
+  border-radius: 8px;
 }
 </style>

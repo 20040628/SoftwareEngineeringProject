@@ -10,8 +10,17 @@
               type="text"
               placeholder="Enter store name"
               class="input"
+              maxlength="50"
+              @input="validateNameLength"
           />
-          <span class="error-message" v-if="errors.name">{{ errors.name }}</span>
+          <el-alert
+              v-if="errors.name"
+              :title="errors.name"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
       <!-- Latitude row -->
@@ -22,10 +31,17 @@
               v-model="storeData.latitude"
               type="number"
               step="0.000001"
-              placeholder="Enter latitude"
+              placeholder="Enter latitude (-90 to 90)"
               class="input"
           />
-          <span class="error-message" v-if="errors.latitude">{{ errors.latitude }}</span>
+          <el-alert
+              v-if="errors.latitude"
+              :title="errors.latitude"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -37,11 +53,28 @@
               v-model="storeData.longitude"
               type="number"
               step="0.000001"
-              placeholder="Enter longitude"
+              placeholder="Enter longitude (-180 to 180)"
               class="input"
           />
-          <span class="error-message" v-if="errors.longitude">{{ errors.longitude }}</span>
+          <el-alert
+              v-if="errors.longitude"
+              :title="errors.longitude"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
+      </div>
+
+      <!-- Error message -->
+      <div class="form-row" v-if="hasError && errorMessage">
+        <el-alert
+            :title="errorMessage"
+            type="error"
+            :closable="false"
+            show-icon
+        />
       </div>
 
       <!-- Buttons row -->
@@ -57,6 +90,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -67,6 +101,8 @@ export default {
         longitude: '',
       },
       errors: {},
+      hasError: false,
+      errorMessage: ''
     };
   },
   methods: {
@@ -77,10 +113,14 @@ export default {
         longitude: '',
       };
       this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
     },
     async addStore() {
       // Reset errors
       this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
 
       if (!this.storeData.name) {
         this.errors.name = 'Store name is required';
@@ -88,13 +128,27 @@ export default {
       // Basic validation
       if (!this.storeData.latitude) {
         this.errors.latitude = 'Latitude is required';
+      } else if (isNaN(this.storeData.latitude)) {
+        this.errors.latitude = 'Latitude must be a number';
+      } else if (this.storeData.latitude < -90 || this.storeData.latitude > 90) {
+        this.errors.latitude = 'Latitude must be between -90 and 90 degrees';
       }
+
       if (!this.storeData.longitude) {
         this.errors.longitude = 'Longitude is required';
+      } else if (isNaN(this.storeData.longitude)) {
+        this.errors.longitude = 'Longitude must be a number';
+      } else if (this.storeData.longitude < -180 || this.storeData.longitude > 180) {
+        this.errors.longitude = 'Longitude must be between -180 and 180 degrees';
       }
 
       if (Object.keys(this.errors).length > 0) {
-        alert('Please fill in all required fields');
+        this.hasError = true;
+        ElNotification({
+          title: "Input Error",
+          message: `Please fix the errors above`,
+          type: "error"
+        });
         return;
       }
 
@@ -102,7 +156,11 @@ export default {
         // Get token from localStorage or sessionStorage
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) {
-          alert('Please login first');
+          ElNotification({
+            title: "Error",
+            message: `Please login first`,
+            type: "error"
+          });
           this.$router.push('/login');
           return;
         }
@@ -123,7 +181,11 @@ export default {
         });
 
         if (res.status === 200) {
-          alert('Store added successfully!\nStore ID: ' + res.data.storeId);
+          ElNotification({
+            title: "Add Store Successfully",
+            message: `New Store ID: ${res.data.storeId}`,
+            type: "success"
+          });
           this.resetForm();
         }
       } catch (error) {
@@ -133,33 +195,34 @@ export default {
             case 400:
               this.errors = error.response.data || {};
               if (error.response.data.message) {
-                alert('Error: ' + error.response.data.message);
+                this.errorMessage = 'Error: ' + error.response.data.message;
               } else if (error.response.data.name) {
-                alert('Error: ' + error.response.data.name);
+                this.errorMessage = 'Error: ' + error.response.data.name;
               } else if (error.response.data.latitude) {
-                alert('Error: ' + error.response.data.latitude);
+                this.errorMessage = 'Error: ' + error.response.data.latitude;
               } else if (error.response.data.longitude) {
-                alert('Error: ' + error.response.data.longitude);
+                this.errorMessage = 'Error: ' + error.response.data.longitude;
               } else {
-                alert('Invalid data provided');
+                this.errorMessage = this.errors;
               }
               break;
             case 401:
               localStorage.removeItem('token');
               sessionStorage.removeItem('token');
               this.$store.commit('logout');
-              alert('Session expired. Please login again.');
+              this.errorMessage = 'Session expired. Please login again.';
               this.$router.push('/login');
               break;
             case 403:
-              alert('Forbidden: You do not have permission to perform this action');
+              this.errorMessage = 'Forbidden: You do not have permission to perform this action';
               break;
             default:
-              alert(`Error: ${error.response.data?.message || 'Unknown error occurred'}`);
+              this.errorMessage = `Error: ${error.response.data?.message || 'Unknown error occurred'}`;
           }
         } else {
-          alert('Network error: Please check your connection');
+          this.errorMessage = 'Network error: Please check your connection';
         }
+        this.hasError = true;
         console.error('Add store error:', error);
       }
     }
@@ -168,7 +231,11 @@ export default {
     // Check login status when component loads
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (!token) {
-      alert('Please login first');
+      ElNotification({
+        title: "Error",
+        message: `Please login first`,
+        type: "error"
+      });
       this.$router.push('/login');
     }
   }
@@ -266,6 +333,13 @@ label {
 
 .button-reset:hover {
   background: #f4f4f4;
+}
+
+.custom-alert {
+  font-size: 16px;
+  width: 99%;
+  margin-top: 3px;
+  height: 30px;
 }
 
 .error-message {

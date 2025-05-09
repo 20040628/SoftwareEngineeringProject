@@ -5,6 +5,7 @@ import store from '../store'
 const UserLogin = () => import('../views/login/index.vue')
 const MainLayout = () => import('@/components/MainLayout.vue')
 const Payment = () => import('@/components/Payment.vue')
+const EditScooter = () => import('@/components/EditScooter.vue')
 
 // 路由配置
 const routes = [
@@ -19,6 +20,12 @@ const routes = [
     meta: {
       requiresAuth: false
     }
+  },
+  {
+    path: '/scooters/:id/edit',
+    name: 'EditScooter',
+    component: EditScooter,
+    props: true
   },
   {
     path: '/',

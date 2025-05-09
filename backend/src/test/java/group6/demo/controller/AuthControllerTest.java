@@ -129,7 +129,7 @@ class AuthControllerTest {
         assertEquals(400, response.getStatusCodeValue());
         Map<String, String> responseBody = (Map<String, String>) response.getBody();
         assertNotNull(responseBody);
-        assertEquals("验证码错误或已过期", responseBody.get("captcha"));
+        assertEquals("Verification code is incorrect or expired", responseBody.get("captcha"));
         verify(captchaService, times(1)).validateCaptcha("captchaKey", "wrongCaptcha");
         verify(userService, times(0)).loginUser(any(UserLoginDTO.class));
     }

@@ -155,7 +155,7 @@ class UserControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof Map);
         Map<?, ?> responseBody = (Map<?, ?>) response.getBody();
-        assertEquals("用户生日信息更新成功", responseBody.get("message"));
+        assertEquals("User birthday information updated successfully", responseBody.get("message"));
         verify(priceDiscountService).updateUserDiscountStatusByBirthday(userId);
     }
 
@@ -169,7 +169,7 @@ class UserControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("用户不存在", response.getBody());
+        assertEquals("User not found", response.getBody());
     }
 
     @Test
@@ -202,7 +202,7 @@ class UserControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("用户不存在", response.getBody());
+        assertEquals("User not found", response.getBody());
     }
 
     @Test

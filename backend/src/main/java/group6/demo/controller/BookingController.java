@@ -135,14 +135,14 @@ public class BookingController {
             Order order = bookingService.returnScooter(returnScooterDTO);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "电动车归还成功");
+            response.put("message", "Scooter returned successfully");
             response.put("orderId", order.getId());
             response.put("returnTime", order.getReturnTime());
             response.put("depositRefunded", order.getDepositRefunded());
             
             if (order.getDepositRefunded()) {
                 response.put("depositAmount", order.getDepositAmount());
-                response.put("depositMessage", "您已成功归还电动车，并且电量大于90%，押金已退还。");
+                response.put("depositMessage", "You have successfully returned the scooter with battery level above 90%, your deposit has been refunded.");
             }
             
             return ResponseEntity.ok(response);
@@ -164,7 +164,7 @@ public class BookingController {
             Order order = bookingService.startRental(orderId);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "租赁已开始");
+            response.put("message", "Rental has started");
             response.put("orderId", order.getId());
             response.put("status", order.getStatus());
             response.put("startTime", order.getStartTime());

@@ -31,8 +31,8 @@ CREATE TABLE `b_user`  (
 CREATE TABLE `b_store` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `name` varchar(50) NOT NULL,
-    `longitude` decimal(9, 6) NOT NULL,
-    `latitude` decimal(9, 6) NOT NULL,
+    `longitude` decimal(9, 6) NOT NULL CHECK (longitude BETWEEN -180.00 AND 180.00),
+    `latitude` decimal(9, 6) NOT NULL CHECK (latitude BETWEEN -90.00 AND 90.00),
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

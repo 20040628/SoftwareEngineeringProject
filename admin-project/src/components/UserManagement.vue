@@ -46,7 +46,6 @@
           <th>Birthday</th>
           <th>Bank Card</th>
           <th>Frequent User</th>
-          <th>Status</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -66,11 +65,6 @@
           <td>
             <span :class="['frequent-label', user.isFrequentUser ? 'frequent-yes' : 'frequent-no']">
               {{ user.isFrequentUser ? 'Yes' : 'No' }}
-            </span>
-          </td>
-          <td>
-            <span :class="['status-label', getStatusClass(user.status)]">
-              {{ getStatusLabel(user.status) }}
             </span>
           </td>
           <td>
@@ -142,6 +136,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -250,7 +245,11 @@ export default {
         );
 
         if (res.status === 200) {
-          alert('User status changed successfully');
+          ElNotification({
+            title: "Successful Action",
+            message: 'User status changed successfully',
+            type: "success"
+          });
           this.fetchUsers();
         }
       } catch (error) {
@@ -491,15 +490,6 @@ export default {
   text-transform: uppercase;
 }
 
-.status-active {
-  background-color: #016025;
-  color: white;
-}
-
-.status-inactive {
-  background-color: #6e0202;
-  color: white;
-}
 
 
 /* Role Label Styles */
@@ -512,7 +502,7 @@ export default {
 }
 
 .role-admin {
-  background-color: #02536F;
+  background-color: #10026e;
   color: white;
 }
 
@@ -530,7 +520,7 @@ export default {
 }
 
 .frequent-yes {
-  background-color: #6e0202;
+  background-color: #950202;
   color: white;
 }
 

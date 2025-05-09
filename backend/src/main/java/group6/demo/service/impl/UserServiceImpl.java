@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,11 +34,11 @@ public class UserServiceImpl implements UserService {
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
 
-    @Override
+    @Transactional
     public User registerUser(UserRegistrationDTO registrationDTO) {
-        // 调试日志
-        System.out.println("开始注册用户: " + registrationDTO.getUsername());
-        System.out.println("收到的生日信息: " + (registrationDTO.getBirthday() != null ? registrationDTO.getBirthday().toString() : "null"));
+        // 日志记录，显示收到的注册请求信息
+        System.out.println("Starting user registration: " + registrationDTO.getUsername());
+        System.out.println("Received birthday information: " + (registrationDTO.getBirthday() != null ? registrationDTO.getBirthday().toString() : "null"));
         
         // Validate input data
         if (!ValidationUtil.isValidUsername(registrationDTO.getUsername())) {
@@ -60,7 +61,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Invalid birthday. Birthday cannot be in the future.");
         }
 
-        System.out.println("验证通过，开始创建用户实体");
+        System.out.println("Validation passed, creating user entity");
 
         // Create new user entity
         User user = new User();
@@ -68,9 +69,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         user.setEmail(registrationDTO.getEmail());
         user.setMobile(registrationDTO.getMobile());
-        user.setBirthday(registrationDTO.getBirthday());
         
-        System.out.println("设置生日: " + (user.getBirthday() != null ? user.getBirthday().toString() : "null"));
+        // 设置生日信息（如果提供）
+        if (registrationDTO.getBirthday() != null) {
+            user.setBirthday(registrationDTO.getBirthday());
+        }
+        System.out.println("Setting birthday: " + (user.getBirthday() != null ? user.getBirthday().toString() : "null"));
         
         // Set default values
         user.setUserType(0);  // 0: normal user
@@ -92,8 +96,8 @@ public class UserServiceImpl implements UserService {
 
         // 保存用户
         User savedUser = userRepository.save(user);
-        System.out.println("用户创建成功，ID: " + savedUser.getId());
-        System.out.println("保存的生日信息: " + (savedUser.getBirthday() != null ? savedUser.getBirthday().toString() : "null"));
+        System.out.println("User created successfully, ID: " + savedUser.getId());
+        System.out.println("Saved birthday information: " + (savedUser.getBirthday() != null ? savedUser.getBirthday().toString() : "null"));
         
         return savedUser;
     }

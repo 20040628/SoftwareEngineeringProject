@@ -13,6 +13,14 @@
               placeholder="3-20 characters (letters, numbers, underscore)"
               class="input"
           />
+          <el-alert
+              v-if="errors.username"
+              :title="errors.username"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -26,6 +34,14 @@
               minlength="8"
               placeholder="Min 8 chars (uppercase, lowercase, number)"
               class="input"
+          />
+          <el-alert
+              v-if="errors.password"
+              :title="errors.password"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
           />
         </div>
       </div>
@@ -42,6 +58,14 @@
               placeholder="16-19 digits"
               class="input"
           />
+          <el-alert
+              v-if="errors.bankCard"
+              :title="errors.bankCard"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -54,6 +78,14 @@
               type="email"
               placeholder="Valid email format"
               class="input"
+          />
+          <el-alert
+              v-if="errors.email"
+              :title="errors.email"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
           />
         </div>
       </div>
@@ -70,6 +102,14 @@
               placeholder="10-13 digits"
               class="input"
           />
+          <el-alert
+              v-if="errors.mobile"
+              :title="errors.mobile"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
       </div>
 
@@ -83,7 +123,25 @@
               class="input"
               max="2023-12-31"
           />
+          <el-alert
+              v-if="errors.birthday"
+              :title="errors.birthday"
+              type="error"
+              :closable="false"
+              show-icon
+              class="custom-alert"
+          />
         </div>
+      </div>
+
+      <!-- Error message -->
+      <div class="form-row" v-if="hasError && errorMessage">
+        <el-alert
+            :title="errorMessage"
+            type="error"
+            :closable="false"
+            show-icon
+        />
       </div>
 
       <!-- Buttons row -->
@@ -99,6 +157,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -111,6 +170,9 @@ export default {
         birthday: '',
         bankCard: ''
       },
+      errors: {},
+      hasError: false,
+      errorMessage: '',
       successMessage: '',
       registrationResult: null
     };
@@ -125,44 +187,68 @@ export default {
         birthday: '',
         bankCard: ''
       };
+      this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
+      this.successMessage = '';
     },
     async registerUser() {
-      // Reset previous messages
+      // Reset previous errors
+      this.errors = {};
+      this.hasError = false;
+      this.errorMessage = '';
       this.successMessage = '';
-      this.registrationResult = null;
 
-      // Collect validation errors
-      const errors = [];
-
+      // Field validation
       if (!this.newUser.username) {
-        errors.push('Username is required');
-      }
-      if (!this.newUser.password) {
-        errors.push('Password is required');
-      }
-      if (!this.newUser.email) {
-        errors.push('Email is required');
-      }
-      if (!this.newUser.mobile) {
-        errors.push('Mobile number is required');
-      }
-      if (!this.newUser.birthday) {
-        errors.push('Birthday is required');
-      }
-      if (!this.newUser.bankCard) {
-        errors.push('Bank card is required');
+        this.errors.username = 'Username is required';
+      } else if (this.newUser.username.length < 3 || this.newUser.username.length > 20) {
+        this.errors.username = 'Username must be 3-20 characters';
       }
 
-      // Show all errors in one alert
-      if (errors.length > 0) {
-        alert("Please fix the following errors:\n\n" + errors.join('\n'));
+      if (!this.newUser.password) {
+        this.errors.password = 'Password is required';
+      } else if (this.newUser.password.length < 8) {
+        this.errors.password = 'Password must be at least 8 characters';
+      }
+
+      if (!this.newUser.bankCard) {
+        this.errors.bankCard = 'Bank card is required';
+      } else if (!/^\d{16,19}$/.test(this.newUser.bankCard)) {
+        this.errors.bankCard = 'Bank card must be 16-19 digits';
+      }
+
+      if (!this.newUser.email) {
+        this.errors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.newUser.email)) {
+        this.errors.email = 'Invalid email format';
+      }
+
+      if (!this.newUser.mobile) {
+        this.errors.mobile = 'Mobile number is required';
+      } else if (!/^\d{10,13}$/.test(this.newUser.mobile)) {
+        this.errors.mobile = 'Mobile must be 10-13 digits';
+      }
+
+      if (!this.newUser.birthday) {
+        this.errors.birthday = 'Birthday is required';
+      }
+
+      if (Object.keys(this.errors).length > 0) {
+        this.hasError = true;
+        ElNotification({
+          title: "Input Error",
+          message: `Please fix the errors above`,
+          type: "error"
+        });
         return;
       }
 
       try {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) {
-          alert('Please login as admin first');
+          this.hasError = true;
+          this.errorMessage = 'Please login as admin first';
           return;
         }
 
@@ -173,30 +259,37 @@ export default {
         });
 
         if (res.status === 200) {
-          this.successMessage = 'User registered successfully';
           this.registrationResult = res.data;
-          this.newUser = {
-            username: '',
-            password: '',
-            email: '',
-            mobile: '',
-            birthday: '',
-            bankCard: ''
-          };
-          alert("Add User successfully");
+          this.resetForm();
+          ElNotification({
+            title: "Add Successfully",
+            message: `User: ${res.data.userId}`,
+            type: "success"
+          });
         }
       } catch (error) {
-        if (error.response && error.response.status === 400) {
-          // Handle validation errors from server
-          const serverErrors = error.response.data;
-          const errorMessages = Object.values(serverErrors).flat();
-          console.log(this.newUser.bankCard);
-          alert("Validation errors:\n" + errorMessages.join(''));
-        } else if (error.response && error.response.status === 401) {
-          alert('Unauthorized: Only admins can register users');
+        if (error.response) {
+          switch(error.response.status) {
+            case 400:
+              // Handle server-side validation errors
+              const serverErrors = error.response.data;
+              this.errors = serverErrors;
+              this.errorMessage = 'Please correct the validation errors';
+              break;
+            case 401:
+              this.errorMessage = 'Unauthorized: Only admins can register users';
+              break;
+            case 403:
+              this.errorMessage = 'Forbidden: You do not have permission';
+              break;
+            default:
+              this.errorMessage = `Error: ${error.response.data?.message || 'Unknown error occurred'}`;
+          }
         } else {
-          alert('Failed to register user: ' + (error.response?.data?.message || error.message));
+          this.errorMessage = 'Network error: Please check your connection';
         }
+        this.hasError = true;
+        console.error('Registration error:', error);
       }
     }
   }
@@ -294,6 +387,22 @@ label {
 
 .button-reset:hover {
   background: #f4f4f4;
+}
+
+.custom-alert {
+  font-size: 16px;
+  width: 99%;
+  margin-top: 3px;
+  height: 30px;
+}
+
+.error-message {
+  color: #f56c6c;
+  font-size: 16px;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fef0f0;
+  border-radius: 4px;
 }
 
 .success-message {

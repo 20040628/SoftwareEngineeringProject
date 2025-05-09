@@ -51,7 +51,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="scooter in filteredPaginatedScooters" :key="scooter.id">
+        <tr
+            v-for="scooter in filteredPaginatedScooters"
+            :key="scooter.id"
+            @click="navigateToEdit(scooter.id)"
+            class="clickable-row"
+        >
           <td>{{ scooter.id }}</td>
           <td>
               <span :class="['status-label', getStatusClass(scooter.status)]">
@@ -67,7 +72,7 @@
           <td>{{ scooter.speed }}</td>
           <td>{{ scooter.store.id }}</td>
           <td>
-            <button class="status-btn" @click="changeScooterStatus(scooter.id)">
+            <button class="status-btn" @click.stop="changeScooterStatus(scooter.id)">
               Change Status
             </button>
           </td>
@@ -133,6 +138,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -192,6 +198,24 @@ export default {
     await this.fetchScooters();
   },
   methods: {
+    navigateToEdit(scooterId) {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (!token) {
+        this.errorMessage = 'Please login first';
+        this.$router.push('/login');
+        return;
+      }
+
+      // Get user ID if available (from your auth system)
+      const userId = localStorage.getItem('userId') || null;
+
+      // Navigate to edit page with scooter ID and user ID as query params
+      this.$router.push({
+        name: 'EditScooter',
+        params: { id: scooterId },
+        query: { userId: userId }
+      });
+    },
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = 'all';
@@ -203,7 +227,11 @@ export default {
         const res = await axios.get('http://localhost:8080/api/stores/getAll');
         this.stores = res.data;
       } catch (error) {
-        alert('Failed to load stores');
+        ElNotification({
+          title: "Error",
+          message: 'Failed to load stores',
+          type: "error"
+        });
       }
     },
     async fetchScooters() {
@@ -212,7 +240,11 @@ export default {
         this.scooters = res.data;
         this.filteredScooters = [...res.data];
       } catch (error) {
-        alert('Failed to load scooters');
+        ElNotification({
+          title: "Error",
+          message: 'Failed to load scooters',
+          type: "error"
+        });
       }
     },
     handleSearch() {
@@ -290,12 +322,24 @@ export default {
         const res = await axios.get(`http://localhost:8080/api/scooters/changeStatus/${id}`);
         if (res.status === 200) {
           this.fetchScooters();
-          alert('Status updated successfully');
+          ElNotification({
+            title: "Error",
+            message: 'Status updated successfully',
+            type: "success"
+          });
         } else {
-          alert('Failed to update status');
+          ElNotification({
+            title: "Error",
+            message: 'Failed to update status',
+            type: "error"
+          });
         }
       } catch (error) {
-        alert('Network error');
+        ElNotification({
+          title: "Error",
+          message: 'Network error',
+          type: "error"
+        });
       }
     }
   }
@@ -363,10 +407,6 @@ export default {
   padding: 6px 26px;
   border: 3px solid #008187;
   border-radius: 30px;
-}
-
-.store-location {
-
 }
 
 /* Search Box Styles */
@@ -485,7 +525,7 @@ export default {
 }
 
 .status-unavailable {
-  background-color: #f56c6c;
+  background-color: #950202;
   color: white;
 }
 
@@ -500,6 +540,20 @@ export default {
   transition: background 0.2s ease-in-out;
   font-size: 16px;
   font-weight: bold;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+  background-color: #f0f8ff !important;
+}
+
+/* Prevent the status button from triggering row click */
+.status-btn {
+  pointer-events: auto;
 }
 
 /* Pagination Styles */

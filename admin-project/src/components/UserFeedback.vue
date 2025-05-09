@@ -160,6 +160,7 @@
 
 <script>
 import axios from 'axios';
+import {ElNotification} from "element-plus";
 
 export default {
   data() {
@@ -327,7 +328,11 @@ export default {
           adminResponse: feedback.adminResponse,
         });
         if (res.status === 200) {
-          alert('Feedback updated successfully');
+          ElNotification({
+            title: "Successful Action",
+            message: 'Feedback updated successfully',
+            type: "success"
+          });
           this.fetchFeedbacks();
         } else {
           alert('Failed to update feedback');
@@ -572,10 +577,6 @@ export default {
   transition: all 0.2s;
 }
 
-.update-button:hover {
-  background: #4ab0b5;
-  transform: translateY(-1px);
-}
 
 /* Pagination Styles */
 .pagination-container {

@@ -38,24 +38,26 @@ public class AlipayController {
         try {
             AlipayClient alipayClient = new DefaultAlipayClient(GATEWAY_URL, alipayConfig.getAppId(),
                     alipayConfig.getAppPrivateKey(), FORMAT, CHARSET, alipayConfig.getAlipayPublicKey(), SIGN_TYPE);
+
             AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
+
             AlipayTradePayModel model = new AlipayTradePayModel();
-            model.setOutTradeNo(orderId.toString());
+            String outTradeNo = System.currentTimeMillis() + "_" + orderId;
+            model.setOutTradeNo(outTradeNo);
             model.setTotalAmount(order.getPrice().toString());
             model.setSubject("Your order");
             model.setBody("This is your rent order");
             model.setProductCode("FAST_INSTANT_TRADE_PAY");
             alipayRequest.setBizModel(model);
 
-            // 跳转到我们的页面，要改成最新前端的
             String url = "http://localhost:5173/my-bookings";
             alipayRequest.setReturnUrl(url);
 
             String result = alipayClient.pageExecute(alipayRequest).getBody();
             response.setContentType("text/html;charset=utf-8");
-            response.getWriter().println(result);
+            response.getWriter().write(result);
+            response.getWriter().flush();
 
-            // mark the status of order as has been paid 还要改一下 没有完成支付也会变成2
             order.setStatus(2);
             orderRepository.save(order);
         } catch (Exception e) {
@@ -85,10 +87,12 @@ public class AlipayController {
             alipayRequest.setReturnUrl(url);
 
             String result = alipayClient.sdkExecute(alipayRequest).getBody();
-            response.setContentType("text/html;charset=utf-8");
-            response.getWriter().println(result);
+            response.setContentType("application/json;charset=utf-8");
+            response.getWriter().write("{\"orderString\": \"" + result + "\"}");
+            response.getWriter().flush();
+            response.getWriter().close();
 
-            // mark the status of order as has been paid 还要改一下 没有完成支付也会变成2
+
             order.setStatus(2);
             orderRepository.save(order);
         } catch (Exception e) {

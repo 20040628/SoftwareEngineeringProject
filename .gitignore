@@ -31,6 +31,12 @@ frontend/.nuxt/
 frontend/.output/
 frontend/.nitro/
 
+# Admin Project
+admin-project/node_modules/
+
+# Uniapp Project
+uniapp-project/node_modules/
+
 # System Files
 .DS_Store
 .env.local

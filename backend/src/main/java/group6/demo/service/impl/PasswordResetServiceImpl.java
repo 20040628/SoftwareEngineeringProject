@@ -89,23 +89,18 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     }
     
     private void sendResetEmail(User user, String resetCode) {
+        // 构建并发送邮件
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("E-Scooter Rental System <bc_somebody@qq.com>");
         message.setTo(user.getEmail());
-        message.setSubject("密码重置验证码");
-        
-        String emailContent = String.format(
-            "尊敬的 %s,\n\n" +
-            "您正在请求重置密码。请使用以下验证码完成密码重置：\n\n" +
-            "验证码: %s\n\n" +
-            "该验证码将在10分钟内有效。如果您没有请求重置密码，请忽略此邮件。\n\n" +
-            "谢谢！\n" +
-            "E-Scooter Rental Team",
-            user.getUsername(),
-            resetCode
-        );
-        
-        message.setText(emailContent);
+        message.setSubject("Password Reset Verification Code");
+        message.setText("Dear " + user.getUsername() + ",\n\n" +
+                "You have requested to reset your password. Here is your verification code:\n\n" +
+                resetCode + "\n\n" +
+                "This code will expire in 30 minutes.\n\n" +
+                "If you did not request a password reset, please ignore this email or contact customer service.\n\n" +
+                "Regards,\n" +
+                "E-Scooter Rental Platform Team");
+
         emailSender.send(message);
     }
     

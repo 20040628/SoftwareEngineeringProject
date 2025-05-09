@@ -194,16 +194,30 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         Calendar currentCal = Calendar.getInstance();
-        System.out.println("请求日期: " + date + ", 年份: " + cal.get(Calendar.YEAR) + 
-                          ", 月份: " + (cal.get(Calendar.MONTH) + 1) + ", 日: " + cal.get(Calendar.DAY_OF_MONTH));
-        System.out.println("系统当前时间: " + new Date() + ", 年份: " + currentCal.get(Calendar.YEAR) + 
-                          ", 月份: " + (currentCal.get(Calendar.MONTH) + 1) + ", 日: " + currentCal.get(Calendar.DAY_OF_MONTH));
+        System.out.println("Requested date: " + date + ", Year: " + cal.get(Calendar.YEAR) +
+                ", Week: " + cal.get(Calendar.WEEK_OF_YEAR) + ", Day: " + cal.get(Calendar.DAY_OF_WEEK));
+        System.out.println("Current system time: " + new Date() + ", Year: " + currentCal.get(Calendar.YEAR) +
+                ", Week: " + currentCal.get(Calendar.WEEK_OF_YEAR) + ", Day: " + currentCal.get(Calendar.DAY_OF_WEEK));
         
-        // find if there is a record of the week that the date belongs to
-        Optional<WeeklyRevenue> weeklyRevenue = weeklyRevenueRepository.findByDate(date);
+        // 先获取该日期所在周的起始日期和结束日期
+        Date weekStartDate = getWeekStartDate(date);
+        Date weekEndDate = getWeekEndDate(date);
         
-        if (weeklyRevenue.isPresent()) {
-            return convertToDTO(weeklyRevenue.get());
+        // 首先根据周起始日期查找是否存在周记录，这可以避免创建重复记录
+        Optional<WeeklyRevenue> weeklyRevenueByStartDate = weeklyRevenueRepository.findByWeekStartDate(weekStartDate);
+        if (weeklyRevenueByStartDate.isPresent()) {
+            return convertToDTO(weeklyRevenueByStartDate.get());
+        }
+        
+        // 如果按周起始日期未找到，再尝试按具体日期查找（这部分可能有重复记录）
+        try {
+            Optional<WeeklyRevenue> weeklyRevenue = weeklyRevenueRepository.findByDate(date);
+            if (weeklyRevenue.isPresent()) {
+                return convertToDTO(weeklyRevenue.get());
+            }
+        } catch (Exception e) {
+            // 如果发生异常（多个结果），记录错误但继续执行，因为我们已经在上面检查了weekStartDate
+            System.out.println("Warning: Multiple weekly revenue records found for date: " + date + ". Using weekStartDate instead.");
         }
         
         // 修改比较逻辑：只有当请求日期在当前日期之后超过一天时，才认为是未来日期
@@ -214,12 +228,9 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
         Date futureDate = futureCal.getTime();
         
         if (date.after(futureDate)) {
-            System.out.println("检测到未来日期：请求日期比当前日期晚超过1天");
+            System.out.println("Future date detected: requested date is more than 1 day ahead of current date");
             // 如果是未来日期，返回一个空的收入记录（零值），而不是尝试创建新记录
             WeeklyRevenueDTO emptyDto = new WeeklyRevenueDTO();
-            Date weekStartDate = getWeekStartDate(date);
-            Date weekEndDate = getWeekEndDate(date);
-            
             emptyDto.setWeekStartDate(weekStartDate);
             emptyDto.setWeekEndDate(weekEndDate);
             emptyDto.setHourlyRevenue(BigDecimal.ZERO);
@@ -233,14 +244,12 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
         }
         
         // 如果是历史日期或当前日期，且记录不存在，则创建新记录
-        System.out.println("创建历史日期的周收入记录");
-        Date weekStartDate = getWeekStartDate(date);
-        Date weekEndDate = getWeekEndDate(date);
+        System.out.println("Creating weekly revenue record for historical date");
         
         try {
             return createWeeklyRevenue(weekStartDate, weekEndDate);
         } catch (Exception e) {
-            System.out.println("创建周收入记录失败：" + e.getMessage());
+            System.out.println("Failed to create weekly revenue record: " + e.getMessage());
             // 如果创建失败，返回空记录
             WeeklyRevenueDTO emptyDto = new WeeklyRevenueDTO();
             emptyDto.setWeekStartDate(weekStartDate);
@@ -417,7 +426,7 @@ public class WeeklyRevenueServiceImpl implements WeeklyRevenueService {
         dailyRevenue.setDayOfWeek(dayOfWeek);
         
         // 设置星期几的名称
-        String[] dayNames = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+        String[] dayNames = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         dailyRevenue.setDayOfWeekName(dayNames[dayOfWeek - 1]);
         
         // 查询按小时租赁的收入

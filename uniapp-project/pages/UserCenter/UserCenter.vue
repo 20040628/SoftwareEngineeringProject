@@ -10,7 +10,7 @@
 								<image class="user-vip" :src="vipLogo" v-if='status>0'></image>
 							</view>
 						</view>
-						<view @click="login()" class="my-nickName">{{userInfo.username||'Click "Authorize Login"'}}
+						<view @click="login()" class="my-nickName">{{userInfo.username||'Click Login'}}
 						</view>
 					</view>
 					<view class="right">
@@ -60,7 +60,7 @@
 				</view>
 			</view>
 			<view class="my-more_box">
-				<view class="myPage-listTable-title">More services</view>
+				<view class="myPage-listTable-title">More Services</view>
 				<view class="myPage-listTable-box">
 					<view @click="goPage(5)">
 						<view class="s">
@@ -114,23 +114,9 @@
 				balance: 0,
 				totalOrders: 0,
 				status: 0,
-				isLoading: true,
+				// isLoading: true,
 				user: [],
 			};
-		},
-		async mounted() {
-			// this.user = uni.getStorageSync('userInfo');
-			// if (this.user) {
-			// 	this.username = this.user.username;
-			// 	this.userid = this.user.userId;
-			// 	this.getuser();
-			// } else {
-			// 	this.username = 'Unknown User';
-			// }
-			// this.getOrders();
-			// this.getCard();
-			// this.getprofile();
-
 		},
 		computed: {
 			statusClass() {
@@ -226,10 +212,10 @@
 				}
 				const token = String(uni.getStorageSync('token'));
 				try {
-					uni.showLoading({
-						title: "Loading",
-						mask: true
-					});
+					// uni.showLoading({
+					// 	title: "Loading",
+					// 	mask: true
+					// });
 					const res = await uni.request({
 						url: `${this.$baseURL}/api/users/profile/${this.userid}`,
 						method: 'GET',
@@ -242,7 +228,7 @@
 						this.userLogo = res.data.avatar
 					} else {
 						uni.showToast({
-							title: res.data.message,
+							title: res.data.message||"Data Loading Failed",
 							icon: 'none',
 							duration: 2000
 						});
@@ -253,17 +239,17 @@
 						icon: 'none'
 					})
 				} finally {
-					uni.hideLoading();
-					this.isLoading = false
+					// uni.hideLoading();
+					// this.isLoading = false
 				}
 			},
 			async getuser() {
 				const token = String(uni.getStorageSync('token'));
 				try {
-					uni.showLoading({
-						title: "Loading",
-						mask: true
-					});
+					// uni.showLoading({
+					// 	title: "Loading...",
+					// 	mask: true
+					// });
 					const res = await uni.request({
 						url: `${this.$baseURL}/api/users/${this.userid}`,
 						method: 'PUT',
@@ -291,7 +277,7 @@
 						}
 					} else {
 						uni.showToast({
-							title: res.data.message,
+							title: res.data.message||"Data Loading Failed",
 							icon: 'none',
 							duration: 2000
 						});
@@ -303,17 +289,17 @@
 					})
 				} finally {
 					uni.hideLoading();
-					this.isLoading = false
+					// this.isLoading = false
 				}
 			},
 			async getCard() {
 				const token = String(uni.getStorageSync('token'));
 				this.user = uni.getStorageSync('userInfo');
 				try {
-					uni.showLoading({
-						title: "加载中...",
-						mask: true
-					});
+					// uni.showLoading({
+					// 	title: "Loading..",
+					// 	mask: true
+					// });
 					const res = await uni.request({
 						url: `${this.$baseURL}/api/bank-payment/check-card/${this.user.userId}`,
 						method: 'GET',
@@ -331,7 +317,7 @@
 					})
 				} finally {
 					uni.hideLoading();
-					this.isLoading = false
+					// this.isLoading = false
 				}
 			},
 			login() {
@@ -340,11 +326,8 @@
 				})
 			},
 			logout() {
-				// 清除本地存储中的用户信息
 				uni.removeStorageSync('userInfo');
 				uni.removeStorageSync('token');
-
-				// 跳转到登录页面
 				uni.reLaunch({
 					url: '/pages/UserLogin/UserLogin'
 				});
@@ -364,16 +347,11 @@
 						if (Array.isArray(res.data)) {
 							this.totalOrders = res.data.length;
 						} else {
-							console.error("返回的数据格式不正确", res.data);
-							uni.showToast({
-								title: '数据格式错误',
-								icon: 'none',
-								duration: 2000
-							});
+							this.totalOrders=0;
 						}
 					} else {
 						uni.showToast({
-							title: res.data.message,
+							title: res.data.message||'Data Loading Failed',
 							icon: 'none',
 							duration: 2000
 						});
@@ -412,8 +390,6 @@
 							url: './payment/card/card'
 						})
 						break;
-					case 6:
-						break;
 					case 7:
 						uni.navigateTo({
 							url: './feedback/feedbackIndex/feedbackIndex'
@@ -424,16 +400,8 @@
 							url: './information/set/set'
 						})
 						break;
-					case 10:
-						break;
-					case 11:
-						break;
-					case 12:
-						break;
 					case 13:
 						that.logout();
-						break;
-					case 15:
 						break;
 				}
 			}
@@ -604,66 +572,6 @@
 			margin-bottom: 40rpx;
 			padding: 20rpx 0 0 20rpx;
 		}
-	}
-
-	// 我的爱车
-	.my-car_add,
-	.my-car_model {
-		margin: 30rpx 40rpx 20rpx;
-		border-radius: 12rpx;
-		background-color: #FFFFFF;
-	}
-
-	.my-car_add {
-		padding: 20rpx;
-	}
-
-	.car-add_label {
-		font-size: 28rpx;
-		color: #333333;
-		font-weight: bold;
-		line-height: 40rpx;
-	}
-
-	.car-add_text,
-	.info-text {
-		color: #666666;
-	}
-
-	.car-add_text:active {
-		color: #333;
-	}
-
-	.car-add_img {
-		display: block;
-		width: 16rpx;
-		height: 16rpx;
-		margin-left: 8rpx;
-	}
-
-	.my-car_model {
-		padding: 16rpx 20rpx;
-	}
-
-	.info-title {
-		margin-bottom: 6rpx;
-		font-size: 32rpx;
-		color: #333333;
-		line-height: 44rpx;
-		font-weight: bold;
-	}
-
-	.info-title_subtitle,
-	.car-add_text,
-	.info-text {
-		font-size: 24rpx;
-		line-height: 34rpx;
-	}
-
-	.info-img {
-		display: block;
-		width: 200rpx;
-		height: 112rpx;
 	}
 
 	.my-more_box {

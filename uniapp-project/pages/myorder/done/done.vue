@@ -9,7 +9,7 @@
 					<li v-if="item.status == tabsIndex || tabsIndex == 0">
 						<view  class="item-top">
 							<view>
-								<text>OrderID:</text>
+								<text>OrderID: </text>
 								<text>{{item.id}}</text>
 							</view>
 						</view>
@@ -19,60 +19,21 @@
 								 <image :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;"></image>
 							</view>
 							<view class="item-right"  @click="goDetail(item)">
-								<!-- <view class="item-right-v1">
-									<text class="item-title">{{item.odName}}</text>
-								</view> -->
 								<view class="item-right-v1 induce">
-									<text class="rate-text1">orderTime:{{formatDate(item.startTime)}}</text>
+									<text class="rate-text1">Order Time: {{formatDate(item.startTime)}}</text>
 								</view>
 								<view class="item-right-v1 induce">
-									<text class="rate-text1">startTime:{{formatDate(item.startTime)}}</text>
+									<text class="rate-text1">Start Time: {{formatDate(item.startTime)}}</text>
 								</view>
 								<view class="item-right-v1 induce">
-									<text class="rate-text1">hirePeriod:{{item.hirePeriod}}</text>
+									<text class="rate-text1">Hire Period: {{item.hirePeriod}}</text>
 								</view>
 								<view class="item-right-v2">
-									<view class="v2-fh">£<text class="v2-price">{{item.price}}</text></view>
+									<view class="v2-fh">£ <text class="v2-price">{{item.price}}</text></view>
 								</view>
 							</view>
 						</view>
-						
 						<view class="dashed-line"></view>
-						<!-- <view class="item-btom" v-if="item.status == 1">
-							<view @click="cancelClick(item)">
-								<view class="item-btom-btn">cancel</view>
-							</view>
-							<view  @click="payClick(item)">
-								<view class="item-btom-btn pay">pay</view>
-							</view>
-						</view> -->
-						
-						<view class="item-btom">
-							<!-- <button class="item-btom-btn" @click="item.showModal = true">Extend</button>
-							<view class="modal" v-if="item.showModal">
-								<view class="modal-content">
-									<view>Extend the order</view>
-									<view class="section-title">Select Duration</view>
-									<view class="duration-section">
-										  <view class="duration-grid">
-											<view 
-											  v-for="(option, index) in durationOptions"
-											  :key="index"
-											  class="duration-item"
-											  :class="{ active: selectedDuration === index }"
-											  @click="selectDuration(index)"
-											>
-											  <text class="label">{{ option.label }}</text>
-											</view>
-										  </view>
-										</view>
-									<view class="modal-buttons">
-									<button @click="handleConfirm(item)">Confirm</button>
-									<button @click="handleCancel(item)">Cancel</button>
-									</view>
-								</view>
-							</view> -->
-						</view>
 					</li>
 				</ul>
 			</view>
@@ -117,10 +78,10 @@
 					}
 			     this.orderList = res.data.map(order => ({
 			           ...order,
-			           showModal: false, // 为每个订单项添加showModal字段
+			           showModal: false,  
 			    }));
 			    } else {
-			      uni.showToast({ title: '数据加载失败', icon: 'none' });
+			      uni.showToast({ title: 'Data loading failed', icon: 'none' });
 			    }
 			  } catch (err) {
 			    uni.showToast({ title: 'Network Error', icon: 'none' });
@@ -164,33 +125,6 @@
 		flex-direction: column;
 		height: 100%;
 	}
-	  .me-head {
-    width: 100%;
-    height: 80upx;
-    padding-bottom: 20upx;
-  }
-
-  .tabs-container {
-    padding: 10rpx;
-    background-color: #fff;
-  }
-
-  .tabs {
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .tab {
-    padding: 10rpx 20rpx;
-    font-size: 28rpx;
-    cursor: pointer;
-  }
-
-  .tab.active {
-    color: #aaaaff;
-    font-weight: bold;
-    transform: scale(1.05);
-  }
 
   .dashed-line {
     border-top: 1px dashed #ccc;
@@ -309,107 +243,13 @@
 					margin-right: 20upx;
 					align-items: center;
 				}
-				.pay{
-					background-color: #aaaaff;
-					border: 1px solid #aaaaff;
+				.pay {
+					background-color: #2c3e50;
+					border: 1px solid #2c3e50;
 					color: #ffffff;
 				}
 			}
 		}
-	}
-	.duration-section {
-	  padding: 30rpx;
-	  .section-title {
-	    font-size: 25rpx;
-	    font-weight: bold;
-	    margin-bottom: 10rpx;
-	  }
-	}
-	
-	.duration-grid {
-	  display: grid;
-	  grid-template-columns: repeat(2, 1fr);
-	  gap: 10rpx;
-	}
-	
-	.duration-item {
-	  padding: 20rpx;
-	  border: 2rpx solid #f0eaff;
-	  border-radius: 16rpx;
-	  text-align: center;
-	  transition: all 0.3s;
-	  box-sizing: border-box;
-	  display: flex;         
-	  justify-content: center; 
-	  align-items: center;    
-	  height: 100rpx;
-	  
-	  &.active {
-	    // border-color: #aa55ff;
-	    background: #e3e2ff;
-	  }
-	  
-	  .label {
-	    display: block;
-	    font-size: 28rpx;
-	    color: #333;
-	  }
-	}
-	.modal {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, 0.5);
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			z-index: 1000; 
-		}
-		/* 窗口 */
-	.modal-content {
-			background-color: white;
-			/* padding: 20px; */
-			width: 600rpx;
-			height: 800rpx;
-			border-radius: 8rpx;
-			position: relative;
-			//modal-content下的第一个view
-			view:first-child{
-				padding:30rpx;
-				font-size:60rpx;
-				font-weight:bold;
-			}
-			//modal-content下的第二个view
-			view:nth-child(2){
-				padding:20rpx;
-				font-size:40rpx;
-				color:red
-			}
-		}
-		/* 按钮 */
-	.modal-buttons {
-			width: 100%;
-			display: flex;
-			bottom: 0;
-			position: absolute;
-		}
-	.modal-buttons button {
-			width: 100%;
-			border: none;
-		}
-	.modal-buttons button:first-child {
-			background-color: #74bfe7;
-			color: #fff;
-			border-radius: 0;
-		}
-	.modal-buttons button:last-child {
-			width: 100%;
-			border: 2rpx solid #74bfe7;
-			border-radius: 0px;
-			background-color: #fff;
-			color: #74bfe7;
 	}
 	.none{
 		color: #B9B9B9;

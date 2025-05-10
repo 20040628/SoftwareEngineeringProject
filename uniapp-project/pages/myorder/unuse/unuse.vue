@@ -7,38 +7,36 @@
 			<view class="list-tab">
 				<ul class="item-ul" v-for="(item, index) in orderList" :key="index">
 					<li v-if="item.status == tabsIndex || tabsIndex == 0">
-						<view  class="item-top">
+						<view class="item-top">
 							<view>
-								<text>OrderID:</text>
+								<text>OrderID: </text>
 								<text>{{item.id}}</text>
 							</view>
 						</view>
 						<view class="dashed-line"></view>
 						<view class="item-content">
-							<view  class="item-left">
-								 <image :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;"></image>
+							<view class="item-left">
+								<image :src="picUrl" alt="Order Image"
+									style="width: 70px; height: 70px; border-radius: 5px;"></image>
 							</view>
-							<view class="item-right"  @click="goDetail(item)">
-								<!-- <view class="item-right-v1">
-									<text class="item-title">{{item.odName}}</text>
-								</view> -->
+							<view class="item-right" @click="goDetail(item)">
 								<view class="item-right-v1 induce">
-									<text class="rate-text1">orderTime:{{formatDate(item.startTime)}}</text>
+									<text class="rate-text1">Order Time: {{formatDate(item.startTime)}}</text>
 								</view>
 								<view class="item-right-v1 induce">
-									<text class="rate-text1">startTime:{{formatDate(item.startTime)}}</text>
+									<text class="rate-text1">Start Time: {{formatDate(item.startTime)}}</text>
 								</view>
 								<view class="item-right-v1 induce">
-									<text class="rate-text1">hirePeriod:{{item.hirePeriod}}</text>
+									<text class="rate-text1">Hire Period: {{item.hirePeriod}}</text>
 								</view>
 								<view class="item-right-v2">
-									<view class="v2-fh">£<text class="v2-price">{{item.price}}</text></view>
+									<view class="v2-fh">£ <text class="v2-price">{{item.price}}</text></view>
 								</view>
 							</view>
 						</view>
-						
+
 						<view class="dashed-line"></view>
-						
+
 						<view class="item-btom">
 							<button class="item-btom-btn" @click="item.showModal = true">Extend</button>
 							<view class="modal" v-if="item.showModal">
@@ -46,21 +44,17 @@
 									<view>Extend the Order</view>
 									<view class="section-title">Select Duration</view>
 									<view class="duration-section">
-										  <view class="duration-grid">
-											<view 
-											  v-for="(option, index) in durationOptions"
-											  :key="index"
-											  class="duration-item"
-											  :class="{ active: selectedDuration === index }"
-											  @click="selectDuration(index)"
-											>
-											  <text class="label">{{ option.label }}</text>
+										<view class="duration-grid">
+											<view v-for="(option, index) in durationOptions" :key="index"
+												class="duration-item" :class="{ active: selectedDuration === index }"
+												@click="selectDuration(index)">
+												<text class="label">{{ option.label }}</text>
 											</view>
-										  </view>
 										</view>
+									</view>
 									<view class="modal-buttons">
-									<button @click="handleConfirm(item)">Confirm</button>
-									<button @click="handleCancel(item)">Cancel</button>
+										<button @click="handleConfirm(item)">Confirm</button>
+										<button @click="handleCancel(item)">Cancel</button>
 									</view>
 								</view>
 							</view>
@@ -78,176 +72,200 @@
 				tabsIndex: 0,
 				orderList: [],
 				userInfo: uni.getStorageSync('userInfo'),
-				isLoading:true,
-				picUrl:"../../../static/images/car.jpg",
-				selectedDuration: 0, 
-				durationOptions: [
-					{ label: '1 Hour', value:"HOUR"},
-			        { label: '4 Hours', value:"FOUR_HOURS"}, 
-			        { label: '1 Day', value: "DAY"}, 
-			        { label: '1 Week', value: "WEEK"} ,
+				isLoading: true,
+				picUrl: "../../../static/images/car.jpg",
+				selectedDuration: 0,
+				durationOptions: [{
+						label: '1 Hour',
+						value: "HOUR"
+					},
+					{
+						label: '4 Hours',
+						value: "FOUR_HOURS"
+					},
+					{
+						label: '1 Day',
+						value: "DAY"
+					},
+					{
+						label: '1 Week',
+						value: "WEEK"
+					},
 				],
 				showModal: false,
-				data:false,
+				data: false,
 			}
 		},
 		async mounted() {
-		   await this.loadBookings();			 
+			await this.loadBookings();
 		},
-		onLoad() {
-		},
+		onLoad() {},
 
 		methods: {
 			async loadBookings() {
-			  const user = uni.getStorageSync('userInfo');
-			  const token = String(uni.getStorageSync('token'));
-			  try {
-			    const res = await uni.request({
-			      url: `${this.$baseURL}/api/bookings/getAllUndo/${user.userId}`, 
-			      method: 'GET',
-				  header: {
-				  	'Content-Type': 'application/json',
-				  	"Authorization": `Bearer ${token}`
-				  	},
-			    });
-			
-			    if (res.statusCode === 200) {
-					if(res.data.length > 0){
-						this.data= true
+				const user = uni.getStorageSync('userInfo');
+				const token = String(uni.getStorageSync('token'));
+				try {
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bookings/getAllUndo/${user.userId}`,
+						method: 'GET',
+						header: {
+							'Content-Type': 'application/json',
+							"Authorization": `Bearer ${token}`
+						},
+					});
+
+					if (res.statusCode === 200) {
+						if (res.data.length > 0) {
+							this.data = true
+						}
+						this.orderList = res.data.map(order => ({
+							...order,
+							showModal: false,
+						}));
+					} else {
+						uni.showToast({
+							title: 'Data loading failed',
+							icon: 'none'
+						});
 					}
-			     this.orderList = res.data.map(order => ({
-			           ...order,
-			           showModal: false, // 为每个订单项添加showModal字段
-			    }));
-			    } else {
-			      uni.showToast({ title: '数据加载失败', icon: 'none' });
-			    }
-			  } catch (err) {
-			    uni.showToast({ title: 'Network Error', icon: 'none' });
-			  } finally {
-			    this.isLoading = false;
-			  }
+				} catch (err) {
+					uni.showToast({
+						title: 'Network Error',
+						icon: 'none'
+					});
+				} finally {
+					this.isLoading = false;
+				}
 			},
-			 formatDate(dateString) {
-			    const date = new Date(dateString);
-			    const year = date.getFullYear();
-			    const month = String(date.getMonth() + 1).padStart(2, '0');
-			    const day = String(date.getDate()).padStart(2, '0');
-			    const hours = String(date.getHours()).padStart(2, '0');
-			    const minutes = String(date.getMinutes()).padStart(2, '0');
-			    return ` ${day}/${month}/${year} ${hours}:${minutes}`;
-			  },
-			  
-			tabClick(item){
+			formatDate(dateString) {
+				const date = new Date(dateString);
+				const year = date.getFullYear();
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const day = String(date.getDate()).padStart(2, '0');
+				const hours = String(date.getHours()).padStart(2, '0');
+				const minutes = String(date.getMinutes()).padStart(2, '0');
+				return ` ${day}/${month}/${year} ${hours}:${minutes}`;
+			},
+
+			tabClick(item) {
 				this.tabsIndex = item.tabId;
 			},
 			getStatusClass(status) {
-			    return {
-			        'status-red': status == 1,
+				return {
+					'status-red': status == 1,
 					'status-2': status == 2,
-			        'status-green': status == 3,
-			    };
-			},
-				
-			// 取消
-			async cancelClick(item) {
-			    uni.showModal({
-			        title: 'Tips',
-			        content: 'Are you sure you want to cancel this order?',
-			        cancelText: 'cancel',
-			        confirmText: 'confirm',
-			        success: async (res) => {  // 注意这里的 success 函数也需要用 async
-			            if (res.confirm) {
-			                const token = String(uni.getStorageSync('token'));
-			                try {
-			                    uni.showLoading({ title: "loading...", mask: true });
-			                    const res = await uni.request({
-			                        url: `${this.$baseURL}/api/bookings/cancel/${item.id}`,
-			                        method: 'POST',
-			                        header: {
-			                            'Authorization': `Bearer ${token}`,
-			                            'Content-Type': 'application/json'
-			                        },
-			                    });
-			
-			                    if (res.statusCode === 200) {
-			                        uni.showToast({
-			                            title: res.data.message,
-			                            icon: 'none',
-			                            duration: 2000
-			                        });
-			                        this.loadBookings();
-			                    } else {
-			                        uni.showToast({
-			                            title: res.data.message,
-			                            icon: 'none',
-			                            duration: 2000
-			                        });
-			                    }
-			                } catch (err) {
-			                    uni.showToast({ title: 'Network Error', icon: 'none' });
-			                } finally {
-			                    uni.hideLoading();
-			                    this.isLoading = false;
-			                }
-			            }
-			        }
-			    });
+					'status-green': status == 3,
+				};
 			},
 
-			
-			payClick(item){
+			async cancelClick(item) {
+				uni.showModal({
+					title: 'Tips',
+					content: 'Are you sure you want to cancel this order?',
+					cancelText: 'cancel',
+					confirmText: 'confirm',
+					success: async (res) => {
+						if (res.confirm) {
+							const token = String(uni.getStorageSync('token'));
+							try {
+								uni.showLoading({
+									title: "loading...",
+									mask: true
+								});
+								const res = await uni.request({
+									url: `${this.$baseURL}/api/bookings/cancel/${item.id}`,
+									method: 'POST',
+									header: {
+										'Authorization': `Bearer ${token}`,
+										'Content-Type': 'application/json'
+									},
+								});
+
+								if (res.statusCode === 200) {
+									uni.showToast({
+										title: res.data.message,
+										icon: 'none',
+										duration: 2000
+									});
+									this.loadBookings();
+								} else {
+									uni.showToast({
+										title: res.data.message,
+										icon: 'none',
+										duration: 2000
+									});
+								}
+							} catch (err) {
+								uni.showToast({
+									title: 'Network Error',
+									icon: 'none'
+								});
+							} finally {
+								uni.hideLoading();
+								this.isLoading = false;
+							}
+						}
+					}
+				});
+			},
+
+
+			payClick(item) {
 				uni.navigateTo({
 					url: `/pages/payment/payh5?id=${item.id}`
 				})
 			},
 			selectDuration(index) {
-			  this.selectedDuration = index
+				this.selectedDuration = index
 			},
 			async handleConfirm(item) {
-				console.log(item.id)
 				const user = uni.getStorageSync('userInfo');
 				const token = String(uni.getStorageSync('token'));
-				
+
 				try {
-				  const res = await uni.request({
-				    url: `${this.$baseURL}/api/bookings/extend/${item.id}`, 
-				    method: 'POST',
-					data:{
-						hireType: this.durationOptions[this.selectedDuration].value
-					},
-					header: {
-						'Content-Type': 'application/json',
-						"Authorization": `Bearer ${token}`
-					},
-				  });
-							
-				  if (res.statusCode === 200) {
-				    uni.showToast({
-				        title: res.data.message,
-				        icon: 'none',
-				        duration: 2000
-				    });
-					uni.navigateTo({
-						url: `/pages/payment/payh5?id=${item.id}`
-					})
-				  } else {
-				    uni.showToast({
-				        title: res.data,
-				        icon: 'none',
-				        duration: 2000
-				    });
-				  }
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bookings/extend/${item.id}`,
+						method: 'POST',
+						data: {
+							hireType: this.durationOptions[this.selectedDuration].value
+						},
+						header: {
+							'Content-Type': 'application/json',
+							"Authorization": `Bearer ${token}`
+						},
+					});
+
+					if (res.statusCode === 200) {
+						const extendId = res.data.orderId
+						uni.showToast({
+							title: res.data.message,
+							icon: 'none',
+							duration: 2000
+						});
+						uni.navigateTo({
+							url: `/pages/payment/payh5?id=${extendId}`
+						})
+					} else {
+						uni.showToast({
+							title: res.data,
+							icon: 'none',
+							duration: 2000
+						});
+					}
 				} catch (err) {
-				  uni.showToast({ title: 'Network Error', icon: 'none' });
+					uni.showToast({
+						title: 'Network Error',
+						icon: 'none'
+					});
 				} finally {
-				  this.isLoading = false;
+					this.isLoading = false;
 				}
-				item.showModal = false; // 关闭模态框
+				item.showModal = false;
 			},
-						
+
 			handleCancel(item) {
-			item.showModal = false; 
+				item.showModal = false;
 			}
 
 		}
@@ -258,264 +276,249 @@
 		text-align: center;
 		background-color: #F7F8FA;
 	}
-	
-	.content{
+
+	.content {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
 	}
-	  .me-head {
-    width: 100%;
-    height: 80upx;
-    padding-bottom: 20upx;
-  }
 
-  .tabs-container {
-    padding: 10rpx;
-    background-color: #fff;
-  }
+	.dashed-line {
+		border-top: 1px dashed #ccc;
+		margin: 10rpx 0;
+	}
 
-  .tabs {
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .tab {
-    padding: 10rpx 20rpx;
-    font-size: 28rpx;
-    cursor: pointer;
-  }
-
-  .tab.active {
-    color: #aaaaff;
-    font-weight: bold;
-    transform: scale(1.05);
-  }
-
-  .dashed-line {
-    border-top: 1px dashed #ccc;
-    margin: 10rpx 0;
-  }
-	
-	.me-center{
+	.me-center {
 		flex: 1;
 		overflow-y: auto;
 		width: 100%;
 		margin-top: 20upx;
-		
+
 		.pullScrollView {
 			display: flex;
 			flex-direction: column;
 		}
-		
-		.list-tab{
+
+		.list-tab {
 			width: 94%;
 			margin: 0 auto;
 
-			.item-ul{
+			.item-ul {
 				margin-bottom: 20upx;
 				list-style-type: none;
-				padding-left: 0; 
+				padding-left: 0;
 			}
-			.item-ul li{
+
+			.item-ul li {
 				background-color: #ffffff;
 				border-radius: 15upx;
 				box-shadow: 0 0upx 6upx 0upx rgba(0, 0, 150, .2);
 			}
-			
-			.item-top{
+
+			.item-top {
 				display: flex;
 				justify-content: space-between;
 				padding: 20rpx;
 				font-size: 28rpx;
-				
-				.pay-type{
+
+				.pay-type {
 					font-weight: bold;
 				}
-				.status-red{
+
+				.status-red {
 					color: #ff5500;
 				}
-				.status-2{
+
+				.status-2 {
 					color: #4891d9;
 				}
-				.status-green{
+
+				.status-green {
 					color: #00d500;
 				}
 			}
-			.item-content{
+
+			.item-content {
 				display: flex;
 				justify-content: center;
 				align-items: center;
 				padding: 10upx 20upx;
 			}
-			
-			.item-right{
+
+			.item-right {
 				flex: 1;
 				margin-left: 20upx;
-				
-				.item-right-v1{
+
+				.item-right-v1 {
 					width: 100%;
 					padding: 8rpx 0;
 
-					.item-title{
+					.item-title {
 						font-weight: bold;
 						display: -webkit-box;
 					}
 				}
-				
-				.induce{
+
+				.induce {
 					display: flex;
 					align-items: center;
-					
-					.rate-text1{
+
+					.rate-text1 {
 						font-size: 26rpx;
 					}
-					.rate-text2{
+
+					.rate-text2 {
 						margin-left: 20rpx;
 						font-size: 26rpx;
 						color: #B9B9B9;
 					}
 				}
-		
-				.item-right-v2{
+
+				.item-right-v2 {
 					padding: 8rpx 0;
 					display: flex;
 					justify-content: space-between;
 					color: #a3a3a3;
 					font-size: 26upx;
-					
-					.v2-fh{
+
+					.v2-fh {
 						color: #ff5500;
 						font-size: 22upx;
 					}
-					.v2-price{
+
+					.v2-price {
 						color: #ff5500;
 						font-weight: bold;
 						font-size: 32upx;
 					}
 				}
-			}	
-			
-			.item-btom{
+			}
+
+			.item-btom {
 				display: flex;
 				justify-content: flex-end;
 				padding: 20rpx 10upx;
 				font-size: 28upx;
-				
-				.item-btom-btn{
-					padding: 6rpx 40rpx ;
+
+				.item-btom-btn {
+					padding: 6rpx 40rpx;
 					border: 1px solid #2c3e50;
 					border-radius: 30rpx;
 					margin-right: 20upx;
 					align-items: center;
 				}
-				.pay{
-					background-color: #aaaaff;
-					border: 1px solid #aaaaff;
+
+				.pay {
+					background-color: #2c3e50;
+					border: 1px solid #2c3e50;
 					color: #ffffff;
 				}
 			}
 		}
 	}
+
 	.duration-section {
-	  padding: 30rpx;
-	  .section-title {
-	    font-size: 25rpx;
-	    font-weight: bold;
-	    margin-bottom: 10rpx;
-	  }
+		padding: 30rpx;
+
+		.section-title {
+			font-size: 25rpx;
+			font-weight: bold;
+			margin-bottom: 10rpx;
+		}
 	}
-	
+
 	.duration-grid {
-	  display: grid;
-	  grid-template-columns: repeat(2, 1fr);
-	  gap: 10rpx;
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 10rpx;
 	}
-	
+
 	.duration-item {
-	  padding: 20rpx;
-	  border: 2rpx solid #f0eaff;
-	  border-radius: 16rpx;
-	  text-align: center;
-	  transition: all 0.3s;
-	  box-sizing: border-box;
-	  display: flex;         
-	  justify-content: center; 
-	  align-items: center;    
-	  height: 100rpx;
-	  
-	  &.active {
-	    border-color: #2c3e50;
-	    // background: #e3e2ff;
-	  }
-	  
-	  .label {
-	    display: block;
-	    font-size: 28rpx;
-	    color: #333;
-	  }
+		padding: 20rpx;
+		border: 2rpx solid #f0eaff;
+		border-radius: 16rpx;
+		text-align: center;
+		transition: all 0.3s;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100rpx;
+
+		&.active {
+			border-color: #2c3e50;
+		}
+
+		.label {
+			display: block;
+			font-size: 28rpx;
+			color: #333;
+		}
 	}
+
 	.modal {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, 0.5);
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			z-index: 1000; 
-		}
-		/* 窗口 */
-	.modal-content {
-			background-color: white;
-			/* padding: 20px; */
-			width: 600rpx;
-			height: 700rpx;
-			border-radius: 8rpx;
-			position: relative;
-			//modal-content下的第一个view
-			view:first-child{
-				padding:20rpx;
-				font-size:40rpx;
-				font-weight:bold;
-				text-align: center;
-			}
-			//modal-content下的第二个view
-			view:nth-child(2){
-				padding:20rpx;
-				font-size:30rpx;
-				color: #000000;
-				text-align: center;
-			}
-		}
-		/* 按钮 */
-	.modal-buttons {
-			width: 100%;
-			display: flex;
-			bottom: 0;
-			position: absolute;
-		}
-	.modal-buttons button {
-			width: 100%;
-			border: none;
-		}
-	.modal-buttons button:first-child {
-			background-color: #014d87;
-			color: #fff;
-			border-radius: 0;
-		}
-	.modal-buttons button:last-child {
-			width: 100%;
-			border: 3rpx solid #014d87;
-			border-radius: 0px;
-			background-color: #fff;
-			color: #014d87;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 1000;
 	}
-	.none{
+
+	.modal-content {
+		background-color: white;
+		width: 600rpx;
+		height: 700rpx;
+		border-radius: 8rpx;
+		position: relative;
+
+		view:first-child {
+			padding: 20rpx;
+			font-size: 40rpx;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		view:nth-child(2) {
+			padding: 20rpx;
+			font-size: 30rpx;
+			color: #000000;
+			text-align: center;
+		}
+	}
+
+	.modal-buttons {
+		width: 100%;
+		display: flex;
+		bottom: 0;
+		position: absolute;
+	}
+
+	.modal-buttons button {
+		width: 100%;
+		border: none;
+	}
+
+	.modal-buttons button:first-child {
+		background-color: #014d87;
+		color: #fff;
+		border-radius: 0;
+	}
+
+	.modal-buttons button:last-child {
+		width: 100%;
+		border: 3rpx solid #014d87;
+		border-radius: 0px;
+		background-color: #fff;
+		color: #014d87;
+	}
+
+	.none {
 		color: #B9B9B9;
 		text-align: center;
 	}
-	
 </style>

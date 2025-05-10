@@ -1,13 +1,11 @@
 <template>
 	<view class="canvas-wrap">
 		<map id="map" :latitude="mapCenter.latitude" :longitude="mapCenter.longitude" :markers="stores"
-			:show-location="true" style="width: 100%; height: 90vh; z-index: 10;" @markertap="handleMarkerTap">
+			:show-location="true" style="width: 100%; height: 90vh; z-index: 10;" @markertap="handleMarkerTap" >
 			<cover-view class="custom-controls">
 				<cover-image src="/static/icons/current_location.png" @tap="centerToUser" class="control-btn" />
 			</cover-view>
-			<cover-view class="picker-btn" @click="open">Recommended Stores
-				<!-- {{ selectedLocation }} -->
-			</cover-view>
+			<cover-view class="picker-btn" @click="open">Recommended Stores</cover-view>
 			<cover-view v-show="showDialog" class="dialog-seletion">
 				<cover-view class="selection-item">Recommended Stores:</cover-view>
 				<cover-view v-for="(item, index) in locationNames" class="selection-item"
@@ -56,6 +54,7 @@
 			for (const store of this.stores) {
 				await this.reverseGeocode(store);
 			}
+			console.log("mounted", this.stores)
 			this.extractLocationNames();
 		},
 		methods: {
@@ -100,6 +99,7 @@
 					const res = await uni.getLocation({
 						type: 'gcj02'
 					});
+					
 					this.userLocation = res;
 					this.mapCenter = res;
 				} catch (err) {
@@ -117,6 +117,7 @@
 				const markerId = e.detail.markerId;
 				const store = this.stores.find(s => s.id === markerId);
 				this.selectedStore = store;
+				console.log("this.selectedStore handleMarkerTap", this.selectedStore)
 				this.selectedStore.iconPath = "/static/icons/choose.png"
 				this.mapCenter = {
 					latitude: this.selectedStore.latitude,
@@ -133,7 +134,7 @@
 				const selected = this.recommendedLocations[index];
 				const store = this.stores.find(s => s.id === selected.store.id);
 				this.selectedStore = store;
-				console.log("this.selectedStore", this.selectedStore)
+				console.log("this.selectedStore selectOneLocation", this.selectedStore)
 				store.iconPath = "/static/icons/choose.png"
 				this.showDialog = false
 				this.selectedLocation = selected.store.name;
@@ -290,7 +291,7 @@
 
 	.store-location {
 		font-size: 14px;
-		color: #777;
+		color: #2c3e50;
 		margin-top: 5rpx;
 		line-height: normal;
 		white-space: normal;

@@ -32,29 +32,6 @@ body[data-v-4d33d24e] {
   flex-direction: column;
   height: 100%;
 }
-.me-head[data-v-4d33d24e] {
-  width: 100%;
-  height: 2.5rem;
-  padding-bottom: 0.625rem;
-}
-.tabs-container[data-v-4d33d24e] {
-  padding: 0.3125rem;
-  background-color: #fff;
-}
-.tabs[data-v-4d33d24e] {
-  display: flex;
-  justify-content: space-around;
-}
-.tab[data-v-4d33d24e] {
-  padding: 0.3125rem 0.625rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-.tab.active[data-v-4d33d24e] {
-  color: #aaaaff;
-  font-weight: bold;
-  transform: scale(1.05);
-}
 .dashed-line[data-v-4d33d24e] {
   border-top: 1px dashed #ccc;
   margin: 0.3125rem 0;
@@ -161,8 +138,8 @@ body[data-v-4d33d24e] {
   align-items: center;
 }
 .me-center .list-tab .item-btom .pay[data-v-4d33d24e] {
-  background-color: #aaaaff;
-  border: 1px solid #aaaaff;
+  background-color: #2c3e50;
+  border: 1px solid #2c3e50;
   color: #ffffff;
 }
 .duration-section[data-v-4d33d24e] {
@@ -191,7 +168,7 @@ body[data-v-4d33d24e] {
   height: 3.125rem;
 }
 .duration-item.active[data-v-4d33d24e] {
-  background: #e3e2ff;
+  border-color: #2c3e50;
 }
 .duration-item .label[data-v-4d33d24e] {
   display: block;
@@ -210,28 +187,25 @@ body[data-v-4d33d24e] {
   align-items: center;
   z-index: 1000;
 }
-
-/* 窗口 */
 .modal-content[data-v-4d33d24e] {
   background-color: white;
-  /* padding: 20px; */
   width: 18.75rem;
-  height: 25rem;
+  height: 21.875rem;
   border-radius: 0.25rem;
   position: relative;
 }
 .modal-content uni-view[data-v-4d33d24e]:first-child {
-  padding: 0.9375rem;
-  font-size: 1.875rem;
+  padding: 0.625rem;
+  font-size: 1.25rem;
   font-weight: bold;
+  text-align: center;
 }
 .modal-content uni-view[data-v-4d33d24e]:nth-child(2) {
   padding: 0.625rem;
-  font-size: 1.25rem;
-  color: red;
+  font-size: 0.9375rem;
+  color: #000000;
+  text-align: center;
 }
-
-/* 按钮 */
 .modal-buttons[data-v-4d33d24e] {
   width: 100%;
   display: flex;
@@ -243,16 +217,16 @@ body[data-v-4d33d24e] {
   border: none;
 }
 .modal-buttons uni-button[data-v-4d33d24e]:first-child {
-  background-color: #74bfe7;
+  background-color: #014d87;
   color: #fff;
   border-radius: 0;
 }
 .modal-buttons uni-button[data-v-4d33d24e]:last-child {
   width: 100%;
-  border: 0.0625rem solid #74bfe7;
+  border: 0.09375rem solid #014d87;
   border-radius: 0px;
   background-color: #fff;
-  color: #74bfe7;
+  color: #014d87;
 }
 .none[data-v-4d33d24e] {
   color: #B9B9B9;

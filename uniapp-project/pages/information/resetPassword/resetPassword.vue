@@ -39,7 +39,6 @@ export default {
   },
   methods: {
     async changePassword() {
-      // 检查新密码和确认密码是否一致
       if (this.newPassword!== this.confirmPassword) {
         uni.showToast({
           title: 'The new password does not match the confirmed password',
@@ -48,11 +47,10 @@ export default {
         return;
       }
 
-      // 检查新密码是否符合要求
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
       if (!passwordRegex.test(this.newPassword)) {
         uni.showToast({
-          title: '新密码必须至少8个字符，包括至少一个大写字母、一个小写字母和一个数字',
+          title: 'The new password must be at least 8 characters long, including at least one capital letter, one lowercase letter and one number',
           icon: 'none'
         });
         return;
@@ -84,13 +82,13 @@ export default {
 		this.confirmPassword = '';
         } else if (response.statusCode === 400) {
           uni.showToast({
-            title: response.data.message,
+            title: response.data,
             icon: 'none'
           });
         }
       } catch (e) {
         uni.showToast({
-          title: `密码修改失败: ${e.message}`,
+          title: `Password modification failed: ${e.message}`,
           icon: 'none'
         });
       }

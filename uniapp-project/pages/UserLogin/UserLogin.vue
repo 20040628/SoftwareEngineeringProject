@@ -9,17 +9,19 @@
 			</view>
 			<form>
 				<view class="form-group">
-					<input type="tel" v-model="username" placeholder="Please enter your username" class="input-field" />
+					<input type="tel" v-model="username" aria-label="username" placeholder="Please enter your username"
+						:placeholder-style="placeholderStyle" class="input-field" />
 				</view>
 				<view class="form-group">
-					<input type="password" v-model="password" placeholder="Please enter your password"
+					<input type="password" v-model="password" aria-label="password"
+						placeholder="Please enter your password" :placeholder-style="placeholderStyle"
 						class="input-field" />
 				</view>
 				<view class="form-group captcha-group">
-					<input type="text" v-model="captcha" placeholder="Enter captcha"
-						class="input-field captcha-input" />
+					<input type="text" v-model="captcha" aria-label="captcha" placeholder="Enter captcha"
+						:placeholder-style="placeholderStyle" class="input-field captcha-input" />
 					<view class="captcha-image" @click="refreshCaptcha">
-						<image v-if="captchaImage" :src="captchaImage" mode="aspectFit"></image>
+						<image v-if="captchaImage" :src="captchaImage" alt="captchaImage" mode="aspectFit"></image>
 						<view v-else class="loading">Loading...</view>
 					</view>
 				</view>
@@ -28,7 +30,7 @@
 			<view class="form-group terms">
 				<checkbox-group @change="checkboxChange">
 					<checkbox value="cb" color="#000000" style="transform:scale(0.8)"></checkbox>
-					I have read and agreed to ScootGo's 
+					I have read and agreed to ScootGo's
 					<a href="javascript:void(0);" @click="goToTerms">Terms</a>
 				</checkbox-group>
 			</view>
@@ -41,7 +43,6 @@
 		</view>
 	</view>
 </template>
-
 <script>
 	export default {
 		data() {
@@ -53,7 +54,8 @@
 				captchaImage: '',
 				token: null,
 				errorMessage: '',
-				agreementChecked: false
+				agreementChecked: false,
+				placeholderStyle: 'color: #2c3e50; font-size: 14px;'
 			};
 		},
 		onLoad() {
@@ -133,7 +135,7 @@
 
 				try {
 					const [err, res] = await uni.request({
-						url: `${this.$baseURL}/api/auth/login`, 
+						url: `${this.$baseURL}/api/auth/login`,
 						method: 'POST',
 						data: {
 							username: this.username,
@@ -177,26 +179,26 @@
 					}
 
 					this.token = res.data.token;
-					uni.setStorageSync('token', this.token); 
+					uni.setStorageSync('token', this.token);
 
-					this.token = res.data.token; 
-					uni.setStorageSync('token', this.token); 
+					this.token = res.data.token;
+					uni.setStorageSync('token', this.token);
 					let userInfo = {
 						username: res.data.username,
 						userId: res.data.userId
 					}
 					uni.setStorageSync('userInfo', userInfo);
 					uni.showToast({
-					  title: 'Login successful!',
-					  icon: 'none',
-					  duration: 1000
+						title: 'Login successful!',
+						icon: 'none',
+						duration: 1000
 					});
-					    
+
 					// Delay the jump to the home page
 					setTimeout(() => {
-					  uni.navigateTo({
-					    url: '/pages/index'
-					  });
+						uni.navigateTo({
+							url: '/pages/index'
+						});
 					}, 1000);
 
 				} catch (error) {
@@ -208,12 +210,12 @@
 
 			goToRegister() {
 				uni.navigateTo({
-					url: '/pages/UserRegister/UserRegister' 
+					url: '/pages/UserRegister/UserRegister'
 				});
 			},
 			find() {
 				uni.navigateTo({
-					url: '/pages/information/findPassword/findPassword' 
+					url: '/pages/information/findPassword/findPassword'
 				});
 			},
 			goToTerms() {
@@ -255,6 +257,6 @@
 
 	.loading {
 		font-size: 12px;
-		color: #999;
+		color: #000000;
 	}
 </style>

@@ -44,36 +44,35 @@
 					this.$refs['indexPage'].loadSelectedSite()
 				}
 				if (this.$refs['myPage']) {
+					this.$refs['myPage'].getprofile()
 					this.$refs['myPage'].getOrders()
 					this.$refs['myPage'].getCard()
-					this.$refs['myPage'].getprofile()
+					
 				}
 			}, 300)
 		},
 		methods: {
 			nowBar: function(e) {
-				let that = this
-				if (e == that.nowBarIndex) {
+				if (e == this.nowBarIndex) {
 					return
 				}
-				that.nowBarIndex = e
-				that.tabPage(e)
+				this.nowBarIndex = e
+				this.tabPage(e)
 			},
 			tabPage: function(e) {
-				let that = this
 				this.$nextTick(() => {
 					switch (Number(e)) {
 						case 0:
-							that.$refs.indexPage.load(1)
+							this.$refs.indexPage.load(1)
 							break
 						case 1:
-							that.$refs.mapPage.load()
+							this.$refs.mapPage.load()
 							break
 						case 3:
-							that.$refs.nowPgae.load()
+							this.$refs.nowPgae.load()
 							break
 						case 4:
-							that.$refs.myPage.load()
+							this.$refs.myPage.load()
 							break
 					}
 				})

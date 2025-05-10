@@ -18,6 +18,7 @@ export function createApp() {
   const app = createSSRApp(App)
   app.config.globalProperties.$baseURL = 'http://118.24.22.77';
   // http://118.24.22.77
+  // http://192.168.1.11:8080
   return {
     app
   }

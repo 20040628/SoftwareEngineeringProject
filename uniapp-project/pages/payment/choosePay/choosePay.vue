@@ -55,16 +55,11 @@
 		</view>
 
 	</view>
-	<!-- <pay-keyboard :show_key="show_key" @hideFun="hideFun" @getPassword="getPassword"></pay-keyboard> -->
 
 </template>
 
 <script>
-	import payKeyboard from '../../../components/keyboard.vue'
 	export default {
-		components: {
-			payKeyboard
-		},
 		data() {
 			return {
 				selectedPaymentMethod: null,
@@ -72,10 +67,7 @@
 				bankCards: null,
 				cardNumber: null,
 				showCardSelectModal: false,
-				showPasswordModal: false,
-				password: '',
 				orderId: null,
-				show_key: false,
 				form: {
 					number: '',
 					code: ''
@@ -155,18 +147,6 @@
 				this.startDate = e.detail.value;
 			},
 			async submit() {
-				// const user = uni.getStorageSync('userInfo');
-				// console.log(user)
-				// this.cardNumber = user.bank_card
-				// console.log(this.cardNumber )
-				// if (this.form.number !== this.cardNumber) {
-				// 	uni.showToast({
-				// 		title: 'The card number does not match the user',
-				// 		icon: 'none'
-				// 	});
-				// 	return;
-				// }
-
 				if (!/^\d{3}$/.test(this.form.code)) {
 					uni.showToast({
 						title: 'The security code should be three digits',
@@ -213,7 +193,6 @@
 							"Authorization": `Bearer ${token}`
 						},
 					});
-					console.log(this.form.number)
 					if (res.statusCode === 200) {
 						uni.showToast({
 							title: 'Payment successful',
@@ -235,7 +214,6 @@
 						icon: 'none'
 					})
 				} finally {}
-				// this.show_key = true
 
 
 			},
@@ -243,60 +221,6 @@
 				this.showCardSelectModal = false;
 			},
 
-			submitPaymentPassword() {
-				if (this.password) {
-					alert('Payment Successful');
-					this.showPasswordModal = false;
-				} else {
-					alert('Please enter a valid password');
-				}
-			},
-
-			cancelPayment() {
-				this.showPasswordModal = false;
-			},
-			// hideFun() {
-			// 	this.show_key = false
-			// },
-			// async getPassword(n) {
-			// const token = String(uni.getStorageSync('token'));
-			// this.user = uni.getStorageSync('userInfo');
-			// try {
-			// 	const res = await uni.request({
-			// 		url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
-			// 		method: 'POST',
-			// 		data: {
-			// 			securityCode: String(n.password)
-			// 		},
-			// 		header: {
-			// 			'Content-Type': 'application/json',
-			// 			"Authorization": `Bearer ${token}`
-			// 		},
-
-			// 	});
-
-			// 	if (res.statusCode === 200) {
-			// 		uni.showToast({
-			// 			title: res.data.message,
-			// 			icon: 'none',
-			// 		});
-			// 		uni.navigateTo({
-			// 			url: "/pages/myorder/orderlist/orderlist"
-			// 		})
-			// 	} else {
-			// 		uni.showToast({
-			// 			title: res.data.message || 'Update failed',
-			// 			icon: 'none',
-			// 		});
-			// 	}
-			// } catch (err) {
-			// 	uni.showToast({
-			// 		title: 'Network Error',
-			// 		icon: 'none'
-			// 	})
-			// } finally {
-			// }
-			// }
 		}
 	};
 </script>
@@ -337,6 +261,7 @@
 		border-radius: 20rpx;
 		background-color: #f9f9f9;
 		transition: all 0.3s ease;
+		margin-bottom: 10rpx;
 	}
 
 	.payment-option:hover {
@@ -421,9 +346,11 @@
 	.input-field {
 		box-sizing: border-box;
 		width: 100%;
-		padding: 10rpx;
+		padding: 20rpx;
+		height: 80rpx;
 		border: 1px solid #ccc;
 		border-radius: 10rpx;
+		font-size: 28rpx;
 	}
 
 	.picker {

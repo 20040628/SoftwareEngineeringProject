@@ -45,7 +45,7 @@ body {
 		font-weight: bold;
 }
 .text-item {
-		color: #999999;
+		color: #2c3e50;
 		font-size: 0.875rem;
 		padding: 0.75rem;
 }
@@ -70,6 +70,7 @@ body {
 }
 .text-top {
 		margin: 0.9375rem;
-		color: #999999;
+		color: #014d87;
 		font-size: 0.9375rem;
+		font-weight: bold;
 }

@@ -1,4 +1,3 @@
-<!-- 帮助反馈页面 -->
 <template>
 	<view>
 		<view class="text-top">Common Problem</view>
@@ -36,11 +35,11 @@
 						problemTitle: 'Scooter Rental',
 						problemList: [{
 								title: 'How do I book a scooter?',
-								content: '微信小程序内部对网页链接进行了限制，遇到此情况可复制链接至手机浏览器中打开。'
+								content: 'You can click [Instruction on Use] on the home page.'
 							},
 							{
 								title: 'Can I cancel my scooter reservation?',
-								content: '对于文件类的课件，请点击[在线预览]，稍等片刻之后程序会跳转到对应的预览页面。点击右上角三个点按钮，在下方弹窗中选择[保存到手机]即可。也可对课件进行[转发][收藏]等操作'
+								content: 'Unpaid orders can be cancelled within [All Orders], while paid orders cannot be cancelled.'
 							}
 
 						]
@@ -49,7 +48,7 @@
 						problemTitle: 'Payment Issues',
 						problemList: [{
 								title: 'Why am I being charged incorrectly for my scooter rental?',
-								content: '在报名截止日期之前均可以取消。点击活动报名详情下方的[取消报名]按钮即可。'
+								content: 'When you return, the power connection is too low or the return is overdue.'
 							}
 
 						]
@@ -58,7 +57,7 @@
 						problemTitle: 'Scooter Usage',
 						problemList: [{
 								title: 'How do I unlock a scooter?',
-								content: '不可以。完成的调查问卷会处于不可点击状态，所以请您认真对待每一次问卷的填写工作。感谢您的支持。'
+								content: 'Click "Return" on the [now] page.'
 							}
 
 						]
@@ -66,19 +65,19 @@
 						problemTitle: 'Other',
 						problemList: [{
 								title: 'How to change my user profile picture?',
-								content: '请点击[我的] - [账号管理] - [头像]即可更换用户头像',
+								content: 'Please click on [My], and click on Avatar to change the your avatar.',
 							},
 							{
 								title: 'How to change my login password?',
-								content: '请点击[我的] - [账号管理] - [修改密码]即可修改登录密码',
+								content: 'Please click on [My]-[Set]-[Account and Security]to change the your password.',
 							},
 							{
 								title: 'How to log out?',
-								content: '请点击[我的] - [账号管理] - [退出登录]即可退出登录',
+								content: 'Please click on [My]-[Log Out] to log out.',
 							},
 							{
 								title: 'What if the system is slow or unresponsive?',
-								content: '如果出现系统反应迟钝、响应时间过长的问题，可查看本机的网络状态，或重启程序后再次尝试。'
+								content: 'If there are problems such as slow system response or excessively long response time, you can check the network status of this machine or restart the program and try again.'
 							}
 						]
 					}
@@ -87,7 +86,6 @@
 		},
 		methods: {
 			onClick(item) {
-
 				uni.navigateTo({
 					url: '/pages/feedback/helpDetail/helpDetail?title=' + item.title + '&content=' + item.content,
 					success: res => {},
@@ -121,8 +119,6 @@
 		background-color: #F8F8F8;
 		height: 100%;
 	}
-
-
 
 	.bg-box {
 		background-color: #F8F8F8;
@@ -165,8 +161,6 @@
 		background-color: #F5F5F5;
 	}
 
-
-
 	.text-title {
 		color: #303133;
 		font-size: 32rpx;
@@ -174,7 +168,7 @@
 	}
 
 	.text-item {
-		color: #999999;
+		color: #2c3e50;
 		font-size: 28rpx;
 		padding: 24rpx;
 	}
@@ -205,7 +199,8 @@
 
 	.text-top {
 		margin: 30rpx;
-		color: #999999;
+		color: #014d87;
 		font-size: 30rpx;
+		font-weight: bold;
 	}
 </style>

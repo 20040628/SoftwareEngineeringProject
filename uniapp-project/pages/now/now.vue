@@ -11,28 +11,36 @@
 				</view>
 			</view>
 			<view v-show="hasOngoingOrder" class="card-content">
-				<view v-if='order'>
+				<view v-if='order' class="order-wrapper">
 					<view class="item-left">
-						<image :src="picUrl" alt="Order Image" style="width: 70px; height: 70px; border-radius: 5px;">
-						</image>
+						<image :src="picUrl" class="order-img" mode="aspectFill"></image>
 					</view>
-					<!-- 车的详情 -->
 					<view class="item-right">
 						<view class="car-info">
-							<view class="car-battery">battery: {{ order.scooter?.battery || 0 }}%</view>
-							<view class="car-speed">speed: {{ order.scooter?.speed || 0 }} km/h</view>
+							<view class="car-battery">
+								🔋{{ order.scooter?.battery || 0 }}%
+							</view>
+							<view class="car-speed">
+								⚡ {{ order.scooter?.speed || 0 }} km/h
+							</view>
 						</view>
+
 						<view class="time-info">
-							<view class="start-time">start: {{ formatTime(order.startTime) }}</view>
-							<view class="end-time">end: {{ formatTime(order.endTime) }}</view>
+							<view class="start-time">
+								<uni-icons type="calendar" size="18" color="#666" style="margin-right: 8rpx;" />
+								Start Time: {{ formatTime(order.startTime) }}
+							</view>
+							<view class="end-time">
+								<uni-icons type="calendar" size="18" color="#666" style="margin-right: 8rpx;" />
+								End Time: {{ formatTime(order.endTime) }}
+							</view>
 						</view>
-						<view v-if="isOvertime" class="overtime-info">Timeout!</view>
+						<view :class="['overtime-info', { visible: isOvertime }]">⛔ Overdue return</view>
 						<view class="choose-btn" @tap="returnCar()">Return</view>
 					</view>
 				</view>
 			</view>
 		</view>
-
 	</view>
 
 
@@ -49,7 +57,7 @@
 				},
 				recommendedLocations: [],
 				selectedLocation: 'near stores',
-				selectedStore: null, // 用于显示地址信息卡片
+				selectedStore: null, 
 				locationNames: [],
 				order: null,
 				picUrl: "../../../static/images/car.jpg",
@@ -62,7 +70,6 @@
 
 		},
 		computed: {
-			// 判断是否超时
 			isOvertime() {
 				return this.currentTime > this.endTime;
 			}
@@ -70,7 +77,6 @@
 		methods: {
 			load() {
 				console.log("Load method is called");
-				// this.getUserLocation();
 				this.loadScooters();
 				console.log('hasOngoingOrder', this.hasOngoingOrder);
 				console.log('order', this.order);
@@ -79,7 +85,7 @@
 				}
 
 			},
-			// 加载滑板车信息
+
 			async loadScooters() {
 				const user = uni.getStorageSync('userInfo');
 				const token = String(uni.getStorageSync('token'));
@@ -99,7 +105,6 @@
 						} else {
 							this.order = null
 						}
-						console.log("order", this.order)
 						if (this.order) {
 							this.hasOngoingOrder = true;
 							const store = this.order.scooter.store;
@@ -114,7 +119,7 @@
 						}
 					} else {
 						uni.showToast({
-							title: '数据加载失败',
+							title: 'Data loading failed',
 							icon: 'none'
 						});
 					}
@@ -136,7 +141,6 @@
 				this.selectedStore = store;
 			},
 
-			//获取用户位置
 			async getUserLocation() {
 				try {
 					const res = await uni.getLocation({
@@ -145,7 +149,7 @@
 					this.userLocation = res;
 					this.mapCenter = res;
 				} catch (err) {
-					console.error('获取定位失败:', err);
+					console.error('Failed to obtain the positioning:', err);
 				}
 			},
 
@@ -176,6 +180,8 @@
 							title: res.data.message,
 							icon: 'none',
 						});
+						this.load();
+						
 					} else {
 						uni.showToast({
 							title: res.data.message || 'Update failed',
@@ -195,15 +201,14 @@
 
 <style scoped>
 	.container {
-	  display: flex;
-	  flex-direction: column;
-	  height: 100vh;
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
 	}
-	
+
 	.bottom {
-	  flex: 1;
-	  overflow: auto;
-	  height: 30vh;
+		flex: 1;
+		height: 30vh;
 	}
 
 	.car-card {
@@ -211,28 +216,11 @@
 		bottom: 190rpx;
 		left: 50%;
 		transform: translateX(-50%);
-		/* background-color: rgba(255, 255, 255, 0.9); */
 		padding: 30rpx;
 		width: 80%;
 		border-radius: 10rpx;
-		/* box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1); */
 	}
 
-	.card-content {
-		position: absolute;
-		bottom: 190rpx;
-		left: 50%;
-		transform: translateX(-50%);
-		background-color: rgba(255, 255, 255, 0.9);
-		padding: 30rpx;
-		width: 80%;
-		/* 调整宽度为80% */
-		border-radius: 10rpx;
-		box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1);
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
 
 	.hint {
 		font-size: 16px;
@@ -251,49 +239,90 @@
 		font-size: 16px;
 	}
 
+	.card-content {
+		position: fixed;
+		bottom: 100rpx;
+		left: 50%;
+		transform: translateX(-50%);
+		background-color: #ffffffdd;
+		padding: 30rpx;
+		width: 90%;
+		border-radius: 16rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+	}
+
+	.order-wrapper {
+		display: flex;
+		align-items: flex-start;
+	}
+
+	.order-img {
+		width: 140rpx;
+		height: 140rpx;
+		border-radius: 12rpx;
+		object-fit: cover;
+	}
+
 	.item-left {
-		width: 70px;
-		height: 70px;
+		flex-shrink: 0;
 	}
 
 	.item-right {
 		flex-grow: 1;
-		margin-left: 20rpx;
+		margin-left: 24rpx;
 	}
 
 	.car-info {
 		display: flex;
 		justify-content: space-between;
-		font-size: 28rpx;
-		color: #333;
+		font-size: 26rpx;
+		color: #014d87;
+		margin-top: 8rpx;
+	}
+
+	.car-battery,
+	.car-speed {
+		display: flex;
+		align-items: center;
 	}
 
 	.time-info {
+		display: flex;
+		flex-direction: column;
 		font-size: 24rpx;
 		color: #666;
-		margin-top: 10rpx;
+		margin-top: 16rpx;
+		gap: 8rpx;
+	}
+
+	.start-time,
+	.end-time {
+		display: flex;
+		align-items: center;
 	}
 
 	.overtime-info {
-		margin-top: 10rpx;
-		color: red;
-		font-size: 26rpx;
+	  height: 20rpx; 
+	  color: red;
+	  font-size: 26rpx;
+	  margin-top: 10rpx;
+	  opacity: 0;
+	  visibility: hidden;
+	  transition: opacity 0.3s;
+	}
+	
+	.overtime-info.visible {
+	  opacity: 1;
+	  visibility: visible;
 	}
 
 	.choose-btn {
-		margin-top: 20rpx;
-		width: 100%;
+		margin-top: 24rpx;
 		background-color: #014d87;
 		color: white;
-		font-size: 16px;
-		border: none;
-		border-radius: 8rpx;
+		font-size: 28rpx;
+		border-radius: 12rpx;
 		text-align: center;
-		line-height: 60rpx;
-	}
-
-	.blurred {
-		filter: blur(5px);
-		pointer-events: none;
+		line-height: 72rpx;
 	}
 </style>

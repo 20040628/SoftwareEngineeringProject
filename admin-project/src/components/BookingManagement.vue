@@ -5,11 +5,11 @@
       <div class="status-filter">
         <label for="status-select">Filter by Status:</label>
         <select id="status-select" v-model="statusFilter" @change="filterBookings">
+          <option value="all">ALL</option>
           <option value="1">CREATED</option>
           <option value="2">PAID</option>
-          <option value="3">ACTIVE</option>
-          <option value="4">COMPLETED</option>
-          <option value="5">CANCELLED</option>
+          <option value="3">COMPLETED</option>
+          <option value="4">CANCELLED</option>
         </select>
       </div>
       <div class="search-box">
@@ -142,7 +142,7 @@ export default {
       itemsPerPage: 7,
       inputPage: 1,
       searchQuery: '',
-      statusFilter: '1',
+      statusFilter: 'all',
       showActionsColumn: true,
       error: null
     };
@@ -187,7 +187,7 @@ export default {
   methods: {
     resetSearch() {
       this.searchQuery = '';
-      this.statusFilter = '1';
+      this.statusFilter = 'all';
       this.filterBookings();
     },
 
@@ -241,7 +241,7 @@ export default {
         console.log("Processed bookings:", this.bookings);
 
         // Default disable filter
-        this.statusFilter = '1';
+        this.statusFilter = 'all';
         this.searchQuery = '';
         this.filterBookings();
       } catch (error) {
@@ -298,7 +298,7 @@ export default {
     formatDateForSearch(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
-      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
     },
 
     resetPagination() {
@@ -350,21 +350,21 @@ export default {
     },
 
     getStatusLabel(status) {
-      const statusMap = { 1: 'CREATED' ,
-        2: 'PAID' ,
-        3: 'ACTIVE' ,
-        4: 'COMPLETED' ,
-        5: 'CANCELLED' };
+      const statusMap = {
+        1: 'CREATED',
+        2: 'PAID',
+        3: 'COMPLETED',
+        4: 'CANCELLED'
+      };
       return statusMap[status] || 'Unknown';
     },
 
     getStatusClass(status) {
       const statusClassMap = {
-        1: 'CREATED' ,
-        2: 'PAID' ,
-        3: 'ACTIVE' ,
-        4: 'COMPLETED' ,
-        5: 'CANCELLED' ,
+        1: 'CREATED',
+        2: 'PAID',
+        3: 'COMPLETED',
+        4: 'CANCELLED'
       };
       return statusClassMap[status] || 'status-unknown';
     }

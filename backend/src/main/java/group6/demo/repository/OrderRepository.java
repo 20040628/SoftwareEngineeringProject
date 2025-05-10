@@ -48,7 +48,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND CURRENT_TIMESTAMP BETWEEN o.startTime AND o.endTime AND o.status = 2")
     List<Order> findAllOngoing(@Param("userId") Long userId);
 
-    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.endTime < CURRENT_TIMESTAMP AND o.status = 3")
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.returnTime < CURRENT_TIMESTAMP AND o.status = 3")
     List<Order> findAllFinished(@Param("userId") Long userId);
     
     /**

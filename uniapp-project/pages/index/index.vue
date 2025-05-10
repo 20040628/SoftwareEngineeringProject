@@ -212,10 +212,16 @@
 				uni.setStorageSync('hireType', hireType);
 				uni.setStorageSync('startTime', formattedStartDate);
 				uni.setStorageSync('endTime', formattedDate);
-				uni.navigateTo({
-					url: '/pages/chooseCar/chooseCar'
-				});
-
+				if(formattedStartDate & this.selectedSite){
+					uni.navigateTo({
+						url: '/pages/chooseCar/chooseCar'
+					});
+				}else{
+					uni.showToast({
+						title: 'Please select both date and store',
+						icon: 'none'
+					})
+				}
 			},
 			instruction(e) {
 				uni.navigateTo({

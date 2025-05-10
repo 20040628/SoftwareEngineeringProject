@@ -4411,9 +4411,16 @@ if (uni.restoreGlobal) {
         uni.setStorageSync("hireType", hireType);
         uni.setStorageSync("startTime", formattedStartDate);
         uni.setStorageSync("endTime", formattedDate);
-        uni.navigateTo({
-          url: "/pages/chooseCar/chooseCar"
-        });
+        if (formattedStartDate && this.selectedSite) {
+          uni.navigateTo({
+            url: "/pages/chooseCar/chooseCar"
+          });
+        } else {
+          uni.showToast({
+            title: "Please select both date and store",
+            icon: "none"
+          });
+        }
       },
       instruction(e) {
         uni.navigateTo({
@@ -4613,8 +4620,6 @@ if (uni.restoreGlobal) {
         var _a;
         formatAppLog("log", "at pages/now/now.vue:79", "Load method is called");
         this.loadScooters();
-        formatAppLog("log", "at pages/now/now.vue:81", "hasOngoingOrder", this.hasOngoingOrder);
-        formatAppLog("log", "at pages/now/now.vue:82", "order", this.order);
         if ((_a = this.order.scooter) == null ? void 0 : _a.endTime) {
           this.endTime = new Date(this.order.scooter.endTime);
         }
@@ -4631,7 +4636,6 @@ if (uni.restoreGlobal) {
               "Authorization": `Bearer ${token}`
             }
           });
-          formatAppLog("log", "at pages/now/now.vue:101", "res.data.", res.data);
           if (res.statusCode === 200) {
             if (res.data.length > 0) {
               this.order = res.data[0];
@@ -4681,7 +4685,7 @@ if (uni.restoreGlobal) {
           this.userLocation = res;
           this.mapCenter = res;
         } catch (err) {
-          formatAppLog("error", "at pages/now/now.vue:152", "Failed to obtain the positioning:", err);
+          formatAppLog("error", "at pages/now/now.vue:149", "Failed to obtain the positioning:", err);
         }
       },
       formatTime(time) {
@@ -4691,7 +4695,7 @@ if (uni.restoreGlobal) {
       async returnCar() {
         uni.getStorageSync("userInfo");
         const token = String(uni.getStorageSync("token"));
-        formatAppLog("log", "at pages/now/now.vue:164", "order", this.order);
+        formatAppLog("log", "at pages/now/now.vue:161", "order", this.order);
         try {
           const res = await uni.request({
             url: `${this.$baseURL}/api/bookings/return`,
@@ -4704,7 +4708,7 @@ if (uni.restoreGlobal) {
               "Authorization": `Bearer ${token}`
             }
           });
-          formatAppLog("log", "at pages/now/now.vue:177", "res", res.data);
+          formatAppLog("log", "at pages/now/now.vue:174", "res", res.data);
           if (res.statusCode === 200) {
             uni.showToast({
               title: res.data.message,
@@ -5341,7 +5345,6 @@ if (uni.restoreGlobal) {
       for (const store of this.stores) {
         await this.reverseGeocode(store);
       }
-      formatAppLog("log", "at pages/map/map.vue:57", "mounted", this.stores);
       this.extractLocationNames();
     },
     methods: {
@@ -5388,7 +5391,7 @@ if (uni.restoreGlobal) {
           this.userLocation = res;
           this.mapCenter = res;
         } catch (err) {
-          formatAppLog("error", "at pages/map/map.vue:106", "Failed to obtain the positioning:", err);
+          formatAppLog("error", "at pages/map/map.vue:105", "Failed to obtain the positioning:", err);
         }
       },
       // Click on the map marker to display the address information
@@ -5401,7 +5404,7 @@ if (uni.restoreGlobal) {
         const markerId = e.detail.markerId;
         const store = this.stores.find((s) => s.id === markerId);
         this.selectedStore = store;
-        formatAppLog("log", "at pages/map/map.vue:120", "this.selectedStore handleMarkerTap", this.selectedStore);
+        formatAppLog("log", "at pages/map/map.vue:119", "this.selectedStore handleMarkerTap", this.selectedStore);
         this.selectedStore.iconPath = "/static/icons/choose.png";
         this.mapCenter = {
           latitude: this.selectedStore.latitude,
@@ -5417,7 +5420,7 @@ if (uni.restoreGlobal) {
         const selected = this.recommendedLocations[index];
         const store = this.stores.find((s) => s.id === selected.store.id);
         this.selectedStore = store;
-        formatAppLog("log", "at pages/map/map.vue:137", "this.selectedStore selectOneLocation", this.selectedStore);
+        formatAppLog("log", "at pages/map/map.vue:136", "this.selectedStore selectOneLocation", this.selectedStore);
         store.iconPath = "/static/icons/choose.png";
         this.showDialog = false;
         this.selectedLocation = selected.store.name;
@@ -5451,7 +5454,7 @@ if (uni.restoreGlobal) {
           }
         } catch (err) {
           this.$set(store, "locationName", "Location request failed");
-          formatAppLog("error", "at pages/map/map.vue:172", "The reverse geocoding request failed:", err);
+          formatAppLog("error", "at pages/map/map.vue:171", "The reverse geocoding request failed:", err);
         }
       },
       chooseStore() {
@@ -8886,8 +8889,8 @@ if (uni.restoreGlobal) {
     ]);
   }
   const PagesMyorderDoneDone = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-4df7be5e"], ["__file", "D:/3/Software engineer principles/project/back/SoftwareEngineeringProject/uniapp-project/pages/myorder/done/done.vue"]]);
-  const _imports_0 = "/static/icons/card.png";
-  const _imports_1 = "/static/icons/alipay.png";
+  const _imports_0 = "/static/icons/quick.png";
+  const _imports_1 = "/static/icons/card.png";
   const _sfc_main$b = {
     data() {
       return {
@@ -8896,7 +8899,9 @@ if (uni.restoreGlobal) {
         bankCards: null,
         cardNumber: null,
         showCardSelectModal: false,
+        showQuickCardModal: false,
         orderId: null,
+        quickCard: "",
         form: {
           number: "",
           code: ""
@@ -8956,13 +8961,10 @@ if (uni.restoreGlobal) {
         if (this.selectedPaymentMethod) {
           this.paymentSuccessful = true;
           if (this.selectedPaymentMethod === "card") {
-            this.showCardSelectModal = true;
+            this.showQuickCardModal = true;
           }
           if (this.selectedPaymentMethod === "Alipay") {
-            const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
-            uni.navigateTo({
-              url: targetUrl
-            });
+            this.showCardSelectModal = true;
           }
         } else {
           alert("Please select a payment method");
@@ -8974,7 +8976,21 @@ if (uni.restoreGlobal) {
       onStartChange(e) {
         this.startDate = e.detail.value;
       },
-      async submit() {
+      async submitNew() {
+        const cardRegex = /^[0-9]{13,16}$/;
+        if (!this.form.number) {
+          uni.showToast({
+            title: "Card number is required",
+            icon: "none"
+          });
+          return;
+        } else if (!cardRegex.test(this.form.number)) {
+          uni.showToast({
+            title: "Card number must be between 13-16 digits",
+            icon: "none"
+          });
+          return;
+        }
         if (!/^\d{3}$/.test(this.form.code)) {
           uni.showToast({
             title: "The security code should be three digits",
@@ -9010,7 +9026,7 @@ if (uni.restoreGlobal) {
         this.user = uni.getStorageSync("userInfo");
         try {
           const res = await uni.request({
-            url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
+            url: `${this.$baseURL}/api/bank-payment/newCard/${this.orderId}`,
             method: "POST",
             data: {
               bankCard: this.form.number
@@ -9043,8 +9059,49 @@ if (uni.restoreGlobal) {
         } finally {
         }
       },
+      async submit() {
+        const token = String(uni.getStorageSync("token"));
+        this.user = uni.getStorageSync("userInfo");
+        try {
+          const res = await uni.request({
+            url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
+            method: "POST",
+            data: {
+              bankCard: this.quickCard
+            },
+            header: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            }
+          });
+          if (res.statusCode === 200) {
+            uni.showToast({
+              title: "Payment successful",
+              icon: "none"
+            });
+            this.closeCardSelectModal();
+            uni.navigateTo({
+              url: "/pages/myorder/orderlist/orderlist"
+            });
+          } else {
+            uni.showToast({
+              title: res.data || "Update failed",
+              icon: "none"
+            });
+          }
+        } catch (err) {
+          uni.showToast({
+            title: "Network Error",
+            icon: "none"
+          });
+        } finally {
+        }
+      },
       closeCardSelectModal() {
         this.showCardSelectModal = false;
+      },
+      closeQuickCardModal() {
+        this.showQuickCardModal = false;
       }
     }
   };
@@ -9073,7 +9130,7 @@ if (uni.restoreGlobal) {
                       class: "payment-icon",
                       mode: "aspectFill"
                     }),
-                    vue.createElementVNode("text", null, "Card")
+                    vue.createElementVNode("text", null, "Quick Payment")
                   ]),
                   $data.selectedPaymentMethod === "card" ? (vue.openBlock(), vue.createElementBlock("view", {
                     key: 0,
@@ -9096,7 +9153,7 @@ if (uni.restoreGlobal) {
                       class: "payment-icon",
                       mode: "aspectFill"
                     }),
-                    vue.createElementVNode("text", null, "Alipay")
+                    vue.createElementVNode("text", null, "New Card Payment")
                   ]),
                   $data.selectedPaymentMethod === "Alipay" ? (vue.openBlock(), vue.createElementBlock("view", {
                     key: 0,
@@ -9198,10 +9255,42 @@ if (uni.restoreGlobal) {
               )
             ]),
             vue.createElementVNode("button", {
-              onClick: _cache[5] || (_cache[5] = ($event) => $options.submit())
+              onClick: _cache[5] || (_cache[5] = ($event) => $options.submitNew())
             }, "submit"),
             vue.createElementVNode("button", {
               onClick: _cache[6] || (_cache[6] = (...args) => $options.closeCardSelectModal && $options.closeCardSelectModal(...args))
+            }, "Close")
+          ])
+        ])) : vue.createCommentVNode("v-if", true),
+        $data.showQuickCardModal ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 1,
+          class: "card-select-modal"
+        }, [
+          vue.createElementVNode("view", { class: "card-options" }, [
+            vue.createElementVNode("view", { class: "form-group" }, [
+              vue.createElementVNode("text", { class: "label" }, [
+                vue.createTextVNode("Card Number"),
+                vue.createElementVNode("text", { class: "required" }, "*")
+              ]),
+              vue.withDirectives(vue.createElementVNode(
+                "input",
+                {
+                  class: "input-field",
+                  placeholder: "Enter card number",
+                  "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $data.quickCard = $event)
+                },
+                null,
+                512
+                /* NEED_PATCH */
+              ), [
+                [vue.vModelText, $data.quickCard]
+              ])
+            ]),
+            vue.createElementVNode("button", {
+              onClick: _cache[8] || (_cache[8] = ($event) => $options.submit())
+            }, "submit"),
+            vue.createElementVNode("button", {
+              onClick: _cache[9] || (_cache[9] = (...args) => $options.closeQuickCardModal && $options.closeQuickCardModal(...args))
             }, "Close")
           ])
         ])) : vue.createCommentVNode("v-if", true)
@@ -10171,7 +10260,7 @@ if (uni.restoreGlobal) {
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/3/Software engineer principles/project/back/SoftwareEngineeringProject/uniapp-project/App.vue"]]);
   function createApp() {
     const app = vue.createVueApp(App);
-    app.config.globalProperties.$baseURL = "http://118.24.22.77";
+    app.config.globalProperties.$baseURL = "http://192.168.1.11:8080";
     return {
       app
     };

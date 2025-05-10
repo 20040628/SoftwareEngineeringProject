@@ -78,8 +78,6 @@
 			load() {
 				console.log("Load method is called");
 				this.loadScooters();
-				console.log('hasOngoingOrder', this.hasOngoingOrder);
-				console.log('order', this.order);
 				if (this.order.scooter?.endTime) {
 					this.endTime = new Date(this.order.scooter.endTime);
 				}
@@ -98,7 +96,6 @@
 							"Authorization": `Bearer ${token}`
 						},
 					});
-					console.log("res.data.", res.data)
 					if (res.statusCode === 200) {
 						if (res.data.length > 0) {
 							this.order = res.data[0]

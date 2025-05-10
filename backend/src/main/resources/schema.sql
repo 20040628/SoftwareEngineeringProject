@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS `b_scooter`;
 DROP TABLE IF EXISTS `b_user`;
 DROP TABLE IF EXISTS `b_store`;
 DROP TABLE IF EXISTS `b_weekly_revenue`;
-
+DROP TABLE IF EXISTS `b_daily_revenue`;
 -- 创建用户表
 CREATE TABLE `b_user`  (
   `id` bigint NOT NULL AUTO_INCREMENT,

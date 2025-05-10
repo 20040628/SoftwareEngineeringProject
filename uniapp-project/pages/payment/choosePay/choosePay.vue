@@ -10,16 +10,16 @@
 				<view class="payment-option" :class="{ selected: selectedPaymentMethod === 'card' }"
 					@click="selectPaymentMethod('card')">
 					<view class="left">
-						<image src="/static/icons/card.png" class="payment-icon" mode="aspectFill"></image>
-						<text>Card</text>
+						<image src="/static/icons/quick.png" class="payment-icon" mode="aspectFill"></image>
+						<text>Quick Payment</text>
 					</view>
 					<view class="check-icon" v-if="selectedPaymentMethod === 'card'">✔</view>
 				</view>
 				<view class="payment-option" :class="{ selected: selectedPaymentMethod === 'Alipay' }"
 					@click="selectPaymentMethod('Alipay')">
 					<view class="left">
-						<image src="/static/icons/alipay.png" class="payment-icon" mode="aspectFill"></image>
-						<text>Alipay</text>
+						<image src="/static/icons/card.png" class="payment-icon" mode="aspectFill"></image>
+						<text>New Card Payment</text>
 					</view>
 					<view class="check-icon" v-if="selectedPaymentMethod === 'Alipay'">✔</view>
 				</view>
@@ -42,18 +42,25 @@
 					<view class="picker">{{ startDate || 'Select MM/YYYY' }}</view>
 				</picker>
 			</view>
-
 			<view class="form-group">
 				<text class="label">Expiry Date <text class="required">*</text></text>
 				<picker mode="date" fields="month" @change="onExpiryChange">
 					<view class="picker">{{ expiryDate || 'Select MM/YYYY' }}</view>
 				</picker>
 			</view>
-
-			<button @click="submit()">submit</button>
+			<button @click="submitNew()">submit</button>
 			<button @click="closeCardSelectModal">Close</button>
 		</view>
-
+	</view>
+	<view class="card-select-modal" v-if="showQuickCardModal">
+		<view class="card-options">
+			<view class="form-group">
+				<text class="label">Card Number<text class="required">*</text></text>
+				<input class="input-field" placeholder="Enter card number" v-model="quickCard" />
+			</view>
+			<button @click="submit()">submit</button>
+			<button @click="closeQuickCardModal">Close</button>
+		</view>
 	</view>
 
 </template>
@@ -67,7 +74,9 @@
 				bankCards: null,
 				cardNumber: null,
 				showCardSelectModal: false,
+				showQuickCardModal:false,
 				orderId: null,
+				quickCard:'',
 				form: {
 					number: '',
 					code: ''
@@ -127,13 +136,10 @@
 				if (this.selectedPaymentMethod) {
 					this.paymentSuccessful = true;
 					if (this.selectedPaymentMethod === 'card') {
-						this.showCardSelectModal = true;
+						this.showQuickCardModal = true;
 					}
 					if (this.selectedPaymentMethod === 'Alipay') {
-						const targetUrl = `/pages/webview/webview?id=${this.orderId}`;
-						uni.navigateTo({
-							url: targetUrl
-						})
+						this.showCardSelectModal = true;
 					}
 				} else {
 					alert('Please select a payment method');
@@ -146,7 +152,21 @@
 			onStartChange(e) {
 				this.startDate = e.detail.value;
 			},
-			async submit() {
+			async submitNew(){
+				const cardRegex = /^[0-9]{13,16}$/;
+				if (!this.form.number) {
+					uni.showToast({
+						title: 'Card number is required',
+						icon: 'none'
+					});
+					return;
+				} else if (!cardRegex.test(this.form.number)) {
+					uni.showToast({
+						title: 'Card number must be between 13-16 digits',
+						icon: 'none'
+					});
+					return;
+				}
 				if (!/^\d{3}$/.test(this.form.code)) {
 					uni.showToast({
 						title: 'The security code should be three digits',
@@ -154,7 +174,7 @@
 					});
 					return;
 				}
-
+				
 				if (!this.startDate || !this.expiryDate) {
 					uni.showToast({
 						title: 'Please select the date.',
@@ -183,10 +203,48 @@
 				this.user = uni.getStorageSync('userInfo');
 				try {
 					const res = await uni.request({
-						url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
+						url: `${this.$baseURL}/api/bank-payment/newCard/${this.orderId}`,
 						method: 'POST',
 						data: {
 							bankCard: this.form.number
+						},
+						header: {
+							'Content-Type': 'application/json',
+							"Authorization": `Bearer ${token}`
+						},
+					});
+					if (res.statusCode === 200) {
+						uni.showToast({
+							title: 'Payment successful',
+							icon: 'none',
+						});
+						this.closeCardSelectModal();
+						uni.navigateTo({
+							url: "/pages/myorder/orderlist/orderlist"
+						})
+					} else {
+						uni.showToast({
+							title: res.data || 'Update failed',
+							icon: 'none',
+						});
+					}
+				} catch (err) {
+					uni.showToast({
+						title: 'Network Error',
+						icon: 'none'
+					})
+				} finally {}
+				
+			},
+			async submit() {
+				const token = String(uni.getStorageSync('token'));
+				this.user = uni.getStorageSync('userInfo');
+				try {
+					const res = await uni.request({
+						url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
+						method: 'POST',
+						data: {
+							bankCard: this.quickCard
 						},
 						header: {
 							'Content-Type': 'application/json',
@@ -220,6 +278,9 @@
 			closeCardSelectModal() {
 				this.showCardSelectModal = false;
 			},
+			closeQuickCardModal(){
+				this.showQuickCardModal = false;
+			}
 
 		}
 	};

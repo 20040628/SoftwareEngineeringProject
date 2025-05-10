@@ -54,7 +54,6 @@
 			for (const store of this.stores) {
 				await this.reverseGeocode(store);
 			}
-			console.log("mounted", this.stores)
 			this.extractLocationNames();
 		},
 		methods: {

@@ -141,4 +141,36 @@ public class BankCardPaymentController {
             return ResponseEntity.badRequest().body("Failed to query bank card: " + e.getMessage());
         }
     }
+
+    @PostMapping("/newCard/{orderId}")
+    public ResponseEntity<?> processNewBankCardPayment(@PathVariable Long orderId,
+                                                       @Valid @RequestBody BankCardPaymentRequest request){
+        try {
+            // 查找订单
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+            // 验证订单状态
+            if (order.getStatus() != 1) {
+                throw new IllegalArgumentException("Invalid order status, cannot process payment");
+            }
+
+            // 设置支付方式为银行卡
+            order.setPaymentMethod("BANK_CARD");
+            // 不添加押金信息
+            order.setDepositPaid(false);
+            // 更新订单状态为已支付
+            order.setStatus(2);
+            orderRepository.save(order);
+
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Bank card payment successful");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Payment failed: " + e.getMessage());
+        }
+    }
 } 

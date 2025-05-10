@@ -212,7 +212,7 @@
 				uni.setStorageSync('hireType', hireType);
 				uni.setStorageSync('startTime', formattedStartDate);
 				uni.setStorageSync('endTime', formattedDate);
-				if(formattedStartDate & this.selectedSite){
+				if(formattedStartDate && this.selectedSite){
 					uni.navigateTo({
 						url: '/pages/chooseCar/chooseCar'
 					});

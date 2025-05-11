@@ -24,6 +24,19 @@
           </div>
           <span class="payment-label">Alipay</span>
         </div>
+
+        <div
+            class="payment-option"
+            :class="{ selected: selectedMethod === 'OtherBankcard' }"
+            @click="handlePayment('OtherBankcard')"
+        >
+          <div class="payment-icon">
+            <img src="/static/center/bankcard.png" alt="Other bank payment cards" />
+          </div>
+          <span class="payment-label">Other bank payment cards</span>
+        </div>
+
+
       </div>
     </div>
   </div>
@@ -62,9 +75,14 @@ export default {
           this.hasError = true;
           this.errorMessage = 'Failed to initiate Alipay payment';
         }
-      } else {
+      } else if (method === 'Card') {
         this.$router.push({
           name: 'Payment',
+          params: { orderId, userId }
+        });
+      } else {
+        this.$router.push({
+          name: 'NewCard',
           params: { orderId, userId }
         });
       }
@@ -84,7 +102,7 @@ export default {
 
 .payment {
   width: 40vw;
-  min-height: 50vh;
+  min-height: 46vh;
   background-color: white;
   border: 2px solid #ccc;
   border-radius: 12px;

@@ -221,10 +221,12 @@ export default {
 
         if (res.status === 200) {
           const orderId = res.data.orderId;
+          const userId = this.bookingData.userId;
           this.resetForm();
 
+          console.log('userid',userId);
           // 跳转到支付页面
-          this.$router.push({ name: 'Payment', params: { orderId } });
+          this.$router.push({ name: 'ChoosePayment', params: { orderId, userId} });
         }
 
       } catch (error) {

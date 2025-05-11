@@ -32,7 +32,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item" v-for="v in menus" :key="v.id">
-              <a class="nav-link" :class="{ active: activeMenu === v.id }" @click="selectMenu(v.id)">
+              <a class="nav-link small-color" :class="{ active: activeMenu === v.id }" @click="selectMenu(v.id)">
                 <img :src="v.icon" alt="menu-icon" class="me-2" style="width: 28px; height: 28px;" />
                 {{ v.name }}
               </a>
@@ -163,6 +163,9 @@ export default {
 
 <style scoped>
 @import "./index.scss";
+.navbar-light .navbar-nav .nav-link{
+  color: white;
+}
 .page {
   display: flex;
   /* flex-direction: row;  */
@@ -189,14 +192,6 @@ export default {
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
-}
-
-.nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-link.active {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .nav-item img {

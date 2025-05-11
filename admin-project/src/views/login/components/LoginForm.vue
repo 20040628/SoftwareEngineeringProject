@@ -78,9 +78,41 @@ const login = async () => {
         });
       }
     } catch (error) {
-      errorMessage.value = error.response?.data?.message || "Login failed";
-      fetchCaptcha(); // 登录失败时刷新验证码
-      loginForm.captcha = ""; // 清空验证码输入
+      // 优先检查是否是字段验证错误
+      const code = error.response?.data?.code;
+      const field = error.response?.data?.field;
+      const message = error.response?.data?.message;
+      console.log("error: ", error);
+      if (code === "VALIDATION_ERROR" && field && message) {
+        // 显示具体字段的错误信息（如用户名不能为空）
+        switch (field) {
+          case "username":
+            errorMessage.value = "Username is required";
+            break;
+          case "password":
+            errorMessage.value = "Password is required";
+            break;
+          case "captcha":
+            errorMessage.value = "Captcha is required";
+            break;
+          case "captchaKey":
+            errorMessage.value = "Captcha expired, please refresh";
+            break;
+          default:
+            errorMessage.value = message;
+        }
+      } else if (code === "INVALID_CREDENTIALS") {
+        errorMessage.value = message || "Username or password incorrect";
+      } else if (code === "INVALID_CAPTCHA") {
+        errorMessage.value = "Captcha incorrect";
+      } else {
+        // 默认错误信息
+        errorMessage.value = message || "Login failed";
+      }
+
+      // 刷新验证码
+      fetchCaptcha();
+      loginForm.captcha = "";
     } finally {
       loading.value = false;
     }

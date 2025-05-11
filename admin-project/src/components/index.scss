@@ -57,6 +57,7 @@ $sidebar-width: 250px; // 侧边栏宽度
       margin: 5px 0;
       border-radius: 8px;
       cursor: pointer;
+
       transition: background 0.3s ease-in-out;
 
       image {
@@ -96,6 +97,10 @@ $sidebar-width: 250px; // 侧边栏宽度
 
 // 响应式布局
 @media screen and (max-width: 992px) {
+  .user span{
+    color: white;
+    font-weight: bold;
+  }
   .page {
     flex-direction: column;
   }
@@ -107,8 +112,14 @@ $sidebar-width: 250px; // 侧边栏宽度
     justify-content: space-around;
     padding: 10px 0;
     box-shadow: none;
+    color: white;
   }
-
+  .small-color{
+    color: white;
+  }
+  .nav-item{
+    color: white !important;
+  }
   .menu {
     flex-direction: row;
     width: 100%;

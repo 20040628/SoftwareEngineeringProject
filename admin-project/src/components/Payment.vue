@@ -80,6 +80,7 @@ export default {
         cvc: '',
         expiryDate: ''
       },
+      user: null, // 用于存储用户信息
       errors: {},
       hasError: false,
       errorMessage: '',
@@ -137,6 +138,28 @@ export default {
       try {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         const orderId = this.$route.params.orderId;
+        const response = await axios.get('/api/bookings/getAll', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+        if (response.status === 200) {
+          const res = response.data[orderId-1];
+          this.user = res.user;
+          console.log(response.data)
+          console.log(this.user)
+        }
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        // 处理错误，例如显示错误消息
+      }
+
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const orderId = this.$route.params.orderId;
+        const userId = this.$route.params.userId;
+        console.log(`orderId: ${orderId}`);
+        console.log(`userId: ${userId}`);
 
         if (!token) {
           this.errorMessage = 'Please login first';
@@ -144,11 +167,13 @@ export default {
           return;
         }
 
+        console.log("userBankCardResponse: ",this.user.bankCard)
         const payload = {
-          securityCode: 123456
+          bankCard: this.user.bankCard
         };
 
         console.log('Request Payload:', payload);
+        console.log('orderId:', orderId);
 
         const res = await axios.post(`http://localhost:8080/api/bank-payment/${orderId}`, payload, {
           headers: {
@@ -157,46 +182,23 @@ export default {
           }
         });
 
-        if (res.status === 200) {
+        if (res.status === 200 && res.data.success) {
           ElNotification({
             title: "Payment Successful",
-            message: 'Your payment has been processed',
+            message: `Your payment of ${res.data.amount} yuan has been processed using card ending in${res.data.bankCardLast4}`,
             type: "success"
           });
           this.$router.push('/add_order');
+        } else {
+          this.errorMessage = res.data.message || 'Payment failed';
         }
 
       } catch (error) {
-        console.error('Payment error:', error);
-        if (error.response) {
-          console.error('Server Response:', error.response.data);
-          switch (error.response.status) {
-            case 400:
-              this.errors = error.response.data || {};
-              if (error.response.data.message) {
-                this.errorMessage = 'Error: ' + error.response.data.message;
-              } else {
-                this.errorMessage = 'Invalid payment details';
-              }
-              break;
-            case 401:
-              localStorage.removeItem('token');
-              sessionStorage.removeItem('token');
-              this.errorMessage = 'Session expired. Please login again.';
-              this.$router.push('/add_order');
-              break;
-            case 403:
-              this.errorMessage = 'Forbidden: You do not have permission to perform this action';
-              break;
-            default:
-              this.errorMessage = `Error: ${error.response.data?.message || 'Payment failed'}`;
-          }
-        } else {
-          this.errorMessage = 'Network error: Please check your connection';
-        }
-        this.hasError = true;
+        console.error('Payment Error:', error.response);
+        this.errorMessage = error.response?.data?.message || error.message || 'Failed to process payment';
       }
     }
+
 
   },
   mounted() {

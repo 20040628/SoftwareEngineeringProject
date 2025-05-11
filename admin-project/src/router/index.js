@@ -6,6 +6,7 @@ const UserLogin = () => import('../views/login/index.vue')
 const MainLayout = () => import('@/components/MainLayout.vue')
 const Payment = () => import('@/components/Payment.vue')
 const EditScooter = () => import('@/components/EditScooter.vue')
+const ChoosePayment = () => import('@/components/ChoosePayment.vue')
 
 // 路由配置
 const routes = [
@@ -44,9 +45,14 @@ const routes = [
     ],
   },
   {
-    path: '/payment/:orderId',
+    path: '/payment/:orderId/:userId',
     name: 'Payment',
     component: Payment,
+  },
+  {
+    path: '/ChoosePayment/:orderId/:userId',
+    name: 'ChoosePayment',
+    component: ChoosePayment,
   },
   {
     path: '/:pathMatch(.*)*',

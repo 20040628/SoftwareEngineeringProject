@@ -5,7 +5,6 @@
       <div class="status-filter">
         <label for="status-select">Filter by Status:</label>
         <select id="status-select" v-model="statusFilter" @change="filterBookings">
-          <option value="all">ALL</option>
           <option value="1">CREATED</option>
           <option value="2">PAID</option>
           <option value="3">COMPLETED</option>
@@ -142,7 +141,7 @@ export default {
       itemsPerPage: 7,
       inputPage: 1,
       searchQuery: '',
-      statusFilter: 'all',
+      statusFilter: '1',
       showActionsColumn: true,
       error: null
     };
@@ -187,7 +186,7 @@ export default {
   methods: {
     resetSearch() {
       this.searchQuery = '';
-      this.statusFilter = 'all';
+      this.statusFilter = '1';
       this.filterBookings();
     },
 
@@ -241,7 +240,7 @@ export default {
         console.log("Processed bookings:", this.bookings);
 
         // Default disable filter
-        this.statusFilter = 'all';
+        this.statusFilter = '1';
         this.searchQuery = '';
         this.filterBookings();
       } catch (error) {
@@ -298,7 +297,7 @@ export default {
     formatDateForSearch(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
-      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
     },
 
     resetPagination() {
@@ -361,10 +360,10 @@ export default {
 
     getStatusClass(status) {
       const statusClassMap = {
-        1: 'CREATED',
-        2: 'PAID',
-        3: 'COMPLETED',
-        4: 'CANCELLED'
+        1: 'status-created',
+        2: 'status-paid',
+        3: 'status-completed',
+        4: 'status-cancelled'
       };
       return statusClassMap[status] || 'status-unknown';
     }
@@ -528,27 +527,22 @@ export default {
   text-transform: uppercase;
 }
 
-.CREATED {
+.status-created {
   background-color: #016025;
   color: white;
 }
 
-.PAID {
+.status-paid{
   background-color: #10026e;
   color: white;
 }
 
-.ACTIVE {
-  background-color: #950202;
-  color: white;
-}
-
-.COMPLETED {
+.status-completed {
   background-color: #026e6a;
   color: white;
 }
 
-.CANCELLED {
+.status-cancelled {
   background-color: #033161;
   color: white;
 }

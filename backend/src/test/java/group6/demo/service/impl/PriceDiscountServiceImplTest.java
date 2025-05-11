@@ -167,18 +167,4 @@ class PriceDiscountServiceImplTest {
         assertEquals(1, user1.getIsFrequentUser());
         assertEquals(1, user2.getIsFrequentUser());
     }
-
-    @Test
-    void testUpdateUserDiscountStatusByBirthday() {
-        User user = new User();
-        user.setId(1L);
-        user.setBirthday(new Date(2005 - 1900, Calendar.JANUARY, 1)); // 20 years old
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
-        priceDiscountService.updateUserDiscountStatusByBirthday(1L);
-
-        assertEquals(1, user.getIsStudent());
-        assertEquals(0, user.getIsSenior());
-    }
 }

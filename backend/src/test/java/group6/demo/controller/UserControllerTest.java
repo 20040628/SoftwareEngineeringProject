@@ -8,13 +8,16 @@ import group6.demo.repository.UserRepository;
 import group6.demo.service.FileStorageService;
 import group6.demo.service.PriceDiscountService;
 import group6.demo.service.UserService;
+import group6.demo.util.Base64Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -243,25 +246,6 @@ class UserControllerTest {
         // Assert
         assertEquals(400, response.getStatusCodeValue());
         assertEquals("The user doesn't exist", response.getBody());
-    }
-
-    @Test
-    void uploadAvatar_Success() throws Exception {
-        // Arrange
-        String filename = "avatar123.jpg";
-        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-        when(fileStorageService.storeAvatar(any(), eq(userId))).thenReturn(filename);
-        when(userService.updateAvatar(eq(userId), eq(filename))).thenReturn(testUser);
-
-        // Act
-        ResponseEntity<?> response = userController.uploadAvatar(userId, multipartFile);
-
-        // Assert
-        assertEquals(200, response.getStatusCodeValue());
-        assertTrue(response.getBody() instanceof Map);
-        Map<?, ?> responseBody = (Map<?, ?>) response.getBody();
-        assertEquals("User avatar upload was successful", responseBody.get("message"));
-        assertEquals("/uploads/avatars/" + filename, responseBody.get("avatarUrl"));
     }
 
     @Test

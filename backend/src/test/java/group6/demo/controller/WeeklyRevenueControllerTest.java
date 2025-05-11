@@ -1,5 +1,6 @@
 package group6.demo.controller;
 
+import group6.demo.config.TestingModeConfig;
 import group6.demo.dto.DailyRevenueDTO;
 import group6.demo.dto.WeeklyRevenueDTO;
 import group6.demo.service.WeeklyRevenueService;
@@ -11,11 +12,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class WeeklyRevenueControllerTest {
@@ -25,6 +28,9 @@ class WeeklyRevenueControllerTest {
 
     @Mock
     private JwtUtil jwtUtil;
+
+    @Mock
+    private TestingModeConfig testingModeConfig;
 
     @InjectMocks
     private WeeklyRevenueController weeklyRevenueController;
@@ -227,5 +233,120 @@ class WeeklyRevenueControllerTest {
         assertEquals("invalid token: invalid token", response.getBody());
         verify(jwtUtil, times(1)).extractRole("invalidToken");
         verify(weeklyRevenueService, times(0)).getDailyRevenuesInWeek(any(Date.class));
+    }
+
+    @Test
+    void testGetDailyRevenuesByDateRange_ValidToken() {
+        String token = "Bearer validToken";
+        Integer role = 0;
+        Date startDate = new Date();
+        Date endDate = new Date();
+        List<DailyRevenueDTO> dailyRevenues = List.of(new DailyRevenueDTO(), new DailyRevenueDTO());
+
+        when(jwtUtil.extractRole("validToken")).thenReturn(role);
+        when(weeklyRevenueService.getDailyRevenuesByDateRange(startDate, endDate)).thenReturn(dailyRevenues);
+
+        ResponseEntity<?> response = weeklyRevenueController.getDailyRevenuesByDateRange(token, startDate, endDate);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(dailyRevenues, response.getBody());
+        verify(jwtUtil, times(1)).extractRole("validToken");
+        verify(weeklyRevenueService, times(1)).getDailyRevenuesByDateRange(startDate, endDate);
+    }
+
+    @Test
+    void testGetDailyRevenuesByDateRange_InvalidToken() {
+        String token = "Bearer invalidToken";
+        Date startDate = new Date();
+        Date endDate = new Date();
+
+        when(jwtUtil.extractRole("invalidToken")).thenThrow(new io.jsonwebtoken.JwtException("invalid token"));
+
+        ResponseEntity<?> response = weeklyRevenueController.getDailyRevenuesByDateRange(token, startDate, endDate);
+
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals("invalid token: invalid token", response.getBody());
+        verify(jwtUtil, times(1)).extractRole("invalidToken");
+        verify(weeklyRevenueService, times(0)).getDailyRevenuesByDateRange(any(Date.class), any(Date.class));
+    }
+
+    @Test
+    void testGetRecentDailyRevenues_ValidToken() {
+        String token = "Bearer validToken";
+        Integer role = 0;
+        int days = 7;
+        List<DailyRevenueDTO> dailyRevenues = List.of(new DailyRevenueDTO(), new DailyRevenueDTO());
+
+        when(jwtUtil.extractRole("validToken")).thenReturn(role);
+        when(weeklyRevenueService.getRecentDailyRevenues(days)).thenReturn(dailyRevenues);
+
+        ResponseEntity<?> response = weeklyRevenueController.getRecentDailyRevenues(token, days);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(dailyRevenues, response.getBody());
+        verify(jwtUtil, times(1)).extractRole("validToken");
+        verify(weeklyRevenueService, times(1)).getRecentDailyRevenues(days);
+    }
+
+    @Test
+    void testGetRecentDailyRevenues_InvalidToken() {
+        String token = "Bearer invalidToken";
+        int days = 7;
+
+        when(jwtUtil.extractRole("invalidToken")).thenThrow(new io.jsonwebtoken.JwtException("invalid token"));
+
+        ResponseEntity<?> response = weeklyRevenueController.getRecentDailyRevenues(token, days);
+
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals("invalid token: invalid token", response.getBody());
+        verify(jwtUtil, times(1)).extractRole("invalidToken");
+        verify(weeklyRevenueService, times(0)).getRecentDailyRevenues(anyInt());
+    }
+
+    @Test
+    void testUpdateDailyRevenue_InvalidToken() {
+        String token = "Bearer invalidToken";
+
+        when(jwtUtil.extractRole("invalidToken")).thenThrow(new io.jsonwebtoken.JwtException("invalid token"));
+
+        ResponseEntity<?> response = weeklyRevenueController.updateDailyRevenue(token);
+
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals("invalid token: invalid token", response.getBody());
+        verify(jwtUtil, times(1)).extractRole("invalidToken");
+        verify(weeklyRevenueService, times(0)).generateAndSaveDailyRevenue(any(Date.class));
+    }
+
+    @Test
+    void testGenerateDailyRevenue_ValidToken() {
+        String token = "Bearer validToken";
+        Integer role = 0;
+        Date date = new Date();
+        DailyRevenueDTO dailyRevenue = new DailyRevenueDTO();
+
+        when(jwtUtil.extractRole("validToken")).thenReturn(role);
+        when(weeklyRevenueService.generateAndSaveDailyRevenue(date)).thenReturn(dailyRevenue);
+
+        ResponseEntity<?> response = weeklyRevenueController.generateDailyRevenue(token, date);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(dailyRevenue, response.getBody());
+        verify(jwtUtil, times(1)).extractRole("validToken");
+        verify(weeklyRevenueService, times(1)).generateAndSaveDailyRevenue(date);
+    }
+
+    @Test
+    void testGenerateDailyRevenue_InvalidToken() {
+        String token = "Bearer invalidToken";
+        Date date = new Date();
+
+        when(jwtUtil.extractRole("invalidToken")).thenThrow(new io.jsonwebtoken.JwtException("invalid token"));
+
+        ResponseEntity<?> response = weeklyRevenueController.generateDailyRevenue(token, date);
+
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals("invalid token: invalid token", response.getBody());
+        verify(jwtUtil, times(1)).extractRole("invalidToken");
+        verify(weeklyRevenueService, times(0)).generateAndSaveDailyRevenue(any(Date.class));
     }
 }

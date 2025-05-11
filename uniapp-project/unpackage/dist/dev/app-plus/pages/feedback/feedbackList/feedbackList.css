@@ -33,12 +33,12 @@ body {
   margin-right: 3.125rem;
 }
 .text-time {
-  color: #909193;
+  color: #014d87;
   font-size: 0.75rem;
   margin-top: 0.75rem;
 }
 .text-tips {
-  color: #bcbcbc;
+  color: #014d87;
   font-size: 0.75rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -78,7 +78,7 @@ body {
 }
 .no-feedback {
   text-align: center;
-  color: #888;
+  color: #014d87;
   padding: 20px;
   font-size: 16px;
 }

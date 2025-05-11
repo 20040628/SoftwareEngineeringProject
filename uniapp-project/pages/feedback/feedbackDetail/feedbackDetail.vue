@@ -2,11 +2,6 @@
 	<view>
 		<view class="white">
 			<view class="text-black">{{feedback.content}}</view>
-			<!-- <view class="img-row" >
-				<view v-for="(item,index) in feedback.images" :key="index" @click="catImage(index)">
-					<image :src="item.url" class="image" mode="aspectFill"> </image>
-				</view>
-			</view> -->
 			<view class="text-time">{{feedback.createTime.replace('T', ' ')}} submitted</view>
 
 		</view>
@@ -84,13 +79,6 @@
 
 
 			}
-			// catImage(index) {
-			// 	uni.navigateTo({
-			// 		url: '/pages/feedback/showImage/showImage?imgs=' + JSON.stringify(this.feedback.images) + '&current=' +
-			// 			index,
-			// 		animationType: "fade-in",
-			// 	})
-			// }
 
 		}
 	}
@@ -115,7 +103,7 @@
 	}
 
 	.text-time {
-		color: #909193;
+		color: #014d87;
 		font-size: 24rpx;
 		text-align: end;
 		margin-top: 30rpx;

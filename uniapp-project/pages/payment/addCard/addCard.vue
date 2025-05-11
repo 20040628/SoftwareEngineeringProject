@@ -2,9 +2,8 @@
   <view class="container">
     <view class="form-item">
       <text class="label">Card Number</text>
-      <input class="input" v-model="card.cardNumber" type="number" placeholder="Please enter the number(13-19)" />
+      <input class="input" v-model="card.cardNumber" type="number" placeholder="Please enter the number(13-19)":placeholder-style="placeholderStyle" />
     </view>
-
     <button class="submit-btn" @click="submitCard">Submit</button>
   </view>
 </template>
@@ -17,13 +16,12 @@ export default {
         cardNumber: '',
       },
       user: null,
-      isLoading: false,  // 处理加载状态
+      isLoading: false, 
+	  placeholderStyle: 'color: #2c3e50; font-size: 14px;'
     };
   },
   methods: {
-    // 提交银行卡信息
     async submitCard() {
-      // 校验银行卡号是否填写完整
       if (!this.card.cardNumber) {
         uni.showToast({
           title: 'Please complete the bank card information',
@@ -31,8 +29,14 @@ export default {
         });
         return;
       }
-
-      // 获取 token 和用户信息
+	  const cardRegex = /^[0-9]{13,16}$/;
+	  if (!cardRegex.test(this.card.cardNumber)) {
+		  uni.showToast({
+		    title: 'Card number must be between 13-16 digits',
+		    icon: 'none',
+		  });
+		  return;
+	  }
       const token = uni.getStorageSync('token');
       this.user = uni.getStorageSync('userInfo');
 
@@ -44,16 +48,15 @@ export default {
         return;
       }
 
-      // 开始请求
       try {
-        this.isLoading = true; // 设置加载状态
+        this.isLoading = true;
         uni.showLoading({ title: "Loading...", mask: true });
 
         const res = await uni.request({
           url: `${this.$baseURL}/api/users/updateBankCard/${this.user.userId}`,
           method: 'POST',
           data: {
-            bankCard: this.card.cardNumber, // 使用正确的 cardNumber
+            bankCard: this.card.cardNumber,
           },
           header: {
             'Content-Type': 'application/json',
@@ -61,7 +64,6 @@ export default {
           },
         });
 
-        // 假设接口返回的数据为 res.data
         if (res.data.success) {
           uni.showToast({
             title: 'Bank card updated successfully',
@@ -74,7 +76,7 @@ export default {
           });
         }
       } catch (err) {
-        console.error(err); // 打印错误，便于调试
+        console.error(err); 
         uni.showToast({
           title: 'Network error',
           icon: 'none',
@@ -83,10 +85,6 @@ export default {
         uni.hideLoading();
         this.isLoading = false;
       }
-
-      console.log('Submitted bank card information:', this.card);
-
-      // 模拟提交成功后返回上一页
       uni.navigateBack();
     },
   },

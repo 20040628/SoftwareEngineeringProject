@@ -38,7 +38,7 @@
 		          ScootGo reserves the right to suspend or terminate your account if any suspicious, illegal, or abusive behavior is detected.</p>
 		          <p><b>8. Changes to Terms</b><br />
 		          We may update these terms from time to time. Continued use of the app after any changes constitutes acceptance of the new terms.</p>
-		          <p>If you have any questions or concerns regarding these Terms, please contact us at <a href="mailto:support@scootgo.com">support@scootgo.com</a>.</p>
+		          <p>If you have any questions or concerns regarding these Terms, please contact us.</p>
 		          <p>Thank you for choosing ScootGo!</p>
 		        </div>
 		      `

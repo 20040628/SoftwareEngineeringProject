@@ -91,6 +91,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private void sendResetEmail(User user, String resetCode) {
         // 构建并发送邮件
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("E-Scooter Rental System <bc_somebody@qq.com>");
         message.setTo(user.getEmail());
         message.setSubject("Password Reset Verification Code");
         message.setText("Dear " + user.getUsername() + ",\n\n" +

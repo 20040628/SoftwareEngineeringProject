@@ -36,7 +36,6 @@
 			this.getUserFeedback();
 		},
 		methods: {
-			//获取用户意见反馈列表
 			async getUserFeedback() {
 				try{
 					const token = String(uni.getStorageSync('token'));
@@ -49,7 +48,7 @@
 					if (res.statusCode === 200) {
 					    this.feedbacks = res.data; 
 					  } else {
-					    uni.showToast({ title: '数据加载失败', icon: 'none' });
+					    uni.showToast({ title: 'Data loading failed', icon: 'none' });
 					  }
 				} catch (err) {
 					  uni.showToast({ title: 'Network Error', icon: 'none' });
@@ -100,13 +99,13 @@
 	}
 
 	.text-time {
-		color: #909193;
+		color: #014d87;
 		font-size: 24rpx;
 		margin-top: 24rpx;
 	}
 
 	.text-tips {
-		color: #bcbcbc;
+		color: #014d87;
 		font-size: 24rpx;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -154,7 +153,7 @@
 	}
 	.no-feedback {
 	    text-align: center;
-	    color: #888;
+	    color: #014d87;
 	    padding: 20px;
 	    font-size: 16px;
 	}

@@ -15,10 +15,6 @@
 		                        url:"../../../pages/information/change/changeAccount"
 		                    },
 		                    {
-		                        name: "Modify personal information",
-		                        url:"../../../pages/information/change/changeInfo"
-		                    },
-		                    {
 		                        name: "About APP",
 		                        url:"../../../pages/information/app/app"
 		                    },

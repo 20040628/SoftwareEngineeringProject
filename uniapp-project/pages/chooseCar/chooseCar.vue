@@ -107,13 +107,11 @@
 							"Authorization": `Bearer ${token}`
 						},
 					});
-					console.log("scooter", res.data)
 
 					if (res.statusCode === 200) {
 						this.scooters = res.data;
 					} else {
 						this.error = res.data
-						console.log("this.error", this.error)
 						uni.showToast({
 							title: `${res.data}`,
 							icon: 'none'
@@ -200,7 +198,7 @@
 		font-weight: 600;
 		color: #555;
 	}
-	
+
 	.arrow-icon {
 		width: 16rpx;
 		height: 16rpx;

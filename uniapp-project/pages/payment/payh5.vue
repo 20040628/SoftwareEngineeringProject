@@ -114,7 +114,7 @@
 					});
 					if (res.statusCode === 200) {
 						this.order = res.data
-						console.log(this.order.priceBeforeDiscount)
+
 						this.discount = this.order.priceBeforeDiscount - this.order.price
 					} else {
 						uni.showToast({
@@ -170,7 +170,7 @@
 							duration: 1000
 						});
 					}
-					uni.reLaunch({
+					uni.navigateTo({
 						url: '/pages/myorder/orderlist/orderlist',
 					});
 				} catch (err) {

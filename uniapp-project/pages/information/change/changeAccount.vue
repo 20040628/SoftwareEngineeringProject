@@ -14,14 +14,6 @@
 		                        name: "Reset Password",
 		                        url:"../../../pages/information/resetPassword/resetPassword"
 		                    },
-		                    {
-		                        name: "Change Email",
-		                        url:"../../../pages/information/change/changeInfo"
-		                    },
-		                    {
-		                        name: "About APP",
-		                        url:"../../../pages/information/app/app"
-		                    },
 		                ]
 		            }
 		        },

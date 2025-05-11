@@ -1,5 +1,5 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/JudeLoginPage/JudeLoginPage",
 			"style": {
@@ -97,19 +97,6 @@
 
 		},
 		{
-			"path": "pages/feedback/showImage/showImage",
-			"style": {
-				"navigationBarTitleText": "图片预览",
-				"enablePullDownRefresh": false,
-				"navigationBarTextStyle": "white",
-				"navigationBarBackgroundColor": "#000000",
-				"app-plus": {
-					"animationType": "fade-in",
-					"animationDuration": 300
-				}
-			}
-		},
-		{
 			"path": "pages/myorder/orderlist/orderlist"
 		},
 		{
@@ -123,13 +110,25 @@
 			}
 		},
 		{
-			"path": "pages/myorder/unuse/unuse"
+			"path": "pages/myorder/unuse/unuse",
+			"style": {
+				"navigationBarTitleText": "Unuse",
+				"enablePullDownRefresh": false
+			}
 		},
 		{
-			"path": "pages/myorder/doing/doing"
+			"path": "pages/myorder/doing/doing",
+			"style": {
+				"navigationBarTitleText": "Doing",
+				"enablePullDownRefresh": false
+			}
 		},
 		{
-			"path": "pages/myorder/done/done"
+			"path": "pages/myorder/done/done",
+			"style": {
+				"navigationBarTitleText": "Done",
+				"enablePullDownRefresh": false
+			}
 		},
 		{
 			"path": "pages/payment/choosePay/choosePay"
@@ -151,9 +150,6 @@
 		},
 		{
 			"path": "pages/information/set/set"
-		},
-		{
-			"path": "pages/information/change/changeInfo"
 		},
 		{
 			"path": "pages/information/change/changeAccount"

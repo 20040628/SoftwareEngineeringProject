@@ -459,6 +459,42 @@
   }
   ```
 
+#### new bank card pay
+
+- **URL**: `/api/bank-payment/newCard/{orderId}`
+
+- **Method**: `POST`
+
+- **Request Body**:
+
+  ```
+  {
+    "bankCard": "string"  // 卡号
+  }
+  ```
+
+  **Success Response** (200 OK):
+
+  ```
+  {
+      "message": "Bank card payment successful"
+  }
+  ```
+
+  **Error Response**:
+
+  ```
+  {
+  	"Order not found"
+  }
+  or
+  {
+      "Invalid order status, cannot process payment"
+  }
+  ```
+
+  ​
+
 #### Return Scooter
 
 - **URL**: `/api/bookings/return`

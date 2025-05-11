@@ -142,12 +142,12 @@
 		watch: {
 			datetimesingle(newval) {
 				console.log("load");
-				uni.setStorageSync("datetimesingle",this.datetimesingle)
+				uni.setStorageSync("datetimesingle", this.datetimesingle)
 			},
 		},
 		mounted() {
 			this.loadSelectedSite();
-			if(uni.getStorageSync('datetimesingle')){
+			if (uni.getStorageSync('datetimesingle')) {
 				this.datetimesingle = uni.getStorageSync('datetimesingle');
 			}
 		},
@@ -183,19 +183,19 @@
 				let endDate;
 				switch (hireType) {
 					case 'HOUR':
-						endDate = new Date(startDate.getTime() + 1 * 60 * 60 * 1000); 
+						endDate = new Date(startDate.getTime() + 1 * 60 * 60 * 1000);
 						break;
 					case 'FOUR_HOURS':
-						endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); 
+						endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000);
 						break;
 					case 'DAY':
 						endDate = new Date(startDate.getTime() + 1 * 24 * 60 * 60 * 1000);
 						break;
 					case 'WEEK':
-						endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000); 
+						endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
 						break;
 					default:
-						endDate = startDate; 
+						endDate = startDate;
 				}
 				let formattedStartDate = startDate.getFullYear() + '-' +
 					(startDate.getMonth() + 1).toString().padStart(2, '0') + '-' +
@@ -212,10 +212,16 @@
 				uni.setStorageSync('hireType', hireType);
 				uni.setStorageSync('startTime', formattedStartDate);
 				uni.setStorageSync('endTime', formattedDate);
-				uni.navigateTo({
-					url: '/pages/chooseCar/chooseCar'
-				});
-
+				if(formattedStartDate && this.selectedSite){
+					uni.navigateTo({
+						url: '/pages/chooseCar/chooseCar'
+					});
+				}else{
+					uni.showToast({
+						title: 'Please select both date and store',
+						icon: 'none'
+					})
+				}
 			},
 			instruction(e) {
 				uni.navigateTo({
@@ -393,12 +399,12 @@
 		box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.15);
 		transition: transform 0.2s ease, box-shadow 0.2s ease;
 	}
-	
+
 	.instruction:hover {
 		transform: scale(1.04);
 		box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.2);
 	}
-	
+
 	.text {
 		font-size: 34rpx;
 		font-weight: 600;
@@ -406,11 +412,11 @@
 		margin-right: 16rpx;
 		letter-spacing: 1rpx;
 	}
-	
+
 	.arrow {
 		transform: translateY(-2rpx);
 	}
-	
+
 	.discount-container {
 		margin: 30rpx;
 		padding: 32rpx 24rpx;
@@ -418,7 +424,7 @@
 		border-radius: 20rpx;
 		box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.08);
 	}
-	
+
 	.discount-title {
 		font-size: 36rpx;
 		font-weight: 700;
@@ -426,11 +432,11 @@
 		margin-bottom: 28rpx;
 		text-align: center;
 	}
-	
+
 	.table {
 		width: 100%;
 	}
-	
+
 	.table-header {
 		display: flex;
 		background-color: #2c3e50;
@@ -440,12 +446,12 @@
 		font-size: 28rpx;
 		font-weight: bold;
 	}
-	
+
 	.header-item {
 		flex: 1;
 		text-align: center;
 	}
-	
+
 	.table-row {
 		display: flex;
 		background-color: #f9f9f9;
@@ -454,13 +460,13 @@
 		font-size: 26rpx;
 		color: black;
 	}
-	
+
 	.row-item {
 		flex: 1;
 		text-align: left;
 		line-height: 1.6;
 	}
-	
+
 	.note {
 		font-size: 26rpx;
 		color: black;
@@ -468,5 +474,4 @@
 		text-align: center;
 		font-style: italic;
 	}
-
 </style>

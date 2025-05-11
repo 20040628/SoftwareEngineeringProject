@@ -91,7 +91,7 @@
 					1: "available",
 					2: "maintenance",
 				};
-				return statusMap[this.scooter.status] || "unknown"; // 默认值
+				return statusMap[this.scooter.status] || "unknown";
 			},
 
 			statusText() {
@@ -131,7 +131,6 @@
 				return 0;
 			},
 
-			// 返回价格的单位标签
 			getPriceLabel() {
 				switch (this.hireType) {
 					case 'HOUR':
@@ -253,7 +252,7 @@
 						uni.showToast({
 							title: 'Book successful!',
 							icon: 'none',
-							duration: 2000 
+							duration: 2000
 						});
 						await this.handlePay(res.data);
 					} else {
@@ -365,7 +364,7 @@
 		}
 	}
 
-	
+
 	.address-section {
 		padding: 20px 15px;
 	}

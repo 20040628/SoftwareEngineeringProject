@@ -1,9 +1,8 @@
 <template>
   <view class="container">
-    <!-- 银行卡列表 -->
     <view class="card-list">
       <view class="card">
-        <view class="card-info">
+        <view class="card-info" v-if="card">
           <text class="card-number">
             {{ card.maskedCard}}
           </text>
@@ -11,8 +10,7 @@
       </view>
     </view>
 
-    <!-- 添加银行卡按钮 -->
-    <button class="add-card-btn" @click="addCard">Update a bank card</button>
+    <button class="add-card-btn" @click="addCard">Update the Card</button>
   </view>
 </template>
 
@@ -26,12 +24,15 @@ export default {
   onLoad(){
 	  this.getCard()
   },
+  mounted() {
+  	 this.getCard()
+  },
   methods: {
      async getCard(){
 		const token = String(uni.getStorageSync('token'));
 		this.user = uni.getStorageSync('userInfo');
 		try {
-			uni.showLoading({ title: "加载中...", mask: true });
+			uni.showLoading({ title: "Loading...", mask: true });
 		    const res = await uni.request({
 		        url: `${this.$baseURL}/api/bank-payment/check-card/${this.user.userId}`,
 		        method: 'GET',
@@ -54,10 +55,6 @@ export default {
 	  	url: '../addCard/addCard'
 	  })
     },
-    // 隐藏卡号的部分数字，显示星号
-    maskCardNumber(cardNumber) {
-      return cardNumber.slice(0, 4) + ' **** **** ' + cardNumber.slice(-4);
-    }
   }
 };
 </script>

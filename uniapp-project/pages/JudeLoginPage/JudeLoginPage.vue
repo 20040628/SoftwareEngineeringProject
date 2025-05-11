@@ -55,7 +55,6 @@
 	}
 </script>
 
-
 <style>
 	.container {
 		flex-direction: column;
@@ -81,6 +80,6 @@
 
 	.loading-text {
 		font-size: 28rpx;
-		color: #888888;
+		color: #000000;
 	}
 </style>

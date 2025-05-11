@@ -157,55 +157,6 @@
   margin-bottom: 1.25rem;
   padding: 0.625rem 0 0 0.625rem;
 }
-.my-car_add[data-v-4d518d9c],
-.my-car_model[data-v-4d518d9c] {
-  margin: 0.9375rem 1.25rem 0.625rem;
-  border-radius: 0.375rem;
-  background-color: #FFFFFF;
-}
-.my-car_add[data-v-4d518d9c] {
-  padding: 0.625rem;
-}
-.car-add_label[data-v-4d518d9c] {
-  font-size: 0.875rem;
-  color: #333333;
-  font-weight: bold;
-  line-height: 1.25rem;
-}
-.car-add_text[data-v-4d518d9c],
-.info-text[data-v-4d518d9c] {
-  color: #666666;
-}
-.car-add_text[data-v-4d518d9c]:active {
-  color: #333;
-}
-.car-add_img[data-v-4d518d9c] {
-  display: block;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-left: 0.25rem;
-}
-.my-car_model[data-v-4d518d9c] {
-  padding: 0.5rem 0.625rem;
-}
-.info-title[data-v-4d518d9c] {
-  margin-bottom: 0.1875rem;
-  font-size: 1rem;
-  color: #333333;
-  line-height: 1.375rem;
-  font-weight: bold;
-}
-.info-title_subtitle[data-v-4d518d9c],
-.car-add_text[data-v-4d518d9c],
-.info-text[data-v-4d518d9c] {
-  font-size: 0.75rem;
-  line-height: 1.0625rem;
-}
-.info-img[data-v-4d518d9c] {
-  display: block;
-  width: 6.25rem;
-  height: 3.5rem;
-}
 .my-more_box[data-v-4d518d9c] {
   margin: 0 1.25rem;
   border-radius: 0.375rem;

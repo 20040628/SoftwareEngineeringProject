@@ -39,7 +39,6 @@ class BankCardPaymentControllerTest {
     private User testUser;
     private final Long orderId = 1L;
     private final Long userId = 1L;
-    private BankCardPaymentRequest validRequest;
 
     @BeforeEach
     void setUp() {
@@ -52,12 +51,8 @@ class BankCardPaymentControllerTest {
         testOrder.setId(orderId);
         testOrder.setUser(testUser);
         testOrder.setPrice(new BigDecimal("100.00"));
-        testOrder.setStatus(1); // Active status
-
-        validRequest = new BankCardPaymentRequest();
-        validRequest.setBankCard("1234567890123456");
+        testOrder.setStatus(1); // CREATED status
     }
-
 
     @Test
     void processBankCardPayment_OrderNotFound() {
@@ -65,7 +60,7 @@ class BankCardPaymentControllerTest {
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
         // Act
-        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
@@ -77,11 +72,11 @@ class BankCardPaymentControllerTest {
     @Test
     void processBankCardPayment_InvalidOrderStatus() {
         // Arrange
-        testOrder.setStatus(2); // Completed status
+        testOrder.setStatus(2); // PAID status
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
 
         // Act
-        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
@@ -97,7 +92,7 @@ class BankCardPaymentControllerTest {
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
 
         // Act
-        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
@@ -109,31 +104,15 @@ class BankCardPaymentControllerTest {
     @Test
     void processBankCardPayment_InsufficientBalance() {
         // Arrange
-        testUser.setBankBalance(new BigDecimal("100.00")); // Not enough for order + deposit
+        testUser.setBankBalance(new BigDecimal("100.00")); // Not enough for order (100) + deposit (50)
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
 
         // Act
-        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
         assertEquals("Insufficient bank card balance, payment failed", response.getBody());
-        verify(orderRepository).findById(orderId);
-        verifyNoMoreInteractions(userRepository, orderRepository);
-    }
-
-    @Test
-    void processBankCardPayment_InvalidBankCard() {
-        // Arrange
-        validRequest.setBankCard("123"); // Invalid length
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
-
-        // Act
-        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
-
-        // Assert
-        assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Invalid bank card", response.getBody());
         verify(orderRepository).findById(orderId);
         verifyNoMoreInteractions(userRepository, orderRepository);
     }
@@ -146,7 +125,7 @@ class BankCardPaymentControllerTest {
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // Act
-        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId, validRequest);
+        ResponseEntity<?> response = bankCardPaymentController.processBankCardPayment(orderId);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
@@ -155,9 +134,12 @@ class BankCardPaymentControllerTest {
         assertTrue(responseBody.isSuccess());
         assertEquals(orderId, responseBody.getOrderId());
         assertEquals("3456", responseBody.getBankCardLast4());
+        assertEquals(new BigDecimal("150.00"), responseBody.getAmount()); // 100 + 50 deposit
         assertEquals("BANK_CARD", testOrder.getPaymentMethod());
-        assertEquals(2, testOrder.getStatus()); // 检查状态是否更新为已支付未开始(2)
+        assertEquals(2, testOrder.getStatus()); // Check status updated to PAID
         assertTrue(testOrder.getDepositPaid());
+        assertEquals(new BigDecimal("50.00"), testOrder.getDepositAmount());
+        assertFalse(testOrder.getDepositRefunded());
         verify(orderRepository).findById(orderId);
         verify(orderRepository).save(testOrder);
         verify(userRepository).save(testUser);
@@ -218,5 +200,51 @@ class BankCardPaymentControllerTest {
         assertEquals(400, response.getStatusCodeValue());
         assertEquals("User not found", response.getBody());
         verify(userRepository).findById(userId);
+    }
+
+    @Test
+    void processNewBankCardPayment_Success() {
+        // Arrange
+        BankCardPaymentRequest request = new BankCardPaymentRequest();
+        request.setBankCard("1234567890123456");
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processNewBankCardPayment(orderId, request);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(response.getBody() instanceof Map);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseMap = (Map<String, Object>) response.getBody();
+        assertEquals("Bank card payment successful", responseMap.get("message"));
+        assertEquals("BANK_CARD", testOrder.getPaymentMethod());
+        assertEquals(2, testOrder.getStatus());
+        assertFalse(testOrder.getDepositPaid());
+
+        verify(orderRepository).findById(orderId);
+        verify(orderRepository).save(testOrder);
+    }
+
+    @Test
+    void processNewBankCardPayment_InvalidOrderStatus() {
+        // Arrange
+        BankCardPaymentRequest request = new BankCardPaymentRequest();
+        request.setBankCard("1234567890123456");
+
+        testOrder.setStatus(2); // Already paid
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(testOrder));
+
+        // Act
+        ResponseEntity<?> response = bankCardPaymentController.processNewBankCardPayment(orderId, request);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("Invalid order status, cannot process payment", response.getBody());
+        verify(orderRepository).findById(orderId);
+        verifyNoMoreInteractions(orderRepository);
     }
 }

@@ -1,16 +1,8 @@
 <template>
   <div>
-
     <h2 class="title">All Users</h2>
     <div class="filter-container">
-      <div class="role-filter">
-        <label for="role-select">Filter by Role:</label>
-        <select id="role-select" v-model="roleFilter" @change="filterUsers">
-          <option value="0">Admin</option>
-          <option value="1">User</option>
-        </select>
-      </div>
-      <div class="status-filter" v-if="roleFilter === '1'">
+      <div class="status-filter">
         <label for="status-select">Filter by Status:</label>
         <select id="status-select" v-model="statusFilter" @change="filterUsers">
           <option value="1">Active</option>
@@ -31,7 +23,6 @@
           <img src="/static/center/search.png" alt="Search" class="search-icon">
         </button>
       </div>
-
     </div>
 
     <div class="table-container">
@@ -39,24 +30,19 @@
         <thead>
         <tr>
           <th>ID</th>
-          <th>Role</th>
           <th>Username</th>
           <th>Email</th>
           <th>Mobile</th>
           <th>Birthday</th>
           <th>Bank Card</th>
           <th>Frequent User</th>
+          <th>Special identity</th>
           <th>Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="user in filteredPaginatedUsers" :key="user.id">
           <td>{{ user.id }}</td>
-          <td>
-            <span :class="['role-label', getRoleClass(user.role)]">
-              {{ getRoleLabel(user.role) }}
-            </span>
-          </td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.mobile }}</td>
@@ -65,6 +51,14 @@
           <td>
             <span :class="['frequent-label', user.isFrequentUser ? 'frequent-yes' : 'frequent-no']">
               {{ user.isFrequentUser ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <span :class="['user-type',
+                          user.isStudent ? 'student' :
+                          user.isSenior ? 'senior' : 'none']">
+              {{ user.isStudent ? 'Student' :
+                user.isSenior ? 'Senior' : 'None' }}
             </span>
           </td>
           <td>
@@ -147,8 +141,7 @@ export default {
       itemsPerPage: 8,
       inputPage: 1,
       searchQuery: '',
-      statusFilter: '1',
-      roleFilter: '1' // Default to showing users
+      statusFilter: '1'
     };
   },
   computed: {
@@ -196,7 +189,6 @@ export default {
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = '1';
-      this.roleFilter = '1';
       this.filterUsers();
     },
     formatDate(dateString) {
@@ -211,9 +203,9 @@ export default {
       try {
         const res = await axios.get('http://localhost:8080/api/users/getAll');
         if (res.status === 200) {
-          console.log(res.data);
-          this.users = res.data;
-          this.filteredUsers = [...res.data];
+          // Filter out admin users (role=0) right after fetching
+          this.users = res.data.filter(user => user.role === 1);
+          this.filteredUsers = [...this.users];
           this.filterUsers();
         }
       } catch (error) {
@@ -227,7 +219,6 @@ export default {
       try {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-        // 检查token是否存在
         if (!token) {
           alert('Please login first');
           this.$router.push('/login');
@@ -268,20 +259,14 @@ export default {
     filterUsers() {
       const query = this.searchQuery.toLowerCase().trim();
       const statusFilter = this.statusFilter;
-      const roleFilter = this.roleFilter;
 
       this.filteredUsers = this.users.filter(user => {
-        // Role filter
-        if (user.role.toString() !== roleFilter) {
+        // Status filter
+        if (statusFilter !== 'all' && user.status.toString() !== statusFilter) {
           return false;
         }
 
-        // Status filter only applies to users (role=1)
-        if (roleFilter === '1' && statusFilter !== 'all' && user.status.toString() !== statusFilter) {
-          return false;
-        }
-
-        // If no search query, return all matching status and role
+        // If no search query, return all matching status
         if (!query) return true;
 
         // Search in all relevant fields
@@ -308,19 +293,6 @@ export default {
       this.currentPage = page;
       this.inputPage = page;
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-
-    getStatusLabel(status) {
-      return status ? 'Active' : 'Inactive';
-    },
-    getStatusClass(status) {
-      return status ? 'status-active' : 'status-inactive';
-    },
-    getRoleLabel(role) {
-      return role === 0 ? 'Admin' : 'User';
-    },
-    getRoleClass(role) {
-      return role === 0 ? 'role-admin' : 'role-user';
     }
   }
 };
@@ -490,7 +462,10 @@ export default {
   text-transform: uppercase;
 }
 
-
+.user-type {
+  padding: 4px 8px;
+  font-weight: 700;
+}
 
 /* Role Label Styles */
 .role-label {

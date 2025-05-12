@@ -107,37 +107,6 @@
         </div>
       </div>
 
-      <!-- Status row -->
-      <div class="form-row">
-        <div class="form-group col-6 col-md-6">
-          <label>Status</label>
-          <div class="checkbox-options">
-            <label class="checkbox-option">
-              <input
-                  type="checkbox"
-                  v-model="newScooter.status"
-                  :true-value="1"
-                  :false-value="0"
-                  class="checkbox-input"
-              >
-              <span class="checkmark"></span>
-              <span class="checkbox-label">Active</span>
-            </label>
-            <label class="checkbox-option">
-              <input
-                  type="checkbox"
-                  v-model="newScooter.status"
-                  :true-value="0"
-                  :false-value="1"
-                  class="checkbox-input"
-              >
-              <span class="checkmark"></span>
-              <span class="checkbox-label">Inactive</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
       <!-- Error message -->
       <div class="form-row" v-if="hasError && errorMessage">
         <el-alert
@@ -171,7 +140,6 @@ export default {
         priceFourHour: null,
         priceDay: null,
         priceWeek: null,
-        status: 1,
         battery: null,
         speed: null,
         storeId: null,
@@ -189,7 +157,6 @@ export default {
         priceFourHour: null,
         priceDay: null,
         priceWeek: null,
-        status: 1,
         battery: null,
         speed: null,
         storeId: null,

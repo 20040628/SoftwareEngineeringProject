@@ -9768,7 +9768,7 @@ if (uni.restoreGlobal) {
                       vue.createElementVNode(
                         "text",
                         { class: "speed-text" },
-                        vue.toDisplayString(scooter.speed || "0.00") + " m/s",
+                        vue.toDisplayString(scooter.speed || "0.00") + " km/h",
                         1
                         /* TEXT */
                       )

@@ -16,7 +16,7 @@
 						<view class="info">
 							<view class="chargin-type">
 								<image mode="widthFix" :src="speedImg" class="icon"></image>
-								<text class="speed-text">{{scooter.speed || '0.00'}} m/s</text>
+								<text class="speed-text">{{scooter.speed || '0.00'}} km/h</text>
 							</view>
 							<view class="chargin-type">
 								<image mode="widthFix" :src="batteryImg" class="icon"></image>

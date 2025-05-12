@@ -16,17 +16,6 @@
 
         <div
             class="payment-option"
-            :class="{ selected: selectedMethod === 'Alipay' }"
-            @click="handlePayment('Alipay')"
-        >
-          <div class="payment-icon">
-            <img src="/static/center/alipay.png" alt="Alipay" />
-          </div>
-          <span class="payment-label">Alipay</span>
-        </div>
-
-        <div
-            class="payment-option"
             :class="{ selected: selectedMethod === 'OtherBankcard' }"
             @click="handlePayment('OtherBankcard')"
         >
@@ -62,20 +51,7 @@ export default {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       const {orderId, userId} = this.$route.params;
 
-      if (method === 'Alipay') {
-        try {
-          const response = await axios.get(
-              `http://localhost:8080/alipay/pay/${orderId}`,
-              {headers: {Authorization: `Bearer ${token}`}}
-          );
-          const newWindow = window.open();
-          newWindow.document.write(response.data);
-        } catch (error) {
-          console.error("Alipay payment error:", error);
-          this.hasError = true;
-          this.errorMessage = 'Failed to initiate Alipay payment';
-        }
-      } else if (method === 'Card') {
+      if (method === 'Card') {
         try {
           const token = localStorage.getItem('token') || sessionStorage.getItem('token');
           const orderId = this.$route.params.orderId;
@@ -137,7 +113,7 @@ export default {
 
 .payment {
   width: 40vw;
-  min-height: 46vh;
+  min-height: 36vh;
   background-color: white;
   border: 2px solid #ccc;
   border-radius: 12px;

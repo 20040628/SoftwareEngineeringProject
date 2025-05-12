@@ -101,7 +101,6 @@ export default {
         cvc: '',
         expiryDate: ''
       },
-      user: null, // 用于存储用户信息
       errors: {},
       hasError: false,
       errorMessage: '',

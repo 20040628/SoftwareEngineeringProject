@@ -86,25 +86,9 @@ export default {
             return;
           }
 
-          // First get user's booking information to obtain bank card details
-          const bookingResponse = await axios.get('/api/bookings/getAll', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-
-          // Find the current order
-          const currentOrder = bookingResponse.data.find(order => order.id == orderId);
-          if (!currentOrder || !currentOrder.user?.bankCard) {
-            throw new Error('Bank card information not found');
-          }
-
-          // Prepare payment payload with bank card
-          const paymentPayload = {
-            bankCard: currentOrder.user.bankCard
-          };
 
           const res = await axios.post(
-              `http://localhost:8080/api/bank-payment/${orderId}`,
-              paymentPayload,  // This is the correct way to send data
+              `http://localhost:8080/api/bank-payment/${orderId}`, // This is the correct way to send data
               {
                 headers: {
                   'Authorization': `Bearer ${token}`,
@@ -134,7 +118,7 @@ export default {
       } else {
         this.$router.push({
           name: 'NewCard',
-          params: { orderId, userId }
+          params: { orderId }
         });
       }
     }

@@ -39,7 +39,8 @@
           <th>Price</th>
           <th>User Info</th>
           <th>Scooter Info</th>
-          <th v-if="showActionsColumn">Actions</th>
+          <th v-if="showActionsColumn">Pay</th>
+          <th v-if="showActionsColumn">Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -62,6 +63,11 @@
           <td>
             <div><strong>Location:</strong> {{ booking.scooter.location }}</div>
             <div><strong>Price/Hour:</strong> £{{ booking.scooter.priceHour.toFixed(2) }}</div>
+          </td>
+          <td v-if="booking.status === 1">
+            <button class="delete-btn" @click="payBooking(booking.id)">
+              <img src="/static/center/paybooking.png" alt="pay" style="width: 30px; height: 30px;">
+            </button>
           </td>
           <td v-if="booking.status === 1">
             <button class="delete-btn" @click="cancelBooking(booking.id)">
@@ -184,6 +190,9 @@ export default {
   },
 
   methods: {
+    payBooking(orderId) {
+      this.$router.push({ name: 'ChoosePayment', params: { orderId } });
+    },
     resetSearch() {
       this.searchQuery = '';
       this.statusFilter = '1';

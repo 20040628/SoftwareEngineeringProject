@@ -46,17 +46,12 @@ const routes = [
     ],
   },
   {
-    path: '/payment/:orderId/:userId',
-    name: 'Payment',
-    component: Payment,
-  },
-  {
-    path: '/NewCard/:orderId/:userId',
+    path: '/NewCard/:orderId',
     name: 'NewCard',
     component: NewCard,
   },
   {
-    path: '/ChoosePayment/:orderId/:userId',
+    path: '/ChoosePayment/:orderId',
     name: 'ChoosePayment',
     component: ChoosePayment,
   },

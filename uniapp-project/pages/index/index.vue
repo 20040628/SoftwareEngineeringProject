@@ -12,7 +12,7 @@
 					<uni-datetime-picker type="datetime" :hide-second="true" v-model="datetimesingle"
 						@change="changeLog" />
 				</view>
-				<view class="address-section" @click="goToSelectPage">
+				<view class="address-section" @click="goToSelectPage()">
 					<image src="/static/icons/location.png" class="icon" alt="Location icon" />
 					<view class="address">
 						<text class="title">Pick-up Position</text>
@@ -171,9 +171,9 @@
 				this.selectedDuration = index;
 			},
 
-			goToSelectPage() {
+			goToSelectPage(e) {
 				uni.navigateTo({
-					url: '/pages/map/map'
+					url: '/pages/chooseStore/chooseStore'
 				});
 			},
 			queryAvailableScooters() {
@@ -213,9 +213,16 @@
 				uni.setStorageSync('startTime', formattedStartDate);
 				uni.setStorageSync('endTime', formattedDate);
 				if(formattedStartDate && this.selectedSite){
-					uni.navigateTo({
-						url: '/pages/chooseCar/chooseCar'
-					});
+					if(new Date(formattedStartDate).getTime() > Date.now()){
+						uni.navigateTo({
+							url: '/pages/chooseCar/chooseCar'
+						});
+					}else{
+						uni.showToast({
+							title: 'The start time can not be earlier than current time',
+							icon: 'none'
+						})
+					}
 				}else{
 					uni.showToast({
 						title: 'Please select both date and store',

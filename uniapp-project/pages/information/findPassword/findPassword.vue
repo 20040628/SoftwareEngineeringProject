@@ -138,7 +138,7 @@
 
 					uni.showToast({
 						title: this.successMessage,
-						icon: 'success',
+						icon: 'none',
 						duration: 2000
 					})
 

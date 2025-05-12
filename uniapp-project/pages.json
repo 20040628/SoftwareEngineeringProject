@@ -159,6 +159,9 @@
 		},
 		{
 			"path": "pages/information/resetPassword/resetPassword"
+		},
+		{
+			"path": "pages/chooseStore/chooseStore"
 		}
 	],
 	"globalStyle": {

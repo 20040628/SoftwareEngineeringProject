@@ -52,16 +52,6 @@
 			<button @click="closeCardSelectModal">Close</button>
 		</view>
 	</view>
-	<view class="card-select-modal" v-if="showQuickCardModal">
-		<view class="card-options">
-			<view class="form-group">
-				<text class="label">Card Number<text class="required">*</text></text>
-				<input class="input-field" placeholder="Enter card number" v-model="quickCard" />
-			</view>
-			<button @click="submit()">submit</button>
-			<button @click="closeQuickCardModal">Close</button>
-		</view>
-	</view>
 
 </template>
 
@@ -136,7 +126,7 @@
 				if (this.selectedPaymentMethod) {
 					this.paymentSuccessful = true;
 					if (this.selectedPaymentMethod === 'card') {
-						this.showQuickCardModal = true;
+						this.submit();
 					}
 					if (this.selectedPaymentMethod === 'Alipay') {
 						this.showCardSelectModal = true;
@@ -243,9 +233,6 @@
 					const res = await uni.request({
 						url: `${this.$baseURL}/api/bank-payment/${this.orderId}`,
 						method: 'POST',
-						data: {
-							bankCard: this.quickCard
-						},
 						header: {
 							'Content-Type': 'application/json',
 							"Authorization": `Bearer ${token}`

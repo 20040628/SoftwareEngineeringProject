@@ -11,7 +11,7 @@
           <div class="payment-icon">
             <img src="/static/center/card.png" alt="Card" />
           </div>
-          <span class="payment-label">Default bank card</span>
+          <span class="payment-label">Quick Payment</span>
         </div>
 
         <div
@@ -44,7 +44,7 @@
 
 <script>
 import axios from 'axios';
-import { ElMessage } from 'element-plus';
+import {ElMessage, ElNotification} from 'element-plus';
 
 export default {
   data() {
@@ -60,13 +60,13 @@ export default {
       this.hasError = false;
 
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      const { orderId, userId } = this.$route.params;
+      const {orderId, userId} = this.$route.params;
 
       if (method === 'Alipay') {
         try {
           const response = await axios.get(
               `http://localhost:8080/alipay/pay/${orderId}`,
-              { headers: { Authorization: `Bearer ${token}` } }
+              {headers: {Authorization: `Bearer ${token}`}}
           );
           const newWindow = window.open();
           newWindow.document.write(response.data);
@@ -76,10 +76,61 @@ export default {
           this.errorMessage = 'Failed to initiate Alipay payment';
         }
       } else if (method === 'Card') {
-        this.$router.push({
-          name: 'Payment',
-          params: { orderId, userId }
-        });
+        try {
+          const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+          const orderId = this.$route.params.orderId;
+
+          if (!token) {
+            this.errorMessage = 'Please login first';
+            this.$router.push('/add_order');
+            return;
+          }
+
+          // First get user's booking information to obtain bank card details
+          const bookingResponse = await axios.get('/api/bookings/getAll', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          // Find the current order
+          const currentOrder = bookingResponse.data.find(order => order.id == orderId);
+          if (!currentOrder || !currentOrder.user?.bankCard) {
+            throw new Error('Bank card information not found');
+          }
+
+          // Prepare payment payload with bank card
+          const paymentPayload = {
+            bankCard: currentOrder.user.bankCard
+          };
+
+          const res = await axios.post(
+              `http://localhost:8080/api/bank-payment/${orderId}`,
+              paymentPayload,  // This is the correct way to send data
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+          );
+
+          if (res.status === 200 && res.data.success) {
+            ElNotification({
+              title: "Payment Successful",
+              message: `Quick payment successful`,
+              type: "success"
+            });
+            this.$router.push('/add_order');
+          } else {
+            throw new Error(res.data.message || 'Payment failed');
+          }
+
+        } catch (error) {
+          console.error('Payment Error:', error);
+          this.errorMessage = error.response?.data?.message ||
+              error.message ||
+              'Failed to process payment';
+          this.hasError = true;
+        }
       } else {
         this.$router.push({
           name: 'NewCard',

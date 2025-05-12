@@ -34,14 +34,12 @@ public class BankCardPaymentController {
     /**
      * 银行卡支付接口
      * @param orderId 订单ID
-     * @param request 支付请求（包含安全码）
      * @return 支付结果
      */
     @PostMapping("/{orderId}")
     @Transactional
     public ResponseEntity<?> processBankCardPayment(
-            @PathVariable Long orderId,
-            @Valid @RequestBody BankCardPaymentRequest request) {
+            @PathVariable Long orderId) {
         try {
             // 查找订单
             Order order = orderRepository.findById(orderId)
@@ -63,12 +61,7 @@ public class BankCardPaymentController {
             if (user.getBankBalance() == null || user.getBankBalance().compareTo(totalAmount) < 0) {
                 throw new IllegalArgumentException("Insufficient bank card balance, payment failed");
             }
-            
-            // 模拟银行卡支付验证 (验证卡号)
-            if (request.getBankCard() == null || !request.getBankCard().equals(user.getBankCard())) {
-                throw new IllegalArgumentException("Invalid bank card");
-            }
-            
+
             // 设置支付方式为银行卡
             order.setPaymentMethod("BANK_CARD");
             
